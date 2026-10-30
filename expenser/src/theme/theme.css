@@ -1,0 +1,44 @@
+/*
+  Expenser - Material 3 Expressive design tokens.
+  Colour roles (--md-*) are generated into colors.css from the green seed; everything else
+  (shape, motion, elevation, state layers, type) is declared here. src/theme/index.js applies a custom
+  seed at runtime by overriding the --md-* colour roles on <html>.
+*/
+@import "./colors.css";
+
+:root {
+  /* Fixed roles + money aliases (expense = error roles; income is generated, always green) */
+  --md-shadow: #000;
+  --md-scrim: #000;
+  --md-expense: var(--md-error);
+  --md-on-expense: var(--md-on-error);
+  --md-expense-container: var(--md-error-container);
+  --md-on-expense-container: var(--md-on-error-container);
+
+  /* Shape scale (M3 Expressive) */
+  --shape-xs: 4px;
+  --shape-sm: 8px;
+  --shape-md: 12px;
+  --shape-lg: 16px;
+  --shape-lg-inc: 20px;
+  --shape-xl: 28px;
+  --shape-xl-inc: 32px;
+  --shape-xxl: 48px;
+  --shape-full: 9999px;
+
+  /* Motion: spring-based "spatial" (slight overshoot, moves things) and "effects" (no overshoot, colour/opacity) */
+  --motion-spatial: linear(0, 0.198, 0.536, 0.81, 0.969, 1.034, 1.046, 1.034, 1.019, 1.007, 1.001, 0.998, 0.998, 0.999, 0.999, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  --motion-spatial-fast: linear(0, 0.159, 0.445, 0.701, 0.877, 0.974, 1.017, 1.028, 1.025, 1.017, 1.009, 1.004, 1.001, 1, 0.999, 0.999, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  --motion-effects: cubic-bezier(0.34, 0.8, 0.34, 1);
+  --motion-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Elevation (tonal surfaces do most of the work; shadows are for floating layers) */
+  --elev-1: 0 1px 2px 0 color-mix(in srgb, var(--md-shadow, #000) 30%, transparent), 0 1px 3px 1px color-mix(in srgb, var(--md-shadow, #000) 15%, transparent);
+  --elev-2: 0 1px 2px 0 color-mix(in srgb, #000 30%, transparent), 0 2px 6px 2px color-mix(in srgb, #000 15%, transparent);
+  --elev-3: 0 4px 8px 3px color-mix(in srgb, #000 15%, transparent), 0 1px 3px 0 color-mix(in srgb, #000 30%, transparent);
+
+  --state-hover: 0.08;
+  --state-focus: 0.1;
+  --state-press: 0.1;
+}
+.dark { --state-hover: 0.08; --state-focus: 0.1; --state-press: 0.12; }

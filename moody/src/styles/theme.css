@@ -1,0 +1,94 @@
+/* =====================================================================
+   Moody — Material 3 Expressive (2026) · bảng màu mặc định (teal)
+   ---------------------------------------------------------------------
+   • Seed teal #009688 → primary #006a60 (sáng) / #82d5c8 (tối); scheme TonalSpot, contrast 0.
+   • Hai khối màu bên dưới và src/lib/palettes.js (10 màu chủ đề chọn trong Cài đặt) được sinh tự động:
+       npm run gen:theme      (sửa danh sách SEEDS trong scripts/gen-theme.mjs để đổi/thêm màu)
+   • Màu chủ đề người dùng chọn được ghi đè lúc chạy bằng thẻ <style id="md-theme-override"> (src/lib/theme.js).
+   • Tên token theo chuẩn Material: --md-<role>. File index.css ánh xạ chúng sang các vai trò --c-*.
+   • Chế độ tối bật bằng class `.dark` trên <html>.
+   ===================================================================== */
+:root {
+  --md-primary: #006a60;
+  --md-on-primary: #ffffff;
+  --md-primary-container: #9ef2e4;
+  --md-on-primary-container: #005048;
+  --md-secondary: #4a635f;
+  --md-on-secondary: #ffffff;
+  --md-secondary-container: #cce8e2;
+  --md-on-secondary-container: #334b47;
+  --md-tertiary: #456179;
+  --md-on-tertiary: #ffffff;
+  --md-tertiary-container: #cce5ff;
+  --md-on-tertiary-container: #2d4961;
+  --md-error: #ba1a1a;
+  --md-on-error: #ffffff;
+  --md-error-container: #ffdad6;
+  --md-on-error-container: #93000a;
+  --md-surface: #f4fbf8;
+  --md-surface-dim: #d5dbd9;
+  --md-surface-container-lowest: #ffffff;
+  --md-surface-container-low: #eff5f2;
+  --md-surface-container: #e9efed;
+  --md-surface-container-high: #e3eae7;
+  --md-surface-container-highest: #dde4e1;
+  --md-on-surface: #161d1c;
+  --md-on-surface-variant: #3f4947;
+  --md-outline: #6f7977;
+  --md-outline-variant: #bec9c6;
+  --md-inverse-surface: #2b3230;
+  --md-inverse-on-surface: #ecf2ef;
+  --md-inverse-primary: #82d5c8;
+
+  /* ---- Shape scale (M3 Expressive) ---- */
+  --shape-xs: 4px;
+  --shape-sm: 8px;
+  --shape-md: 12px;
+  --shape-lg: 16px;
+  --shape-lg-inc: 20px;
+  --shape-xl: 28px;
+  --shape-xl-inc: 32px;
+  --shape-xxl: 48px;
+  --shape-full: 9999px;
+
+  /* ---- Motion (M3 Expressive springs) ----
+     spatial = có nảy nhẹ (vị trí, kích thước, hình dạng) · effects = mượt, không nảy (màu, độ mờ) */
+  --spring-fast-spatial: cubic-bezier(0.42, 1.67, 0.21, 0.9);
+  --spring-default-spatial: cubic-bezier(0.38, 1.21, 0.22, 1);
+  --spring-slow-spatial: cubic-bezier(0.39, 1.29, 0.35, 0.98);
+  --spring-fast-effects: cubic-bezier(0.31, 0.94, 0.34, 1);
+  --spring-default-effects: cubic-bezier(0.34, 0.8, 0.34, 1);
+}
+
+.dark {
+  --md-primary: #82d5c8;
+  --md-on-primary: #003731;
+  --md-primary-container: #005048;
+  --md-on-primary-container: #9ef2e4;
+  --md-secondary: #b1ccc6;
+  --md-on-secondary: #1c3531;
+  --md-secondary-container: #334b47;
+  --md-on-secondary-container: #cce8e2;
+  --md-tertiary: #adcae6;
+  --md-on-tertiary: #153349;
+  --md-tertiary-container: #2d4961;
+  --md-on-tertiary-container: #cce5ff;
+  --md-error: #ffb4ab;
+  --md-on-error: #690005;
+  --md-error-container: #93000a;
+  --md-on-error-container: #ffdad6;
+  --md-surface: #0e1513;
+  --md-surface-dim: #0e1513;
+  --md-surface-container-lowest: #090f0e;
+  --md-surface-container-low: #161d1c;
+  --md-surface-container: #1a2120;
+  --md-surface-container-high: #252b2a;
+  --md-surface-container-highest: #303635;
+  --md-on-surface: #dde4e1;
+  --md-on-surface-variant: #bec9c6;
+  --md-outline: #899390;
+  --md-outline-variant: #3f4947;
+  --md-inverse-surface: #dde4e1;
+  --md-inverse-on-surface: #2b3230;
+  --md-inverse-primary: #006a60;
+}

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="vi" data-color="rose">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Cho phép phóng to (trợ năng): không đặt maximum-scale / user-scalable=no -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Calendar Pro - Lịch Âm Dương &amp; Vạn Niên Việt Nam</title>
+    <meta name="description" content="Calendar Pro: tra cứu lịch âm dương, lịch vạn niên, đếm ngược ngày lễ nổi bật, ngày chay và ngày rằm tại Việt Nam." />
+    <!-- Giá trị khởi đầu theo hệ điều hành; script bên dưới đổi thành 1 thẻ duy nhất theo giao diện đã lưu trong app -->
+    <meta name="theme-color" content="#F7F4F5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0F1217" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Calendar Pro" />
+    <meta name="application-name" content="Calendar Pro" />
+    <meta name="keywords" content="lịch âm dương, lịch vạn niên, ngày chay, ngày rằm, đếm ngược ngày lễ, can chi, giờ hoàng đạo, lunar calendar vietnam" />
+    <meta name="author" content="minhtrong67" />
+    <!-- Open Graph / Twitter: ảnh chia sẻ chuẩn 1200×630 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Calendar Pro" />
+    <meta property="og:title" content="Calendar Pro - Lịch Âm Dương &amp; Vạn Niên Việt Nam" />
+    <meta property="og:description" content="Tra cứu lịch âm dương, lịch vạn niên, đếm ngược ngày lễ nổi bật, ngày chay và ngày rằm tại Việt Nam." />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Calendar Pro - Lịch Âm Dương &amp; Vạn Niên Việt Nam" />
+    <meta name="twitter:description" content="Tra cứu lịch âm dương, lịch vạn niên, đếm ngược ngày lễ nổi bật, ngày chay và ngày rằm tại Việt Nam." />
+    <meta name="twitter:image" content="/og-image.png" />
+
+    <!-- Favicon: SVG (trình duyệt hiện đại, nét ở mọi kích thước) + ICO 16/32/48 + PNG dự phòng -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
+    <!-- iOS: ảnh vuông đầy khung, không trong suốt (iOS tự bo góc) -->
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-touch-icon-120.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/apple-touch-icon-167.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png" />
+
+    <!-- Khởi động: vẽ đúng nền sáng/tối NGAY từ khung hình đầu tiên, trước cả khi file CSS/JS của app tải xong.
+         (Màn hình chờ này nằm trong #root và tự biến mất khi React vẽ lần đầu.) -->
+    <style id="boot-style">
+      html { background: #F7F4F5; color-scheme: light; --boot-fg: #0A0A0B; --boot-dim: #A1A1AA; }
+      html.dark { background: #0F1217; color-scheme: dark; --boot-fg: #F4F4F5; --boot-dim: #52525B; }
+      html, body, #root { height: 100%; margin: 0; }
+      .boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: inherit; color: var(--boot-fg); }
+      .boot svg { width: 44px; height: 44px; animation: boot-in 0.4s ease-out 0.1s both; }
+      .boot .dim { color: var(--boot-dim); }
+      @keyframes boot-in { from { opacity: 0; } to { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) { .boot svg { animation: none; } }
+    </style>
+    <script>
+      (function () {
+        var d = document.documentElement;
+        var s = {};
+        try {
+          // Đọc cài đặt mới; nếu chưa có thì dùng khoá cũ ("lich-pro") của phiên bản trước khi đổi tên project
+          s = JSON.parse(localStorage.getItem('calendar-pro:settings') || localStorage.getItem('lich-pro:settings') || '{}') || {};
+        } catch (e) {}
+        var dark = false;
+        try {
+          // Tính ngoài khối try ở trên: dù localStorage bị chặn (chế độ riêng tư...) vẫn theo đúng hệ điều hành
+          dark = s.themeMode === 'dark' || ((s.themeMode || 'system') === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        } catch (e) {}
+        var ids = ['mono', 'rose', 'do', 'vang', 'xanh-la', 'xanh-duong', 'tim', 'hong', 'cam', 'ngoc-lam'];
+        var color = s.color === 'm3' ? 'rose' : (ids.indexOf(s.color) > -1 ? s.color : 'rose');
+        if (s.dailyColorRotation) {
+          var n = new Date();
+          color = ids[(n.getFullYear() * 372 + n.getMonth() * 31 + n.getDate()) % ids.length];
+        }
+        var scales = { nho: 0.925, vua: 1, lon: 1.08, 'rat-lon': 1.16 };
+        d.classList.toggle('dark', dark);
+        d.style.colorScheme = dark ? 'dark' : 'light';
+        d.setAttribute('data-color', color);
+        if (scales[s.fontSize]) d.style.setProperty('--font-scale', scales[s.fontSize]);
+        try {
+          // Chỉ giữ 1 thẻ theme-color (bỏ media) để thanh trạng thái theo đúng giao diện của app, không theo hệ điều hành
+          var metas = document.querySelectorAll('meta[name="theme-color"]');
+          for (var i = 1; i < metas.length; i++) metas[i].parentNode.removeChild(metas[i]);
+          if (metas[0]) {
+            metas[0].removeAttribute('media');
+            metas[0].setAttribute('content', dark ? '#0F1217' : '#F7F4F5');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Bộ icon nét mảnh (Material Symbols Outlined): chỉ tải đúng các icon đang dùng (vài KB thay vì ~4 MB); nếu lỗi thì dùng bản đầy đủ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&icon_names=account_balance,alarm,arrow_drop_down,auto_awesome,auto_stories,autorenew,bedtime,cake,calendar_month,celebration,check,check_box,check_box_outline_blank,check_circle,chevron_left,chevron_right,child_care,close,cruelty_free,dark_mode,devices,eco,engineering,error,event,expand_more,explore_off,favorite,flag,help,home,hourglass_top,info,install_mobile,light_mode,local_fire_department,local_florist,menu,military_tech,notifications,notifications_active,park,progress_activity,refresh,restart_alt,schedule,school,search,sell,settings,shield,shuffle,swap_horiz,today,translate,volunteer_activism,warning,wb_sunny&display=block"
+      onerror="this.onerror=null;this.href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block'"
+    />
+  </head>
+  <body>
+    <div id="root">
+      <div class="boot" role="status" aria-label="Calendar Pro">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <rect x="3.5" y="5" width="17" height="15.5" rx="3.5" />
+          <path d="M3.5 10h17M8 3v3.5M16 3v3.5" />
+          <circle cx="12" cy="15.2" r="1.6" fill="currentColor" stroke="none" />
+        </svg>
+      </div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

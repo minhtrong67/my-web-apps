@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  
+  <!-- Icons -->
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+  <!-- Primary SEO -->
+  <title>Expenser — Quản lý chi tiêu cá nhân thông minh | Smart expense tracker</title>
+  <meta name="description"
+    content="Expenser: ứng dụng quản lý thu chi cá nhân miễn phí, mã nguồn mở. Theo dõi nhiều ví, thống kê trực quan, xuất báo cáo PDF/Excel, giao diện Material 3 Expressive, song ngữ Việt - Anh, dùng được offline." />
+  <meta name="keywords"
+    content="quản lý chi tiêu, nhắc nhở ghi chép chi tiêu, quản lý thu chi, sổ thu chi, ứng dụng tài chính cá nhân, ghi chép chi tiêu, expense tracker, personal finance app, budget tracker, Material 3 Expressive, PWA" />
+  <meta name="author" content="minhtrong67" />
+  <meta name="application-name" content="Expenser" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <meta name="googlebot" content="index, follow" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="generator" content="Vite + React" />
+  <link rel="canonical" href="https://expenser-quan-ly-chi-tieu.vercel.app/" />
+  <link rel="alternate" hreflang="vi" href="https://expenser-quan-ly-chi-tieu.vercel.app/" />
+  <link rel="alternate" hreflang="en" href="https://expenser-quan-ly-chi-tieu.vercel.app/" />
+  <link rel="alternate" hreflang="x-default" href="https://expenser-quan-ly-chi-tieu.vercel.app/" />
+
+  <!-- PWA / mobile home-screen -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Expenser" />
+  <meta name="msapplication-TileImage" content="/icons/icon-192.png" />
+
+  <!-- Open Graph (Facebook, Zalo, Messenger, LinkedIn...) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Expenser" />
+  <meta property="og:url" content="https://expenser-quan-ly-chi-tieu.vercel.app/" />
+  <meta property="og:title" content="Expenser — Quản lý chi tiêu cá nhân thông minh" />
+  <meta property="og:description"
+    content="Theo dõi thu chi, quản lý nhiều ví, thống kê trực quan và xuất báo cáo. giao diện Material 3 Expressive, đổi màu chủ đạo, song ngữ Việt - Anh, mã nguồn mở." />
+  <meta property="og:image" content="https://expenser-quan-ly-chi-tieu.vercel.app/og-image.png" />
+  <meta property="og:image:secure_url" content="https://expenser-quan-ly-chi-tieu.vercel.app/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt"
+    content="Expenser - ứng dụng quản lý chi tiêu cá nhân: tổng quan thu chi, biểu đồ và nhắc nhở hàng ngày" />
+  <meta property="og:locale" content="vi_VN" />
+  <meta property="og:locale:alternate" content="en_US" />
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://expenser-quan-ly-chi-tieu.vercel.app/" />
+  <meta name="twitter:title" content="Expenser — Quản lý chi tiêu cá nhân thông minh" />
+  <meta name="twitter:description"
+    content="Theo dõi thu chi, quản lý ví, thống kê và báo cáo. giao diện Material 3 Expressive, song ngữ Việt - Anh, mã nguồn mở." />
+  <meta name="twitter:image" content="https://expenser-quan-ly-chi-tieu.vercel.app/og-image.png" />
+  <meta name="twitter:image:alt" content="Expenser - ứng dụng quản lý chi tiêu cá nhân" />
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Expenser",
+        "alternateName": "Expenser - Quản lý chi tiêu cá nhân",
+        "url": "https://expenser-quan-ly-chi-tieu.vercel.app/",
+        "description": "Free, open-source personal expense tracker with multiple wallets, statistics, PDF/Excel reports and a Material 3 Expressive interface. Ứng dụng quản lý thu chi cá nhân miễn phí, mã nguồn mở.",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Any (Web, PWA)",
+        "browserRequirements": "Requires JavaScript",
+        "inLanguage": ["vi", "en"],
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "VND" },
+        "license": "https://opensource.org/licenses/MIT",
+        "author": { "@type": "Person", "name": "minhtrong67" },
+        "image": "https://expenser-quan-ly-chi-tieu.vercel.app/og-image.png"
+      }
+    </script>
+  <!-- First-paint theme + splash: runs before any JS bundle so the PWA never opens on a blank screen -->
+  <script>
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem('qlct:settings') || '{}');
+        var m = s.themeMode || 'system';
+        var dark = m === 'dark' || (m === 'system' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+        var el = document.documentElement;
+        if (dark) el.classList.add('dark');
+        var meta = document.createElement('meta');
+        meta.name = 'theme-color';
+        meta.content = dark ? '#0e150c' : '#f3fcec';
+        document.head.appendChild(meta);
+      } catch (e) { /* storage unavailable */ }
+    })();
+  </script>
+  <style>
+    html { background: #f3fcec; color-scheme: light; }
+    html.dark { background: #0e150c; color-scheme: dark; }
+    html.dark .splash-spinner { background: #00e546; }
+    body { margin: 0; }
+    /* Shared by this static splash and the React <SplashScreen /> (same look = no flicker on hand-over) */
+    .splash {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+    .splash-logo { width: 96px; height: 96px; border-radius: 28px; user-select: none; -webkit-user-drag: none; animation: splash-in 400ms cubic-bezier(0.2, 0, 0, 1) both; }
+    .splash-spinner {
+      width: 48px; height: 48px; background: #006e1c;
+      animation: splash-morph 2.4s cubic-bezier(0.2, 0, 0, 1) infinite, splash-spin 4.8s linear infinite;
+    }
+    @keyframes splash-spin { to { transform: rotate(360deg); } }
+    @keyframes splash-morph { 0%,100% { border-radius: 50%; } 25% { border-radius: 28% 72% 28% 72% / 72% 28% 72% 28%; } 50% { border-radius: 22%; } 75% { border-radius: 72% 28% 72% 28% / 28% 72% 28% 72%; } }
+    @keyframes splash-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { .splash-logo { animation: none; } .splash-spinner { animation-duration: 1800ms; } }
+  </style>
+</head>
+
+<body>
+  <div id="root">
+    <!-- Replaced automatically when React renders -->
+    <div class="splash" role="status" aria-label="Loading">
+      <img class="splash-logo" src="/icons/icon-192.png" width="96" height="96" alt="" draggable="false" />
+      <div class="splash-spinner"></div>
+    </div>
+  </div>
+  <noscript>
+    <main
+      style="font-family: system-ui, sans-serif; max-width: 640px; margin: 15vh auto; padding: 0 24px; line-height: 1.6">
+      <h1>Expenser</h1>
+      <p>Quản lý chi tiêu cá nhân: theo dõi thu chi, ví và thống kê. Vui lòng bật JavaScript để sử dụng ứng dụng.</p>
+      <p>Personal expense tracker: income &amp; expenses, wallets and statistics. Please enable JavaScript to use the
+        app.</p>
+    </main>
+  </noscript>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>

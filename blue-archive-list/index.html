@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" id="tc" content="#eaf3ff">
+<script>/* Áp theme TRƯỚC khi vẽ trang để không bị nháy sáng/tối khi reload */
+(function(){try{var c=JSON.parse(localStorage.getItem('ba-cfg')||'{}'),r=document.documentElement,
+d=c.theme==='dark'||((c.theme||'system')==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);
+r.dataset.theme=d?'dark':'light';r.dataset.ff=c.ff||'sans';if(c.motion===0)r.dataset.motion='off';
+if(c.ac){r.style.setProperty('--ac',c.ac);r.style.setProperty('--onac',c.onac||'#fff')}
+if(c.fs)r.style.setProperty('--fs',c.fs+'px');
+document.getElementById('tc').content=d?'#0b1322':'#eaf3ff';
+if(sessionStorage.getItem('ba-s'))r.className='nosplash'}catch(e){}})();</script>
+<title>Blue Archive List – Danh sách học sinh Blue Archive, tìm kiếm & lọc nhanh</title>
+<meta name="description" content="Tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, lọc theo trường, vai trò, vũ khí, địa hình, sắp xếp và xem chi tiết. Hoạt động offline, không cần đăng nhập.">
+<meta name="keywords" content="Blue Archive, ブルーアーカイブ, danh sách học sinh, nhân vật, student list, wiki, SRT, Abydos, Gehenna, Trinity">
+<meta name="author" content="minhtrong67">
+<meta name="application-name" content="Blue Archive List">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="format-detection" content="telephone=no">
+<link rel="canonical" href="https://minhtrong67.github.io/blue-archive-list/">
+<link rel="alternate" hreflang="vi" href="https://minhtrong67.github.io/blue-archive-list/">
+<link rel="alternate" hreflang="x-default" href="https://minhtrong67.github.io/blue-archive-list/">
+<!-- Open Graph (Facebook, Zalo, Messenger, Discord, Telegram, LinkedIn…) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://minhtrong67.github.io/blue-archive-list/">
+<meta property="og:site_name" content="Blue Archive List">
+<meta property="og:title" content="Blue Archive List – Danh sách học sinh Blue Archive">
+<meta property="og:description" content="Tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, bộ lọc, xem chi tiết. Nhanh, đẹp, chạy offline, không cần đăng nhập.">
+<meta property="og:image" content="https://minhtrong67.github.io/blue-archive-list/og-image.png">
+<meta property="og:image:secure_url" content="https://minhtrong67.github.io/blue-archive-list/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Blue Archive List – logo halo trên nền xanh dương">
+<meta property="og:locale" content="vi_VN">
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Blue Archive List – Danh sách học sinh Blue Archive">
+<meta name="twitter:description" content="Tìm kiếm, lọc và xem chi tiết toàn bộ học sinh Blue Archive. Nhanh, đẹp, chạy offline.">
+<meta name="twitter:image" content="https://minhtrong67.github.io/blue-archive-list/og-image.png">
+<meta name="twitter:image:alt" content="Blue Archive List – logo halo trên nền xanh dương">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BA List">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://static.wikitide.net" crossorigin>
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Blue Archive List","url":"https://minhtrong67.github.io/blue-archive-list/","image":"https://minhtrong67.github.io/blue-archive-list/og-image.png","description":"Danh sách và tra cứu học sinh Blue Archive: tìm kiếm thông minh, bộ lọc, xem chi tiết, hoạt động offline.","applicationCategory":"GameApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","inLanguage":"vi","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","author":{"@type":"Person","name":"minhtrong67","url":"https://github.com/minhtrong67"}}</script>
+</head>
+<body>
+<div id="splash" aria-hidden="true"><div class="sp">
+  <svg class="sl" viewBox="0 0 64 64"><circle class="r1" cx="32" cy="32" r="22"/><circle class="r3" cx="32" cy="32" r="29"/><path class="r2" d="M6 24 L58 11 M6 41 L58 54"/></svg>
+  <b>Blue Archive <span>List</span></b><div class="bar"><i></i></div><small>Đang tải dữ liệu học sinh…</small></div></div>
+<header class="top">
+  <div class="logo"><svg viewBox="0 0 32 32" width="30" height="30"><circle cx="16" cy="16" r="11" style="stroke-width:3"/><path d="M5 12 L27 6 M5 20 L27 26"/></svg><b>Blue Archive <span>List</span></b></div>
+  <label class="search"><svg viewBox="0 0 24 24" width="18" height="18"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+    <input id="q" type="text" inputmode="search" placeholder="Tìm tên, họ tên, seiyuu…  VD: school:abydos age>16" autocomplete="off" spellcheck="false" aria-label="Tìm kiếm">
+    <kbd>/</kbd><button id="qc" class="cl" hidden aria-label="Xóa tìm kiếm"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M6 6l12 12M18 6L6 18"/></svg></button></label>
+  <div class="ctl">
+    <label class="sel"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg><select id="sort" aria-label="Sắp xếp"></select></label>
+    <button class="btn" id="dir" title="Đổi chiều sắp xếp"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 19V5M5 12l7-7 7 7"/></svg><span></span></button>
+    <button class="btn ic" id="view" title="Đổi kiểu hiển thị"></button>
+    <button class="btn ic only-m" id="fbtn" title="Bộ lọc" aria-label="Bộ lọc" aria-expanded="false"></button>
+  </div>
+  <button class="btn ic pri" id="set" title="Cài đặt" aria-label="Cài đặt"></button>
+</header>
+<div class="wrap">
+  <div id="scrim"></div>
+  <aside id="side" aria-label="Bộ lọc">
+    <div class="grip" data-drag></div>
+    <div class="side-h"><h2>Bộ lọc</h2><button class="btn" id="reset">Xóa lọc</button><button class="btn ic only-m" data-sclose aria-label="Đóng bộ lọc"><svg viewBox="0 0 24 24" width="17" height="17"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="groups"></div>
+    <div class="side-f"><button class="btn pri" id="sapply" data-sclose>Xem kết quả</button></div>
+  </aside>
+  <main><p id="count" class="count" aria-live="polite"></p><div id="active" class="act"></div><div id="list" class="grid"></div></main>
+</div>
+<button id="up" class="btn ic pri" aria-label="Lên đầu trang"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+<dialog id="dlg"></dialog><dialog id="cfg"></dialog><div id="toasts"><div class="tl" aria-live="polite"></div></div>
+<noscript><p style="padding:20px">Trang cần bật JavaScript để hiển thị danh sách học sinh Blue Archive.</p></noscript>
+<script>document.getElementById('list').innerHTML=Array(12).fill('<div class="card sk"><div class="ph"></div><div class="ci"><i></i><i></i><i></i></div></div>').join('')</script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

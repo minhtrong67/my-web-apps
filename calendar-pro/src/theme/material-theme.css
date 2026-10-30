@@ -1,0 +1,152 @@
+/* ===========================================================================
+   TỰ ĐỘNG SINH bởi scripts/generate-theme.mjs từ material-theme.json — đừng sửa tay.
+   Seed color: #769CDF
+   =========================================================================== */
+
+/* Thang màu accent (palettes.primary) — dùng cho bóng, viền, trạng thái phụ */
+html[data-color='m3'] {
+  --accent-50: #ECF0FF;
+  --accent-100: #D6E3FF;
+  --accent-200: #AAC7FF;
+  --accent-300: #86ACF0;
+  --accent-400: #6B91D3;
+  --accent-500: #5177B8;
+  --accent-600: #365E9D;
+  --accent-700: #194683;
+  --accent-800: #002F64;
+  --accent-900: #001B3E;
+}
+/* Nền tối: các sắc độ chính đều dùng tông sáng (primary tối = tone 80) */
+html.dark[data-color='m3'] {
+  --accent-400: #AAC7FF;
+  --accent-500: #AAC7FF;
+  --accent-600: #AAC7FF;
+}
+
+/* Sáng */
+html[data-color='m3'] {
+  --primary: #415F91;
+  --on-primary: #FFFFFF;
+  --primary-container: #D6E3FF;
+  --on-primary-container: #284777;
+  --secondary-container: #DAE2F9;
+  --on-secondary-container: #3E4759;
+  --tertiary: #705575;
+  --on-tertiary: #FFFFFF;
+  --tertiary-container: #FAD8FD;
+  --on-tertiary-container: #573E5C;
+  --error: #BA1A1A;
+  --on-error: #FFFFFF;
+  --error-container: #FFDAD6;
+  --on-error-container: #93000A;
+  --surface: #F9F9FF;
+  --surface-lowest: #FFFFFF;
+  --surface-low: #F3F3FA;
+  --surface-container: #EDEDF4;
+  --surface-high: #E7E8EE;
+  --surface-highest: #E2E2E9;
+  --ink: #191C20;
+  --ink-soft: #44474E;
+  --outline: #74777F;
+  --outline-variant: #C4C6D0;
+  --inverse-surface: #2E3036;
+  --inverse-on-surface: #F0F0F7;
+  --inverse-primary: #AAC7FF;
+  --ink-faint: color-mix(in srgb, #44474E 82%, #F9F9FF);
+}
+
+/* Tối */
+html.dark[data-color='m3'] {
+  --primary: #AAC7FF;
+  --on-primary: #0A305F;
+  --primary-container: #284777;
+  --on-primary-container: #D6E3FF;
+  --secondary-container: #3E4759;
+  --on-secondary-container: #DAE2F9;
+  --tertiary: #DDBCE0;
+  --on-tertiary: #3F2844;
+  --tertiary-container: #573E5C;
+  --on-tertiary-container: #FAD8FD;
+  --error: #FFB4AB;
+  --on-error: #690005;
+  --error-container: #93000A;
+  --on-error-container: #FFDAD6;
+  --surface: #111318;
+  --surface-lowest: #0C0E13;
+  --surface-low: #191C20;
+  --surface-container: #1D2024;
+  --surface-high: #282A2F;
+  --surface-highest: #33353A;
+  --ink: #E2E2E9;
+  --ink-soft: #C4C6D0;
+  --outline: #8E9099;
+  --outline-variant: #44474E;
+  --inverse-surface: #E2E2E9;
+  --inverse-on-surface: #2E3036;
+  --inverse-primary: #415F91;
+  --ink-faint: color-mix(in srgb, #C4C6D0 82%, #111318);
+}
+
+/* Tương phản cao (theo cài đặt của hệ điều hành) */
+@media (prefers-contrast: more) {
+  html[data-color='m3'] {
+    --primary: #032B5B;
+    --on-primary: #FFFFFF;
+    --primary-container: #2A497A;
+    --on-primary-container: #FFFFFF;
+    --secondary-container: #41495B;
+    --on-secondary-container: #FFFFFF;
+    --tertiary: #3A2440;
+    --on-tertiary: #FFFFFF;
+    --tertiary-container: #59405E;
+    --on-tertiary-container: #FFFFFF;
+    --error: #600004;
+    --on-error: #FFFFFF;
+    --error-container: #98000A;
+    --on-error-container: #FFFFFF;
+    --surface: #F9F9FF;
+    --surface-lowest: #FFFFFF;
+    --surface-low: #F0F0F7;
+    --surface-container: #E2E2E9;
+    --surface-high: #D3D4DB;
+    --surface-highest: #C5C6CD;
+    --ink: #000000;
+    --ink-soft: #000000;
+    --outline: #292C33;
+    --outline-variant: #464951;
+    --inverse-surface: #2E3036;
+    --inverse-on-surface: #FFFFFF;
+    --inverse-primary: #AAC7FF;
+    --ink-faint: color-mix(in srgb, #000000 82%, #F9F9FF);
+  }
+  html.dark[data-color='m3'] {
+    --primary: #EBF0FF;
+    --on-primary: #000000;
+    --primary-container: #A6C3FC;
+    --on-primary-container: #000B20;
+    --secondary-container: #BAC3D8;
+    --on-secondary-container: #030B1A;
+    --tertiary: #FFE9FF;
+    --on-tertiary: #000000;
+    --tertiary-container: #D8B8DC;
+    --on-tertiary-container: #16041D;
+    --error: #FFECE9;
+    --on-error: #000000;
+    --error-container: #FFAEA4;
+    --on-error-container: #220001;
+    --surface: #111318;
+    --surface-lowest: #000000;
+    --surface-low: #1D2024;
+    --surface-container: #2E3036;
+    --surface-high: #393B41;
+    --surface-highest: #45474C;
+    --ink: #FFFFFF;
+    --ink-soft: #FFFFFF;
+    --outline: #EEEFF9;
+    --outline-variant: #C0C2CC;
+    --inverse-surface: #E2E2E9;
+    --inverse-on-surface: #000000;
+    --inverse-primary: #294878;
+    --ink-faint: color-mix(in srgb, #FFFFFF 82%, #111318);
+  }
+}

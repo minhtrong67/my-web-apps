@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://minhtrong67.github.io/blue-archive-list/sitemap.xml

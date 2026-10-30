@@ -1,0 +1,4 @@
+{ "routes": [
+  { "src": "/landing.html", "status": 308, "headers": { "Location": "/welcome" } },
+  { "src": "/[^.]+", "dest": "/", "status": 200 }
+] }
