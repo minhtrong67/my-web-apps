@@ -6,7 +6,7 @@ import { useExitTransition } from "../hooks/useExitTransition";
 import { useModal } from "../hooks/useModal";
 
 /**
- * Bottom sheet: nền surface, viền mảnh, bo góc trên 16px, tay cầm 32×4.
+ * Bottom sheet Expressive: nền tonal, bo góc trên 28px, tay cầm 32×4; vào bằng spring nảy nhẹ.
  * Có animation vào/ra, vuốt xuống ở phần tay cầm để đóng (cảm ứng), Esc/scrim để đóng,
  * giữ focus trong sheet và trả focus về nút đã mở nó.
  */
@@ -43,7 +43,7 @@ export default function Sheet({ open, onClose, title, children }) {
       el.style.transform = "";
       onClose();
     } else {
-      el.style.transition = "transform 0.25s var(--ease-decel)";
+      el.style.transition = "transform var(--dur-spatial) var(--ease-spatial)";
       el.style.transform = "translateY(0)";
       setTimeout(() => {
         if (panelRef.current) {
@@ -70,7 +70,7 @@ export default function Sheet({ open, onClose, title, children }) {
       <div
         ref={panelRef}
         tabIndex={-1}
-        className={`${closing ? "animate-drawer-down" : "animate-drawer-up"} relative z-10 flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-2xl border border-b-0 border-outline-variant bg-card shadow-elevated outline-none md:max-h-[85dvh] md:max-w-lg md:rounded-2xl md:border-b`}
+        className={`${closing ? "animate-drawer-down" : "animate-drawer-up"} relative z-10 flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-[28px] bg-surface-low shadow-elevated outline-none md:max-h-[85dvh] md:max-w-lg md:rounded-[28px]`}
       >
         <div
           className="shrink-0 touch-none"
@@ -81,13 +81,13 @@ export default function Sheet({ open, onClose, title, children }) {
         >
           <div className="mx-auto mt-3 h-1 w-8 rounded-full bg-outline/50 md:hidden" aria-hidden="true" />
           <div className="flex items-center justify-between pb-1 pl-5 pr-2 pt-3 md:pt-4">
-            <h2 className="text-title-lg text-ink">{title}</h2>
+            <h2 className="text-title-lg text-on-surface">{title}</h2>
             <button
               onClick={onClose}
-              className="state focus-ring flex h-10 w-10 items-center justify-center rounded-lg text-ink-soft"
+              className="state morph focus-ring flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant"
               aria-label={t("common.close")}
             >
-              <Icon name="close" size={22} />
+              <Icon name="close" size={24} />
             </button>
           </div>
         </div>

@@ -35,7 +35,7 @@ export default function Sheet({ open, onClose, title, variant = 'full', children
           </div>
           {title && <h2 className="px-6 pt-2 pb-3 text-lg font-bold tracking-tight">{title}</h2>}
           <div className="px-3 pb-4 overflow-y-auto overscroll-contain-y">{children}</div>
-          {footer && <div className="px-6 pb-5 flex flex-wrap justify-end gap-2">{footer}</div>}
+          {footer && <div className="px-6 pb-5 grid grid-cols-2 gap-3 [&>*]:w-full">{footer}</div>}
         </div>
       </div>,
       document.body,
@@ -66,7 +66,7 @@ export default function Sheet({ open, onClose, title, variant = 'full', children
       </div>
       {footer && (
         <footer className="shrink-0 bg-[var(--md-surface-container)] pb-[env(safe-area-inset-bottom)]">
-          <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-3 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">{footer}</div>
+          <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-3 grid grid-cols-2 gap-3 [&>*]:w-full">{footer}</div>
         </footer>
       )}
     </div>,

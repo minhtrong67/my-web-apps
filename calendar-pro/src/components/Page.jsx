@@ -14,13 +14,13 @@ export function Page({ children, wide = false, className = '' }) {
   )
 }
 
-/** Tiêu đề trang: căn thẳng lề với nội dung bên dưới, không trang trí thêm. */
+/** Tiêu đề trang Expressive: chữ lớn, đậm, tracking âm; chữ đầu hạ độ đậm dần xuống phụ đề. */
 export function PageHeader({ title, subtitle, children }) {
   return (
     <header className="mb-6 flex items-end justify-between gap-4 sm:mb-8">
       <div className="min-w-0">
-        <h1 className="text-headline-md text-ink sm:text-headline-lg">{title}</h1>
-        {subtitle && <p className="mt-1 text-body-md text-ink-soft">{subtitle}</p>}
+        <h1 className="text-headline-lg text-on-surface sm:text-display-md">{title}</h1>
+        {subtitle && <p className="mt-1.5 text-body-lg text-on-surface-variant">{subtitle}</p>}
       </div>
       {children}
     </header>

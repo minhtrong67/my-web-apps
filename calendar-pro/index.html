@@ -7,8 +7,8 @@
     <title>Calendar Pro - Lịch Âm Dương &amp; Vạn Niên Việt Nam</title>
     <meta name="description" content="Calendar Pro: tra cứu lịch âm dương, lịch vạn niên, đếm ngược ngày lễ nổi bật, ngày chay và ngày rằm tại Việt Nam." />
     <!-- Giá trị khởi đầu theo hệ điều hành; script bên dưới đổi thành 1 thẻ duy nhất theo giao diện đã lưu trong app -->
-    <meta name="theme-color" content="#F7F4F5" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0F1217" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#FFF8F7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1D1011" media="(prefers-color-scheme: dark)" />
     <meta name="color-scheme" content="light dark" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -49,13 +49,13 @@
     <!-- Khởi động: vẽ đúng nền sáng/tối NGAY từ khung hình đầu tiên, trước cả khi file CSS/JS của app tải xong.
          (Màn hình chờ này nằm trong #root và tự biến mất khi React vẽ lần đầu.) -->
     <style id="boot-style">
-      html { background: #F7F4F5; color-scheme: light; --boot-fg: #0A0A0B; --boot-dim: #A1A1AA; }
-      html.dark { background: #0F1217; color-scheme: dark; --boot-fg: #F4F4F5; --boot-dim: #52525B; }
+      html { background: #FFF8F7; color-scheme: light; --boot-fg: #BE003A; }
+      html.dark { background: #1D1011; color-scheme: dark; --boot-fg: #FFB2B7; }
       html, body, #root { height: 100%; margin: 0; }
       .boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: inherit; color: var(--boot-fg); }
-      .boot svg { width: 44px; height: 44px; animation: boot-in 0.4s ease-out 0.1s both; }
-      .boot .dim { color: var(--boot-dim); }
-      @keyframes boot-in { from { opacity: 0; } to { opacity: 1; } }
+      .boot svg { width: 72px; height: 72px; animation: boot-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both, boot-spin 6s linear infinite; }
+      @keyframes boot-in { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: scale(1); } }
+      @keyframes boot-spin { to { rotate: 360deg; } }
       @media (prefers-reduced-motion: reduce) { .boot svg { animation: none; } }
     </style>
     <script>
@@ -71,6 +71,7 @@
           // Tính ngoài khối try ở trên: dù localStorage bị chặn (chế độ riêng tư...) vẫn theo đúng hệ điều hành
           dark = s.themeMode === 'dark' || ((s.themeMode || 'system') === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
         } catch (e) {}
+        /* @surfaces:start */ var SURF = {"rose":["#fff8f7","#1d1011","#be003a","#ffb2b7"],"mono":["#f9f9f9","#131313","#000000","#ffffff"],"do":["#fff8f7","#1d100e","#c00009","#ffb4a9"],"vang":["#fff8f3","#191207","#7d5700","#ffba30"],"xanh-la":["#f3fcef","#0d150e","#006d32","#00e470"],"xanh-duong":["#f9f9ff","#0f141b","#005faf","#a6c8ff"],"tim":["#fff7ff","#16121a","#8100f5","#d8baff"],"hong":["#fff8f8","#1c1013","#b90062","#ffb1c7"],"cam":["#fff8f5","#1c110a","#994700","#ffb68a"],"ngoc-lam":["#f0fcf9","#0a1514","#006a62","#00dece"]}; /* @surfaces:end */
         var ids = ['mono', 'rose', 'do', 'vang', 'xanh-la', 'xanh-duong', 'tim', 'hong', 'cam', 'ngoc-lam'];
         var color = s.color === 'm3' ? 'rose' : (ids.indexOf(s.color) > -1 ? s.color : 'rose');
         if (s.dailyColorRotation) {
@@ -81,6 +82,12 @@
         d.classList.toggle('dark', dark);
         d.style.colorScheme = dark ? 'dark' : 'light';
         d.setAttribute('data-color', color);
+        var sp = (typeof SURF !== 'undefined' && SURF[color]) || null;
+        if (sp) {
+          // Nền + màu splash đúng theo màu chủ đạo và sáng/tối đã lưu — ngay khung hình đầu tiên
+          d.style.backgroundColor = dark ? sp[1] : sp[0];
+          d.style.setProperty('--boot-fg', dark ? sp[3] : sp[2]);
+        }
         if (scales[s.fontSize]) d.style.setProperty('--font-scale', scales[s.fontSize]);
         try {
           // Chỉ giữ 1 thẻ theme-color (bỏ media) để thanh trạng thái theo đúng giao diện của app, không theo hệ điều hành
@@ -88,7 +95,7 @@
           for (var i = 1; i < metas.length; i++) metas[i].parentNode.removeChild(metas[i]);
           if (metas[0]) {
             metas[0].removeAttribute('media');
-            metas[0].setAttribute('content', dark ? '#0F1217' : '#F7F4F5');
+            metas[0].setAttribute('content', sp ? (dark ? sp[1] : sp[0]) : (dark ? '#1D1011' : '#FFF8F7'));
           }
         } catch (e) {}
       })();
@@ -99,18 +106,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&icon_names=account_balance,alarm,arrow_drop_down,auto_awesome,auto_stories,autorenew,bedtime,cake,calendar_month,celebration,check,check_box,check_box_outline_blank,check_circle,chevron_left,chevron_right,child_care,close,cruelty_free,dark_mode,devices,eco,engineering,error,event,expand_more,explore_off,favorite,flag,help,home,hourglass_top,info,install_mobile,light_mode,local_fire_department,local_florist,menu,military_tech,notifications,notifications_active,park,progress_activity,refresh,restart_alt,schedule,school,search,sell,settings,shield,shuffle,swap_horiz,today,translate,volunteer_activism,warning,wb_sunny&display=block"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..700,0..1,0&icon_names=account_balance,alarm,arrow_drop_down,auto_awesome,auto_stories,autorenew,bedtime,cake,calendar_month,celebration,check,check_box,check_box_outline_blank,check_circle,chevron_left,chevron_right,child_care,close,cruelty_free,dark_mode,devices,eco,engineering,error,event,expand_more,explore_off,favorite,flag,help,home,hourglass_top,info,install_mobile,light_mode,local_fire_department,local_florist,menu,military_tech,notifications,notifications_active,park,progress_activity,refresh,restart_alt,schedule,school,search,sell,settings,shield,shuffle,swap_horiz,today,translate,volunteer_activism,warning,wb_sunny&display=block"
       onerror="this.onerror=null;this.href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block'"
     />
   </head>
   <body>
     <div id="root">
       <div class="boot" role="status" aria-label="Calendar Pro">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
-          <rect x="3.5" y="5" width="17" height="15.5" rx="3.5" />
-          <path d="M3.5 10h17M8 3v3.5M16 3v3.5" />
-          <circle cx="12" cy="15.2" r="1.6" fill="currentColor" stroke="none" />
-        </svg>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><polygon fill="currentColor" points="50.0,0.0 56.3,2.4 61.5,7.1 66.7,9.6 73.4,9.5 80.3,10.5 84.7,15.3 86.1,22.3 87.6,28.3 92.0,32.6 97.4,37.3 99.3,43.5 96.7,50.0 93.3,55.7 92.9,61.5 94.3,68.4 93.3,75.0 88.1,79.2 81.4,81.4 76.6,84.7 73.4,90.5 69.0,96.0 62.7,97.4 55.9,95.1 50.0,93.5 44.1,95.1 37.3,97.4 31.0,96.0 26.6,90.5 23.4,84.7 18.6,81.4 11.9,79.2 6.7,75.0 5.7,68.4 7.1,61.5 6.7,55.7 3.3,50.0 0.7,43.5 2.6,37.3 8.0,32.6 12.4,28.3 13.9,22.3 15.3,15.3 19.7,10.5 26.6,9.5 33.3,9.6 38.5,7.1 43.7,2.4" /></svg>
       </div>
     </div>
     <script type="module" src="/src/main.jsx"></script>

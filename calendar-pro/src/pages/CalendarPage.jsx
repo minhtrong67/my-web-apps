@@ -75,35 +75,39 @@ export default function CalendarPage() {
 
   return (
     <Page wide className="!pb-20">
-      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_24rem] xl:items-start xl:gap-6">
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_25rem] xl:items-start xl:gap-6">
       <div className="min-w-0">
-      <header className="mb-4 flex items-center justify-between gap-2 sm:mb-5">
+      <header className="mb-5 flex items-center justify-between gap-3 sm:mb-6">
         <div className="min-w-0">
-          <h1 className="text-headline-md text-ink sm:text-headline-lg">
+          <h1 key={`${cursor.year}-${cursor.month}`} className={`text-headline-lg text-on-surface sm:text-display-md ${slideClass}`}>
             {MONTH_NAMES[cursor.month]} {cursor.year}
           </h1>
-          <p className="text-body-md text-ink-soft">{t('calendar.yearLabel', canChiYear(lunarYear), lunarYear)}</p>
+          <p className="mt-0.5 inline-flex items-center gap-1.5 text-body-lg text-on-surface-variant">
+            <Icon name="bedtime" size={18} filled className="text-tertiary" />
+            {t('calendar.yearLabel', canChiYear(lunarYear), lunarYear)}
+          </p>
         </div>
-        <div className="flex shrink-0 items-center">
-          <button onClick={() => changeMonth(-1)} className="state focus-ring flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant text-ink-soft" aria-label={t('calendar.prevMonth')}>
-            <Icon name="chevron_left" size={22} />
+        {/* Connected button group: 2 nút liền nhau, bo ngoài tròn - bo trong nhỏ; nhấn thì biến hình */}
+        <div className="flex shrink-0 items-center gap-0.5">
+          <button onClick={() => changeMonth(-1)} className="state focus-ring flex h-12 w-14 items-center justify-center rounded-l-full rounded-r-lg bg-secondary-container text-on-secondary-container transition-[border-radius,transform] duration-spatial-fast ease-spatial-fast active:scale-95 active:rounded-r-3xl" aria-label={t('calendar.prevMonth')}>
+            <Icon name="chevron_left" size={26} weight={500} />
           </button>
-          <button onClick={() => changeMonth(1)} className="state focus-ring ml-1.5 flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant text-ink-soft" aria-label={t('calendar.nextMonth')}>
-            <Icon name="chevron_right" size={22} />
+          <button onClick={() => changeMonth(1)} className="state focus-ring flex h-12 w-14 items-center justify-center rounded-l-lg rounded-r-full bg-secondary-container text-on-secondary-container transition-[border-radius,transform] duration-spatial-fast ease-spatial-fast active:scale-95 active:rounded-l-3xl" aria-label={t('calendar.nextMonth')}>
+            <Icon name="chevron_right" size={26} weight={500} />
           </button>
         </div>
       </header>
 
-      <section className="rounded-2xl border border-outline-variant bg-card shadow-soft p-2 min-[360px]:p-3 sm:p-5" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <section className="rounded-[32px] bg-surface-container p-2 min-[360px]:p-3 sm:p-6" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <div key={`${cursor.year}-${cursor.month}`} className={slideClass}>
           <CalendarGrid year={cursor.year} month={cursor.month} selectedDate={selected} onSelect={handleSelect} />
         </div>
-        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-outline-variant px-1 pt-4 text-label-md text-ink-soft">
+        <div className="mt-4 flex flex-wrap items-center gap-2 px-1 pt-2 text-label-md text-on-surface-variant">
           <LegendDot color="bg-primary" label={t('calendar.legendToday')} />
-          <span className="font-semibold text-ink">{t('calendar.legendLunarMark')}</span>
-          <LegendDot color="bg-emerald-500" label={t('calendar.legendVegetarian')} />
-          <LegendDot color="bg-amber-500" label={t('calendar.legendHoliday')} />
-          <span className="text-error">{t('calendar.legendSunday')}</span>
+          <span className="rounded-full bg-surface-high px-3 py-1.5 font-bold text-on-surface">{t('calendar.legendLunarMark')}</span>
+          <LegendDot color="bg-chay" label={t('calendar.legendVegetarian')} />
+          <LegendDot color="bg-holiday" label={t('calendar.legendHoliday')} />
+          <span className="rounded-full bg-surface-high px-3 py-1.5 text-error">{t('calendar.legendSunday')}</span>
         </div>
       </section>
       </div>
@@ -114,13 +118,13 @@ export default function CalendarPage() {
       </aside>
       </div>
 
-      {/* Nút nổi: về hôm nay */}
+      {/* FAB mở rộng: về hôm nay */}
       <button
         onClick={goToday}
-        className="state focus-ring animate-pop fixed bottom-[calc(env(safe-area-inset-bottom)+5rem)] right-4 z-30 flex h-12 items-center gap-2.5 rounded-xl bg-primary px-3.5 text-on-primary shadow-elevated sm:bottom-8 sm:right-8 sm:px-4"
+        className="state morph-square focus-ring animate-pop-in fixed bottom-[calc(env(safe-area-inset-bottom)+6.5rem)] right-4 z-30 flex h-14 items-center gap-2.5 rounded-[20px] bg-primary-container px-4 text-on-primary-container shadow-fab sm:bottom-8 sm:right-8 sm:px-5"
         aria-label={t('calendar.goToday')}
       >
-        <Icon name="today" size={22} />
+        <Icon name="today" size={26} filled />
         <span className="hidden text-label-lg sm:inline">{t('calendar.goToday')}</span>
       </button>
 
@@ -133,8 +137,8 @@ export default function CalendarPage() {
 
 function LegendDot({ color, label }) {
   return (
-    <span className="flex items-center gap-1.5">
-      <span className={`h-2 w-2 rounded-full ${color}`} />
+    <span className="flex items-center gap-2 rounded-full bg-surface-high px-3 py-1.5">
+      <span className={`h-2.5 w-2.5 rounded-full ${color}`} />
       {label}
     </span>
   )

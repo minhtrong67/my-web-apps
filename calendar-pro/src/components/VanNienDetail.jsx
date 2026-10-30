@@ -1,4 +1,5 @@
 import Icon from './Icon'
+import RollingNumber from './RollingNumber'
 import { holidayIconName } from '../lib/iconMap'
 import { canChiDay, canChiMonth, canChiYear, chiAnimalYear, gioHoangDao, lunarMonthName } from '../lib/lunar'
 import { getLunarInfo, formatVNDate } from '../lib/dateUtils'
@@ -22,57 +23,60 @@ export default function VanNienDetail({ date }) {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Hero: ngày âm là chữ số lớn duy nhất của trang — mọi thứ xung quanh giữ yên tĩnh */}
-      <div className="rounded-2xl p-5 text-on-primary shadow-soft min-[360px]:p-6" style={{ background: 'linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 70%, #000))' }}>
-        <p className="text-label-md opacity-90">{t('vanNienDetail.solar')}</p>
-        <p className="mt-0.5 text-title-lg">{formatVNDate(date, lang)}</p>
+      {/* Hero Expressive: khối màu chủ đạo rực rỡ + hình cookie/flower xoay chậm làm nền; ngày âm là số cuộn khổng lồ */}
+      <div className="fx-shine relative overflow-hidden rounded-[32px] bg-primary p-5 text-on-primary min-[360px]:p-6">
+        <span className="fx-spin-slow shape-cookie pointer-events-none absolute -right-14 -top-14 h-52 w-52 bg-primary-container opacity-25" aria-hidden="true" />
+        <span className="fx-spin-slower shape-flower pointer-events-none absolute -bottom-16 -right-6 h-40 w-40 bg-tertiary-container opacity-20" aria-hidden="true" />
 
-        <div className="my-5 h-px bg-on-primary/25" />
+        <div className="relative">
+          <p className="text-label-lg opacity-85">{t('vanNienDetail.solar')}</p>
+          <p className="mt-0.5 text-title-lg">{formatVNDate(date, lang)}</p>
 
-        <p className="text-label-md opacity-90">{t('vanNienDetail.lunar')}</p>
-        <div className="mt-1 flex items-end gap-4">
-          <span className="num text-[clamp(4rem,19vw,5.5rem)] font-light leading-[0.95] tracking-tighter">{lunarDay}</span>
-          <div className="pb-1.5">
-            <p className="text-headline-sm">
-              {isLeap ? t('vanNienDetail.leap') : ''}
-              {t('vanNienDetail.monthOf', lunarMonthName(lunarMonth))}
-            </p>
-            <p className="text-body-md opacity-90">{t('vanNienDetail.yearOf', canChiY, lunarYear)}</p>
+          <p className="mt-6 text-label-lg opacity-85">{t('vanNienDetail.lunar')}</p>
+          <div className="mt-1 flex items-end gap-4">
+            <RollingNumber value={lunarDay} className="text-[clamp(4.5rem,20vw,6.5rem)] font-extrabold leading-none tracking-tighter" />
+            <div className="pb-2">
+              <p className="text-headline-sm">
+                {isLeap ? t('vanNienDetail.leap') : ''}
+                {t('vanNienDetail.monthOf', lunarMonthName(lunarMonth))}
+              </p>
+              <p className="text-body-md opacity-90">{t('vanNienDetail.yearOf', canChiY, lunarYear)}</p>
+            </div>
           </div>
+
+          {(isRam || isMungMot || isChay) && (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {isMungMot && <Chip>{t('vanNienDetail.firstDayBadge')}</Chip>}
+              {isRam && <Chip>{t('vanNienDetail.fullMoonBadge')}</Chip>}
+              {isChay && <Chip icon="eco">{t('vanNienDetail.vegetarianBadge')}</Chip>}
+            </div>
+          )}
         </div>
-
-        {(isRam || isMungMot || isChay) && (
-          <div className="mt-5 flex flex-wrap gap-2">
-            {isMungMot && <Chip>{t('vanNienDetail.firstDayBadge')}</Chip>}
-            {isRam && <Chip>{t('vanNienDetail.fullMoonBadge')}</Chip>}
-            {isChay && <Chip icon="eco">{t('vanNienDetail.vegetarianBadge')}</Chip>}
-          </div>
-        )}
       </div>
 
       {/* Ngày chay */}
       {isChay && (
-        <div className="animate-fade-in flex items-center gap-4 rounded-xl border border-outline-variant bg-card shadow-soft p-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-container text-emerald-600 dark:text-emerald-400">
-            <Icon name="eco" size={22} />
+        <div className="animate-rise flex items-center gap-4 rounded-3xl bg-chay-container p-4 text-on-chay-container">
+          <div className="shape-scallop flex h-12 w-12 shrink-0 items-center justify-center bg-chay text-on-chay">
+            <Icon name="eco" size={24} filled />
           </div>
           <div>
-            <p className="text-title-sm text-ink">{isMungMot ? t('vanNienDetail.vegetarianFirstDay') : t('vanNienDetail.vegetarianFullMoon')}</p>
-            <p className="text-body-md text-ink-soft">{t('vanNienDetail.vegetarianDesc')}</p>
+            <p className="text-title-sm">{isMungMot ? t('vanNienDetail.vegetarianFirstDay') : t('vanNienDetail.vegetarianFullMoon')}</p>
+            <p className="text-body-md opacity-85">{t('vanNienDetail.vegetarianDesc')}</p>
           </div>
         </div>
       )}
 
       {/* Ngày lễ */}
       {holidaysToday.map((h) => (
-        <div key={h.id} className="animate-fade-in flex items-start gap-4 rounded-xl border border-outline-variant bg-card shadow-soft p-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-container text-amber-600 dark:text-amber-400">
-            <Icon name={holidayIconName(h.icon)} size={22} />
+        <div key={h.id} className="animate-rise flex items-start gap-4 rounded-3xl bg-holiday-container p-4 text-on-holiday-container">
+          <div className="shape-cookie flex h-12 w-12 shrink-0 items-center justify-center bg-holiday text-on-holiday">
+            <Icon name={holidayIconName(h.icon)} size={24} filled />
           </div>
           <div className="min-w-0">
-            <p className="text-title-sm text-ink">{h.name}</p>
+            <p className="text-title-sm">{h.name}</p>
             <CategoryBadge category={h.category} className="mt-1" />
-            <p className="mt-1.5 text-body-md text-ink-soft">{h.desc}</p>
+            <p className="mt-1.5 text-body-md opacity-85">{h.desc}</p>
           </div>
         </div>
       ))}
@@ -83,14 +87,14 @@ export default function VanNienDetail({ date }) {
         <InfoTile icon="cruelty_free" label={t('vanNienDetail.yearAnimal')} value={convat} />
       </div>
 
-      <div className="rounded-xl border border-outline-variant bg-card shadow-soft p-4">
-        <div className="mb-3 flex items-center gap-2 text-ink-soft">
-          <Icon name="schedule" size={20} />
+      <div className="rounded-3xl bg-surface-container p-4">
+        <div className="mb-3 flex items-center gap-2 text-on-surface-variant">
+          <Icon name="schedule" size={22} />
           <p className="text-title-sm">{t('vanNienDetail.luckyHours')}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {gioTot.map((g) => (
-            <span key={g} className="flex h-7 items-center rounded-md border border-outline-variant px-2.5 text-label-md text-ink-soft">
+            <span key={g} className="flex h-8 items-center rounded-full bg-tertiary-container px-3.5 text-label-lg text-on-tertiary-container">
               {g}
             </span>
           ))}
@@ -100,11 +104,11 @@ export default function VanNienDetail({ date }) {
   )
 }
 
-/** Nhãn nhỏ viền mảnh (ngày mùng một, rằm, chay) */
+/** Nhãn viên thuốc trên nền màu chủ đạo (ngày mùng một, rằm, chay) */
 function Chip({ children, icon }) {
   return (
-    <span className="flex h-7 items-center gap-1.5 rounded-md border border-on-primary/40 px-2.5 text-label-md">
-      {icon && <Icon name={icon} size={16} />}
+    <span className="flex h-8 items-center gap-1.5 rounded-full bg-on-primary/20 px-3.5 text-label-lg backdrop-blur-sm">
+      {icon && <Icon name={icon} size={16} filled />}
       {children}
     </span>
   )
@@ -112,11 +116,13 @@ function Chip({ children, icon }) {
 
 function InfoTile({ icon, label, value }) {
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-outline-variant bg-card shadow-soft p-3 min-[360px]:p-3.5">
-      <Icon name={icon} size={20} className="text-primary" />
+    <div className="flex flex-col gap-2.5 rounded-3xl bg-surface-container p-3 min-[360px]:p-3.5">
+      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container">
+        <Icon name={icon} size={20} filled />
+      </span>
       <div>
-        <p className="text-label-sm leading-tight text-ink-soft">{label}</p>
-        <p className="mt-0.5 text-title-sm text-ink">{value}</p>
+        <p className="text-label-sm leading-tight text-on-surface-variant">{label}</p>
+        <p className="mt-0.5 text-title-sm text-on-surface">{value}</p>
       </div>
     </div>
   )

@@ -5,6 +5,9 @@ import App from './App.jsx'
 import { SettingsProvider } from './contexts/SettingsContext.jsx'
 import { ToastProvider } from './contexts/ToastContext.jsx'
 import './index.css'
+import { initRipple } from './lib/ripple.js'
+
+initRipple()
 
 // Hiện icon khi font Material Symbols đã sẵn sàng (hoặc sau tối đa 2.5s) — tránh nhấp nháy chữ ligature
 const showIcons = () => document.documentElement.classList.add('icons-ready')

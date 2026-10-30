@@ -75,53 +75,53 @@ export default function CommandPalette({ open, onClose }) {
   return createPortal(
     <div className="fixed inset-0 z-[90] flex items-start justify-center px-4 pt-[10vh]" role="dialog" aria-modal="true" aria-label={t('commandPalette.placeholder')}>
       <div className={`absolute inset-0 bg-black/40 ${closing ? 'scrim-out' : 'scrim-in'}`} onClick={onClose} />
-      <div className={`${closing ? 'animate-palette-out' : 'animate-palette-in'} relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-outline-variant bg-card shadow-soft shadow-elevated`}>
-        <div className="flex h-12 items-center gap-3 border-b border-outline-variant px-4">
-          <Icon name="search" size={22} className="shrink-0 text-ink-soft" />
+      <div className={`${closing ? 'animate-palette-out' : 'animate-palette-in'} relative z-10 w-full max-w-lg overflow-hidden rounded-[28px] bg-surface-high shadow-elevated`}>
+        <div className="m-3 flex h-14 items-center gap-3 rounded-full bg-surface-highest px-5">
+          <Icon name="search" size={22} className="shrink-0 text-on-surface-variant" />
           <input
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder={t('commandPalette.placeholder')}
-            className="w-full min-w-0 flex-1 bg-transparent text-body-lg text-ink outline-none placeholder:text-ink-faint"
+            className="w-full min-w-0 flex-1 bg-transparent text-body-lg text-on-surface outline-none placeholder:text-on-surface-variant/70"
             aria-label={t('commandPalette.placeholder')}
           />
-          <kbd className="hidden shrink-0 rounded-md border border-outline-variant px-1.5 py-0.5 text-label-sm text-ink-faint sm:block">
+          <kbd className="hidden shrink-0 rounded-full bg-surface-high px-2 py-0.5 text-label-sm text-on-surface-variant sm:block">
             Esc
           </kbd>
         </div>
 
-        <div className="max-h-80 overflow-y-auto py-2">
+        <div className="max-h-80 overflow-y-auto px-3 pb-2">
           {results.length === 0 ? (
-            <p className="px-4 py-8 text-center text-body-md text-ink-faint">{t('commandPalette.noResults')}</p>
+            <p className="px-4 py-8 text-center text-body-md text-on-surface-variant">{t('commandPalette.noResults')}</p>
           ) : (
             results.map((item, i) => (
               <button
                 key={item.to}
                 onClick={() => go(item)}
                 onMouseEnter={() => setActiveIndex(i)}
-                className={`state focus-ring flex h-11 w-full items-center gap-3 px-4 text-left text-body-lg text-ink ${
+                className={`state morph-square focus-ring flex h-14 w-full items-center gap-4 rounded-full px-5 text-left text-body-lg text-on-surface ${
                   i === activeIndex ? 'bg-secondary-container text-on-secondary-container' : ''
                 }`}
               >
-                <Icon name={item.icon} size={22} weight={i === activeIndex ? 400 : 300} />
+                <Icon name={item.icon} size={24} filled={i === activeIndex} weight={i === activeIndex ? 500 : 400} />
                 {item.label}
               </button>
             ))
           )}
         </div>
 
-        <div className="flex items-center gap-4 border-t border-outline-variant px-4 py-2.5 text-label-sm text-ink-faint">
+        <div className="flex items-center gap-4 px-5 pb-4 pt-2 text-label-sm text-on-surface-variant">
           <span className="flex items-center gap-1">
-            <kbd className="rounded border border-outline-variant px-1 py-0.5">↑</kbd>
-            <kbd className="rounded border border-outline-variant px-1 py-0.5">↓</kbd> {t('commandPalette.hint')}
+            <kbd className="rounded-md bg-surface-highest px-1.5 py-0.5">↑</kbd>
+            <kbd className="rounded-md bg-surface-highest px-1.5 py-0.5">↓</kbd> {t('commandPalette.hint')}
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="rounded border border-outline-variant px-1 py-0.5">Enter</kbd> {t('commandPalette.selectHint')}
+            <kbd className="rounded-md bg-surface-highest px-1.5 py-0.5">Enter</kbd> {t('commandPalette.selectHint')}
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="rounded border border-outline-variant px-1 py-0.5">Esc</kbd> {t('commandPalette.closeHint')}
+            <kbd className="rounded-md bg-surface-highest px-1.5 py-0.5">Esc</kbd> {t('commandPalette.closeHint')}
           </span>
         </div>
       </div>

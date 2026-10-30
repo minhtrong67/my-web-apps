@@ -10,12 +10,12 @@ const ICON_NAMES = {
   warning: 'warning'
 }
 
-// Toast dùng nền đảo (inverse) nên icon trạng thái phải đủ tương phản trên cả nền sáng lẫn tối
+// Snackbar dùng nền đảo (inverse) nên icon trạng thái phải đủ tương phản trên cả nền sáng lẫn tối
 const RING = {
-  success: 'text-emerald-400 dark:text-emerald-600',
-  error: 'text-rose-400 dark:text-rose-600',
+  success: 'text-chay-container dark:text-chay',
+  error: 'text-error-container dark:text-error',
   info: 'text-inverse-primary',
-  warning: 'text-amber-400 dark:text-amber-600'
+  warning: 'text-holiday-container dark:text-holiday'
 }
 
 export function ToastProvider({ children }) {
@@ -24,7 +24,7 @@ export function ToastProvider({ children }) {
   // Đánh dấu "đang rời" để chạy animation thoát rồi mới gỡ khỏi DOM
   const dismiss = useCallback((id) => {
     setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, leaving: true } : t)))
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 180)
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 220)
   }, [])
 
   const notify = useCallback(
@@ -56,7 +56,7 @@ export function ToastProvider({ children }) {
           return (
             <div
               key={t.id}
-              className={`${t.leaving ? 'animate-toast-out' : 'animate-toast-in'} pointer-events-auto flex items-center gap-3 rounded-lg bg-inverse-surface py-3 pl-4 pr-2 text-inverse-on-surface shadow-elevated`}
+              className={`${t.leaving ? 'animate-toast-out' : 'animate-toast-in'} pointer-events-auto flex items-center gap-3 rounded-2xl bg-inverse-surface py-3 pl-4 pr-2 text-inverse-on-surface shadow-elevated`}
             >
               <Icon name={iconName} filled size={22} className={`shrink-0 ${RING[t.type]}`} />
               <div className="min-w-0 flex-1">
@@ -65,7 +65,7 @@ export function ToastProvider({ children }) {
               </div>
               <button
                 onClick={() => dismiss(t.id)}
-                className="state focus-ring flex h-9 w-9 shrink-0 items-center justify-center rounded-md"
+                className="state morph-square focus-ring flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
                 aria-label="Đóng thông báo"
               >
                 <Icon name="close" size={20} />

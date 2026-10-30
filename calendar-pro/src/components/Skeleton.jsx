@@ -1,11 +1,11 @@
 export function Skeleton({ className = '' }) {
-  return <div className={`skeleton rounded-lg ${className}`} aria-hidden="true" />
+  return <div className={`skeleton rounded-xl ${className}`} aria-hidden="true" />
 }
 
 export function CardSkeleton() {
   return (
-    <div className="rounded-xl border border-outline-variant bg-card p-4">
-      <Skeleton className="mb-3 h-10 w-10" />
+    <div className="rounded-2xl bg-surface-container p-4">
+      <Skeleton className="mb-3 h-12 w-12 !rounded-full" />
       <Skeleton className="mb-2 h-5 w-32" />
       <Skeleton className="h-4 w-24" />
     </div>
@@ -14,7 +14,7 @@ export function CardSkeleton() {
 
 export function CalendarSkeleton() {
   return (
-    <div className="rounded-2xl border border-outline-variant bg-card p-3 sm:p-5">
+    <div className="rounded-3xl bg-surface-container p-3 sm:p-5">
       <div className="mb-3 grid grid-cols-7 gap-1">
         {Array.from({ length: 7 }).map((_, i) => (
           <Skeleton key={i} className="mx-auto h-3 w-6" />
@@ -22,7 +22,7 @@ export function CalendarSkeleton() {
       </div>
       <div className="grid grid-cols-7 gap-1">
         {Array.from({ length: 35 }).map((_, i) => (
-          <Skeleton key={i} className="aspect-square w-full" />
+          <Skeleton key={i} className="aspect-square w-full !rounded-full" />
         ))}
       </div>
     </div>
@@ -45,7 +45,7 @@ export function PageSkeleton() {
     <div className="mx-auto w-full max-w-3xl px-4 pt-4 sm:px-6 sm:pt-10" aria-busy="true">
       <Skeleton className="mb-2 h-8 w-48" />
       <Skeleton className="mb-6 h-4 w-32" />
-      <Skeleton className="h-64 !rounded-2xl" />
+      <Skeleton className="h-64 !rounded-3xl" />
     </div>
   )
 }

@@ -22,6 +22,7 @@
 ## Mục lục
 
 - [Giới thiệu](#giới-thiệu)
+- [Ảnh chụp màn hình](#ảnh-chụp-màn-hình)
 - [Tính năng](#tính-năng)
 - [Hệ thống thiết kế](#hệ-thống-thiết-kế)
 - [Tùy chỉnh](#tùy-chỉnh)
@@ -39,12 +40,20 @@
 
 Streak Logger là ứng dụng web đề cao quyền riêng tư dành cho người đang xây dựng thói quen. Đăng nhập bằng Google, đặt một mốc (ví dụ "bỏ đường từ ngày…") và ứng dụng đếm thời gian trôi qua theo thời gian thực. Bên cạnh đó bạn ghi nhật ký streak, còn trang thống kê biến các mục đó thành biểu đồ. Dữ liệu đồng bộ tức thì giữa các thiết bị qua Firebase, mỗi tài khoản chỉ truy cập được dữ liệu của chính mình.
 
+## Ảnh chụp màn hình
+
+| Đăng nhập (sáng) | Nhật ký streak (sáng) |
+| :---: | :---: |
+| ![Màn hình đăng nhập](screenshots/01-login.png) | ![Trang nhật ký streak](screenshots/02-streak-journal.png) |
+| **Thống kê (tối)** | **Cài đặt (tối)** |
+| ![Trang thống kê](screenshots/03-statistics.png) | ![Trang cài đặt](screenshots/04-settings.png) |
+
 ## Tính năng
 
 | Mảng | Nội dung |
 | --- | --- |
 | **Mốc thời gian** | Đếm thời gian đã trôi qua (năm, tháng, ngày, giờ, phút) theo thời gian thực, có nút sao chép nhanh và đếm ngược cho mốc ở tương lai. |
-| **Nhật ký streak** | Thêm, sửa, xem chi tiết bằng sheet toàn màn hình, xóa có xác nhận, nút nổi (FAB) để thêm. Tìm kiếm, sắp xếp, lọc (buổi trong ngày, khoảng ngày), tìm theo cột trên desktop, vuốt thẻ trên mobile (phải để sửa, trái để xóa) và xóa hàng loạt. |
+| **Nhật ký streak** | Thêm và sửa bằng sheet toàn màn hình, xóa có xác nhận, nút nổi (FAB) chỉ xuất hiện ở trang này. Tìm kiếm, sắp xếp, lọc (buổi trong ngày, khoảng ngày), tìm theo cột trên desktop và vuốt thẻ trên mobile (phải để sửa, trái để xóa). |
 | **Thống kê** | Thẻ số liệu nổi bật và **hai biểu đồ tròn** (phân bổ theo thời gian và theo buổi trong ngày) có đủ nhãn và số liệu ngay trên biểu đồ, kèm **thanh tiến độ phần trăm** ngay bên dưới mỗi biểu đồ. Xem theo ngày, tuần, tháng, năm. Xuất báo cáo **PDF chi tiết** hoặc **PNG** gọn (chỉ số liệu và hai biểu đồ tròn). |
 | **Cài đặt** | Chế độ hiển thị, màu chủ đề và font chữ (mục thu gọn được), cỡ chữ, ngôn ngữ, **nhập và xuất nhật ký** (nhập CSV, JSON, Excel; xuất thêm Word, PDF, PNG), cài ứng dụng, khôi phục mặc định, đăng xuất và thẻ tác giả. |
 | **An toàn** | Mọi thao tác sửa và xóa đều qua hộp thoại xác nhận. Dữ liệu được làm sạch và kiểm tra ở client, rồi kiểm tra lại bằng Firestore Rules. |
@@ -59,7 +68,8 @@ Giao diện theo **Material 3 Expressive**:
 - **Chuyển động**: easing lò xo hơi nảy, easing emphasized cho chuyển trang và sheet, ripple và state layer ở mọi phần tử tương tác, danh sách hiện dần lần lượt. Tôn trọng `prefers-reduced-motion`.
 - **Thành phần**: navigation drawer / rail, navigation bar có chỉ báo dạng viên thuốc, nhóm nút kết nối, nút biểu tượng tonal, ô nhập kiểu filled, công tắc, snackbar (toast), hộp thoại, sheet toàn màn hình và sheet đáy.
 - **Nút hành động** trong mọi hộp thoại, hộp thoại xác nhận và sheet đều có **nhãn, biểu tượng và màu nền theo vai trò** để nhận diện ngay: Hủy (trung tính, `X`), Lưu (chính, `Check`), Cập nhật (chính, `Save`), Xóa (lỗi, `Trash2`), Đăng xuất và Đặt lại (cảnh báo).
-- **Sheet và hộp thoại**: mọi thao tác thêm, sửa, xem chi tiết đều dùng sheet toàn màn hình; hộp thoại chỉ dành cho xác nhận ngắn. Cập nhật hoặc xóa luôn hỏi xác nhận trước. Danh sách lựa chọn trên mobile dùng sheet đáy.
+- **Sheet và hộp thoại**: mọi form thêm và sửa đều dùng sheet toàn màn hình; hộp thoại chỉ dành cho xác nhận ngắn. Cập nhật hoặc xóa luôn hỏi xác nhận trước, và hai nút hành động của mọi hộp thoại, hộp thoại xác nhận và sheet nằm cạnh nhau trên một hàng. Danh sách lựa chọn trên mobile dùng sheet đáy.
+- **Header** hiển thị tên trang đang xem thay cho logo và tên ứng dụng.
 - **Toast** có 4 biến thể (`info`, `success`, `error`, `warning`), hỗ trợ sáng và tối, tạm dừng khi rê chuột và có thanh đếm ngược.
 - **Nút lên đầu trang** hiện khi cuộn xuống, cuộn mượt bằng easing requestAnimationFrame riêng (không phụ thuộc cài đặt giảm chuyển động của hệ điều hành hay `scroll-behavior` của CSS) và tự nâng lên phía trên FAB khi có FAB.
 - **Dropdown tùy biến**: không dùng `<select>` gốc. Danh sách theo giao diện sáng/tối và màu chủ đề, mở bằng portal (không bị hộp thoại hay accordion cắt), tự lật lên khi thiếu chỗ, cao tối đa 280px có thanh cuộn và dùng được bằng bàn phím.
@@ -175,7 +185,7 @@ Dòng thiếu thời lượng hoặc sai ngày giờ sẽ bị bỏ qua và đư
 
 ```
 src/
-  components/      layout, form, menu xuất, vuốt thẻ, logo...
+  components/      layout, tên trang, form, menu xuất, vuốt thẻ, logo...
     ui/            thành phần nền tảng: Button, Modal, Sheet, ConfirmDialog, Segmented...
   context/         Auth, Theme (chế độ + màu), Appearance (cỡ chữ + font), Lang, Toast
   hooks/           hook Firestore realtime, lớp phủ, media query, vị trí cuộn, cài PWA
@@ -186,6 +196,7 @@ src/
   utils/           kiểm tra dữ liệu, nhập, xuất, thống kê, báo cáo PDF, ripple
 scripts/           generate-icons.mjs (favicon, icon ứng dụng, ảnh splash)
 firestore.rules    quy tắc bảo mật Firestore
+screenshots/       ảnh dùng trong README
 ```
 
 ## PWA và màn hình chờ

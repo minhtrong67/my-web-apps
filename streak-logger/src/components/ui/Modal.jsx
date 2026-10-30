@@ -56,7 +56,7 @@ export default function Modal({ open, onClose, title, icon: Icon, tone = 'primar
           </button>
         </div>
         <div className="px-6 py-2 overflow-y-auto overscroll-contain-y text-[var(--md-on-surface-variant)]">{children}</div>
-        {footer && <div className="px-6 pt-4 pb-6 flex flex-wrap justify-end gap-2">{footer}</div>}
+        {footer && <div className="px-6 pt-4 pb-6 grid grid-cols-2 gap-3 [&>*]:w-full">{footer}</div>}
       </div>
     </div>,
     document.body,

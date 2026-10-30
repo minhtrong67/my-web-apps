@@ -54,7 +54,7 @@ export default function HomePage() {
     <Page wide>
       <div className="hidden sm:block">
         <PageHeader title={t('home.greeting')} subtitle={t('home.greetingDesc')}>
-          <Button variant="outline" icon={(p) => <Icon name="refresh" {...p} />} loading={refreshing} onClick={handleRefresh}>
+          <Button variant="secondary" icon={(p) => <Icon name="refresh" {...p} />} loading={refreshing} onClick={handleRefresh}>
             {t('home.refresh')}
           </Button>
         </PageHeader>
@@ -69,13 +69,14 @@ export default function HomePage() {
               key={date.getTime()}
               role="listitem"
               aria-current={isToday ? 'date' : undefined}
-              className={`flex flex-col items-center gap-1 rounded-xl py-3 ${isToday ? 'bg-primary text-on-primary' : 'border border-outline-variant bg-card text-ink shadow-soft'}`}
+              style={{ '--i': i }}
+              className={`stagger-item flex flex-col items-center gap-1 rounded-[24px] py-3.5 sm:rounded-[28px] ${isToday ? 'bg-primary text-on-primary shadow-fab' : 'bg-surface-container text-on-surface'}`}
             >
-              <span className={`text-label-sm ${isToday ? 'opacity-80' : date.getDay() === 0 ? 'text-error' : 'text-ink-soft'}`}>
+              <span className={`text-label-md ${isToday ? 'opacity-85' : date.getDay() === 0 ? 'text-error' : 'text-on-surface-variant'}`}>
                 {WEEKDAYS_SHORT[i]}
               </span>
-              <span className="num text-title-md">{date.getDate()}</span>
-              <span className={`num text-label-sm ${isToday ? 'opacity-80' : 'text-ink-soft'}`}>{lunarDay}</span>
+              <span className="num text-title-lg font-bold">{date.getDate()}</span>
+              <span className={`num text-label-sm ${isToday ? 'opacity-85' : 'text-on-surface-variant'}`}>{lunarDay}</span>
             </div>
           )
         })}
@@ -91,8 +92,8 @@ export default function HomePage() {
           {/* Ngày lễ sắp tới */}
           <section>
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-title-lg text-ink">{t('home.upcomingEvents')}</h2>
-              <Link to="/dem-nguoc" className="state focus-ring flex h-9 items-center gap-0.5 rounded-lg pl-3 pr-2 text-label-lg text-primary">
+              <h2 className="text-headline-sm text-on-surface">{t('home.upcomingEvents')}</h2>
+              <Link to="/dem-nguoc" className="state morph focus-ring flex h-10 items-center gap-0.5 rounded-full pl-4 pr-3 text-label-lg text-primary">
                 {t('home.viewAll')} <Icon name="chevron_right" size={18} />
               </Link>
             </div>
@@ -106,12 +107,12 @@ export default function HomePage() {
           {/* Ngày chay trong tháng */}
           <section>
             <div className="mb-3 flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-surface-container text-emerald-600 dark:text-emerald-400">
-                <Icon name="eco" size={20} />
+              <div className="shape-scallop flex h-12 w-12 items-center justify-center bg-chay-container text-on-chay-container">
+                <Icon name="eco" size={24} filled />
               </div>
               <div>
-                <h2 className="text-title-lg leading-tight text-ink">{t('home.vegetarianTitle')}</h2>
-                <p className="text-body-sm text-ink-soft">{t('home.vegetarianSubtitle')}</p>
+                <h2 className="text-headline-sm leading-tight text-on-surface">{t('home.vegetarianTitle')}</h2>
+                <p className="text-body-sm text-on-surface-variant">{t('home.vegetarianSubtitle')}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -123,13 +124,13 @@ export default function HomePage() {
                 return (
                   <div
                     key={day}
-                    className={`flex flex-col gap-1 rounded-2xl p-5 ${
-                      isTodayChay ? 'bg-primary text-on-primary' : 'border border-outline-variant bg-card text-ink shadow-soft'
+                    className={`lift fx-spot flex flex-col gap-1 rounded-[28px] p-5 ${
+                      isTodayChay ? 'bg-primary text-on-primary' : 'bg-chay-container text-on-chay-container'
                     }`}
                   >
                     <p className="text-headline-sm">{label}</p>
-                    <p className={`text-body-sm ${isTodayChay ? 'opacity-80' : 'text-ink-soft'}`}>{desc}</p>
-                    {isTodayChay && <span className="mt-2 w-fit rounded-md bg-on-primary/20 px-2 py-0.5 text-label-sm">{t('common.today')}</span>}
+                    <p className={`text-body-sm ${isTodayChay ? 'opacity-85' : 'opacity-80'}`}>{desc}</p>
+                    {isTodayChay && <span className="mt-2 w-fit rounded-full bg-on-primary/20 px-3 py-1 text-label-md">{t('common.today')}</span>}
                   </div>
                 )
               })}
@@ -137,8 +138,10 @@ export default function HomePage() {
           </section>
 
           {/* Gợi ý bật thông báo */}
-          <section className="flex items-center gap-4 rounded-2xl bg-primary-container p-4 text-on-primary-container">
-            <Icon name="notifications_active" size={22} className="shrink-0" />
+          <section className="flex items-center gap-4 rounded-[28px] bg-tertiary-container p-4 text-on-tertiary-container">
+            <span className="fx-spin-slow shape-flower flex h-12 w-12 shrink-0 items-center justify-center bg-tertiary text-on-tertiary">
+              <Icon name="notifications_active" size={24} filled className="[animation:none]" />
+            </span>
             <p className="text-body-md">
               {t('home.notifyHintPrefix')}{' '}
               <Link to="/cai-dat" className="font-semibold underline underline-offset-4">

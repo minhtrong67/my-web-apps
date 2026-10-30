@@ -1,30 +1,19 @@
-import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { HOLIDAYS } from '../data/holidays'
+import { getFont, loadFont, DEFAULT_FONT_ID } from '../lib/fonts'
+import COLOR_SEEDS from '../theme/colors.json'
 
 const SettingsContext = createContext(null)
 
-/** Font mặc định: font giao diện của hệ điều hành (system-ui) — nhanh, không tải thêm file, hỗ trợ đủ dấu tiếng Việt. */
-export const APP_FONT_FAMILY =
-  "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif"
 
 export const LANGUAGE_OPTIONS = [
   { id: 'vi', label: 'Tiếng Việt' },
   { id: 'en', label: 'English' }
 ]
 
-/** 9 màu nhấn — "Hồng Rose" (#FF2056, Tailwind rose-500) là mặc định; màu nhấn chỉ tô nút chính và ngày đang chọn, nền giữ trung tính. */
-export const COLOR_OPTIONS = [
-  { id: 'mono', label: 'Đơn sắc', hex: '#0A0A0B' },
-  { id: 'rose', label: 'Hồng Rose', hex: '#FF2056' },
-  { id: 'do', label: 'Đỏ Son', hex: '#B3261E' },
-  { id: 'vang', label: 'Vàng Kim', hex: '#C9860F' },
-  { id: 'xanh-la', label: 'Xanh Ngọc', hex: '#2C9750' },
-  { id: 'xanh-duong', label: 'Xanh Dương', hex: '#226FC2' },
-  { id: 'tim', label: 'Tím Huế', hex: '#7638AE' },
-  { id: 'hong', label: 'Hồng Đào', hex: '#D23D71' },
-  { id: 'cam', label: 'Cam Sen', hex: '#D9670B' },
-  { id: 'ngoc-lam', label: 'Ngọc Lam', hex: '#0E8C82' }
-]
+/** 10 màu chủ đạo — "Hồng Rose" (rose của Material 3 Expressive) là mặc định.
+ *  Bảng màu đầy đủ (primary / secondary / tertiary / surface...) được sinh từ seed bởi scripts/generate-theme.mjs. */
+export const COLOR_OPTIONS = COLOR_SEEDS.map(({ id, label, seed }) => ({ id, label, hex: seed }))
 
 export const FONT_SIZE_OPTIONS = [
   { id: 'nho', label: 'Nhỏ', scale: 0.925 },
@@ -39,6 +28,7 @@ const DEFAULTS = {
   dailyColorRotation: false,
   language: 'vi', // 'vi' | 'en'
   fontSize: 'vua',
+  fontFamily: DEFAULT_FONT_ID,
   notificationsEnabled: false,
   notifyLunarDays: true,
   notifyHolidayIds: HOLIDAYS.map((h) => h.id),
@@ -48,14 +38,12 @@ const DEFAULTS = {
   notifyBeforeDays: 1
 }
 
-/** Màu --surface (khớp index.css và khối script đầu index.html) — nền trung tính nên chỉ phụ thuộc sáng/tối */
-export const SURFACE_HEX = { light: '#F7F4F5', dark: '#0F1217' }
-
-/** Giữ đúng 1 thẻ <meta name="theme-color"> (không media) theo giao diện đang dùng.
+/** Giữ đúng 1 thẻ <meta name="theme-color"> (không media) theo màu --surface đang dùng (đã gồm màu chủ đạo).
  *  Các thẻ có media="(prefers-color-scheme)" ở index.html chỉ là giá trị khởi đầu; khi người dùng
  *  chọn Sáng/Tối riêng trong app thì phải dùng giá trị của app, không theo hệ điều hành. */
-export function applyThemeColorMeta(isDark) {
-  const hex = isDark ? SURFACE_HEX.dark : SURFACE_HEX.light
+export function applyThemeColorMeta() {
+  const hex = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim()
+  if (!hex) return
   const metas = document.querySelectorAll('meta[name="theme-color"]')
   let meta = metas[0]
   if (!meta) {
@@ -106,18 +94,37 @@ export function SettingsProvider({ children }) {
   const isDark = settings.themeMode === 'dark' || (settings.themeMode === 'system' && systemDark)
   const effectiveColor = settings.dailyColorRotation ? getDailyColorId() : settings.color
 
+  const firstRun = useRef(true)
+  const lastTheme = useRef(`${isDark}|${effectiveColor}`)
+
+  // Font: áp ngay stack (font dự phòng hiển thị trong lúc tải), tải font web theo nhu cầu
+  useEffect(() => {
+    const font = getFont(settings.fontFamily)
+    document.documentElement.style.setProperty('--font-family', font.stack)
+    document.documentElement.setAttribute('data-font', font.id)
+    loadFont(font.id)
+  }, [settings.fontFamily])
+
   useEffect(() => {
     const root = document.documentElement
+    const themeKey = `${isDark}|${effectiveColor}`
+    if (!firstRun.current && lastTheme.current !== themeKey) {
+      // Đổi sáng/tối hoặc màu: bật chuyển màu mượt cho toàn trang trong ~0.6s
+      root.classList.add('theme-anim')
+      window.clearTimeout(root.__themeAnimTimer)
+      root.__themeAnimTimer = window.setTimeout(() => root.classList.remove('theme-anim'), 650)
+    }
+    firstRun.current = false
+    lastTheme.current = themeKey
     root.classList.toggle('dark', isDark)
     root.setAttribute('data-color', effectiveColor)
-    root.style.setProperty('--font-family', APP_FONT_FAMILY)
     root.setAttribute('lang', settings.language === 'en' ? 'en' : 'vi')
     const scale = FONT_SIZE_OPTIONS.find((s) => s.id === settings.fontSize)?.scale ?? 1
     root.style.setProperty('--font-scale', String(scale))
 
     root.style.colorScheme = isDark ? 'dark' : 'light'
     root.style.backgroundColor = '' // nền do CSS (--surface) đảm nhiệm sau khi app đã chạy
-    applyThemeColorMeta(isDark)
+    applyThemeColorMeta()
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
       localStorage.removeItem(LEGACY_STORAGE_KEY)

@@ -1,17 +1,19 @@
-import MaterialIcon from './Icon'
+import Loader from './Loader'
 
-// 4 kiểu nút: primary (đặc, màu nhấn), secondary (nền xám nhạt), outline (viền mảnh), ghost (chỉ chữ).
+// Nút Expressive: hình viên thuốc (pill), nhấn thì "biến hình" sang bo vừa rồi nảy lại bằng spring.
+// 5 kiểu: primary (đặc), secondary (tonal), tertiary (tonal màu thứ ba), outline (viền), ghost (chữ).
 const VARIANTS = {
   primary: 'bg-primary text-on-primary',
   secondary: 'bg-secondary-container text-on-secondary-container',
-  outline: 'border border-outline/50 text-ink',
-  ghost: 'text-ink'
+  tertiary: 'bg-tertiary-container text-on-tertiary-container',
+  outline: 'border border-outline text-primary',
+  ghost: 'text-primary'
 }
 
 const SIZES = {
-  sm: 'h-8 px-3 text-label-md gap-1.5',
-  md: 'h-10 px-4 text-label-lg gap-2',
-  lg: 'h-11 px-5 text-label-lg gap-2'
+  sm: 'h-10 px-4 text-label-lg gap-2',
+  md: 'h-12 px-6 text-title-sm gap-2',
+  lg: 'h-14 px-8 text-title-md gap-2.5'
 }
 
 export default function Button({
@@ -31,14 +33,10 @@ export default function Button({
       type={type}
       disabled={isDisabled}
       aria-busy={loading}
-      className={`state focus-ring inline-flex shrink-0 items-center justify-center rounded-lg disabled:cursor-not-allowed disabled:opacity-40 ${VARIANTS[variant]} ${SIZES[size]} ${Icon || loading ? '!pl-3.5' : ''} ${className}`}
+      className={`state morph focus-ring inline-flex shrink-0 items-center justify-center rounded-full disabled:cursor-not-allowed disabled:opacity-40 ${VARIANTS[variant]} ${SIZES[size]} ${Icon || loading ? '!pl-4' : ''} ${className}`}
       {...props}
     >
-      {loading ? (
-        <MaterialIcon name="progress_activity" size={18} className="animate-spin" />
-      ) : Icon ? (
-        <Icon size={18} />
-      ) : null}
+      {loading ? <Loader size={20} tone="container" /> : Icon ? <Icon size={20} /> : null}
       {children}
     </button>
   )

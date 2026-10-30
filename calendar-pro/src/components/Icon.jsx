@@ -1,10 +1,11 @@
 /**
- * Icon — bọc font Material Symbols Outlined, dùng nét mảnh (weight 300) cho phong cách minimalist.
+ * Icon — bọc font Material Symbols Outlined (variable font).
  *
- * Dùng "font-variation-settings" (variable font) để bật/tắt fill và chỉnh độ đậm ngay tại chỗ dùng,
- * không cần tải thêm file font nào khác.
+ * Dùng "font-variation-settings" để bật/tắt fill và chỉnh độ đậm ngay tại chỗ dùng. Material 3 Expressive
+ * dùng nét dày hơn (weight 400–500) và icon đặc (FILL 1) cho trạng thái đang chọn; CSS có transition
+ * cho font-variation-settings nên icon "đặc dần" mượt khi chuyển trạng thái.
  */
-export default function Icon({ name, size = 20, filled = false, weight = 300, className = '', style, ...props }) {
+export default function Icon({ name, size = 24, filled = false, weight = 400, className = '', style, ...props }) {
   return (
     <span
       className={`material-symbols-outlined inline-block shrink-0 select-none leading-none ${className}`}

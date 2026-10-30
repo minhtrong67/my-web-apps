@@ -1,0 +1,12 @@
+[
+  { "id": "rose", "label": "Hồng Rose", "seed": "#FF2056" },
+  { "id": "mono", "label": "Đơn sắc", "seed": "#5E5E62" },
+  { "id": "do", "label": "Đỏ Son", "seed": "#D9362B" },
+  { "id": "vang", "label": "Vàng Kim", "seed": "#D99A06" },
+  { "id": "xanh-la", "label": "Xanh Ngọc", "seed": "#2C9750" },
+  { "id": "xanh-duong", "label": "Xanh Dương", "seed": "#226FC2" },
+  { "id": "tim", "label": "Tím Huế", "seed": "#7E3FD0" },
+  { "id": "hong", "label": "Hồng Đào", "seed": "#E0558A" },
+  { "id": "cam", "label": "Cam Sen", "seed": "#E8710A" },
+  { "id": "ngoc-lam", "label": "Ngọc Lam", "seed": "#0E8C82" }
+]

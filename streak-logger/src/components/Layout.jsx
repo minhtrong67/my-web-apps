@@ -3,11 +3,10 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { Search, Menu } from 'lucide-react'
 import Sidebar from './Sidebar'
 import BottomNav from './BottomNav'
-import Breadcrumb from './Breadcrumb'
+import PageTitle from './PageTitle'
 import ThemeSwitcher from './ThemeSwitcher'
 import OfflineBanner from './OfflineBanner'
 import CommandPalette from './CommandPalette'
-import BrandMark from './BrandMark'
 import ScrollToTopButton from './ui/ScrollToTopButton'
 import { useLang } from '../context/LangContext'
 import { useScrolledPast } from '../hooks/useScrollPosition'
@@ -49,7 +48,7 @@ export default function Layout() {
       <div className="flex-1 min-w-0 flex flex-col">
         <OfflineBanner />
 
-        {/* Header mobile: nút mở menu + tên web (trái), tìm kiếm + giao diện (phải). */}
+        {/* Header mobile: nút mở menu + tên trang đang xem (trái), tìm kiếm + giao diện (phải). */}
         <header
           className={`lg:hidden sticky top-0 z-30 flex items-center justify-between gap-2 px-3 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] transition-colors duration-300 ${barBg}`}
         >
@@ -62,10 +61,7 @@ export default function Layout() {
             >
               <Menu size={22} />
             </button>
-            <div className="flex items-center gap-2 min-w-0">
-              <BrandMark size={30} />
-              <p className="font-bold text-base tracking-tight text-[var(--md-on-surface)] truncate">{t('app.name')}</p>
-            </div>
+            <PageTitle compact />
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             <button
@@ -85,7 +81,7 @@ export default function Layout() {
         <header
           className={`hidden lg:flex sticky top-0 z-30 items-center justify-between gap-3 px-8 py-3 transition-colors duration-300 ${barBg}`}
         >
-          <Breadcrumb />
+          <PageTitle />
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"

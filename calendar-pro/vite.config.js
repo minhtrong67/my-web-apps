@@ -18,9 +18,9 @@ export default defineConfig({
         // Nền splash của hệ điều hành lấy từ đây (tĩnh, đọc lúc cài đặt/khởi chạy): mặc định = nền sáng.
         // `color_scheme_dark` là thành phần mới trong đặc tả Web App Manifest cho bản tối; trình duyệt chưa hỗ trợ sẽ bỏ qua
         // (không gây lỗi). Màn hình chờ trong index.html đảm nhiệm phần còn lại ngay khi trang mở.
-        theme_color: '#F7F4F5',
-        background_color: '#F7F4F5',
-        color_scheme_dark: { theme_color: '#0F1217', background_color: '#0F1217' },
+        theme_color: '#FFF8F7',
+        background_color: '#FFF8F7',
+        color_scheme_dark: { theme_color: '#1D1011', background_color: '#1D1011' },
         display: 'standalone',
         orientation: 'any',
         scope: '/',
@@ -50,6 +50,16 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,ico}'],
         cleanupOutdatedCaches: true,
         runtimeCaching: [
+          {
+            // Font chữ tự host (Google Sans Flex, Roboto Flex, Inter...): chỉ tải khi người dùng chọn, rồi cache lâu dài để dùng offline
+            urlPattern: /\/assets\/.*\.woff2$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'app-fonts',
+              expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          },
           {
             // Stylesheet font icon: dùng bản cache ngay, cập nhật ngầm
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

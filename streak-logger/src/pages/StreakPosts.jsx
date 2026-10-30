@@ -4,7 +4,6 @@ import {
   NotebookText,
   Pencil,
   Trash2,
-  Eye,
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
@@ -19,7 +18,6 @@ import Toolbar from "../components/ui/Toolbar";
 import Button from "../components/ui/Button";
 import Select from "../components/ui/Select";
 import Input from "../components/ui/Input";
-import Checkbox from "../components/ui/Checkbox";
 import EmptyState from "../components/ui/EmptyState";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import IconButton from "../components/ui/IconButton";
@@ -28,7 +26,6 @@ import Pagination from "../components/ui/Pagination";
 import Fab from "../components/ui/Fab";
 import SwipeRow from "../components/SwipeRow";
 import StreakPostForm from "../components/StreakPostForm";
-import StreakPostView from "../components/StreakPostView";
 import { SkeletonTableRow, SkeletonCard } from "../components/ui/Skeleton";
 import { formatDateOnly, getPeriodOfDay, PERIOD_ORDER } from "../utils/date";
 import { PERIOD_TONE } from "../utils/period";
@@ -48,7 +45,6 @@ export default function StreakPosts() {
     create,
     update,
     remove,
-    removeMany,
   } = useStreakPosts();
 
   const [search, setSearch] = useState("");
@@ -61,10 +57,7 @@ export default function StreakPosts() {
   const [page, setPage] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [viewing, setViewing] = useState(null);
   const [deleting, setDeleting] = useState(null);
-  const [selected, setSelected] = useState([]);
-  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   const sortOptions = [
     { value: "newest", label: t("common.newest") },
@@ -139,15 +132,6 @@ export default function StreakPosts() {
     if (page > totalPages) setPage(totalPages);
   }, [page, totalPages]);
 
-  // Bỏ chọn các mục đã bị xóa (ví dụ xóa từ thiết bị khác).
-  useEffect(() => {
-    setSelected((prev) => {
-      const ids = new Set(items.map((i) => i.id));
-      const next = prev.filter((id) => ids.has(id));
-      return next.length === prev.length ? prev : next;
-    });
-  }, [items]);
-
   const paginated = useMemo(
     () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
     [filtered, page],
@@ -191,25 +175,6 @@ export default function StreakPosts() {
       toast.error(t("toast.error"));
     }
   };
-
-  const handleBulkDelete = async () => {
-    try {
-      await removeMany(selected);
-      setSelected([]);
-      toast.success(t("toast.deleted"));
-    } catch {
-      toast.error(t("toast.error"));
-    }
-  };
-
-  const toggleSelected = (id) =>
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  const allSelected =
-    filtered.length > 0 && selected.length === filtered.length;
-  const toggleSelectAll = () =>
-    setSelected(allSelected ? [] : filtered.map((f) => f.id));
 
   const toggleDateSort = () =>
     setSort((s) => (s === "newest" ? "oldest" : "newest"));
@@ -281,23 +246,6 @@ export default function StreakPosts() {
         </div>
       </Toolbar>
 
-      {selected.length > 0 && (
-        <div className="anim-pop flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 px-5 py-3 rounded-[24px] bg-[var(--md-primary-container)] text-sm">
-          <span className="text-[var(--md-on-primary-container)] font-bold">
-            {t("common.rowsSelected", { count: selected.length })}
-          </span>
-          <div>
-            <Button
-              variant="danger"
-              icon={Trash2}
-              onClick={() => setBulkDeleteOpen(true)}
-            >
-              {t("common.deleteSelected")}
-            </Button>
-          </div>
-        </div>
-      )}
-
       {error && (
         <p className="mb-4 text-sm font-medium text-[var(--md-error)]">
           {t("toast.loadError")}
@@ -347,13 +295,6 @@ export default function StreakPosts() {
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="border-b border-[var(--md-outline-variant)] text-left text-xs font-semibold text-[var(--md-on-surface-variant)]">
-                    <th className="sticky left-0 z-10 bg-[var(--md-surface-container-low)] px-4 py-3 w-10">
-                      <Checkbox
-                        checked={allSelected}
-                        onChange={toggleSelectAll}
-                        aria-label={t("common.all")}
-                      />
-                    </th>
                     <th className="px-2 py-3 font-semibold">
                       <button
                         type="button"
@@ -391,7 +332,6 @@ export default function StreakPosts() {
                     </th>
                   </tr>
                   <tr className="border-b border-[var(--md-outline-variant)] bg-[var(--md-surface-container)]">
-                    <th className="sticky left-0 z-10 bg-[var(--md-surface-container)] px-4 py-2" />
                     <th className="px-2 py-2" />
                     <th className="px-2 py-2" />
                     <th className="px-2 py-2">
@@ -425,18 +365,8 @@ export default function StreakPosts() {
                     return (
                       <tr
                         key={row.id}
-                        className="group border-b border-[var(--md-outline-variant)] last:border-0 transition-colors cursor-pointer hover:bg-[color-mix(in_oklab,var(--md-primary)_8%,transparent)]"
-                        onClick={() => setViewing(row)}
+                        className="group border-b border-[var(--md-outline-variant)] last:border-0 transition-colors hover:bg-[color-mix(in_oklab,var(--md-primary)_8%,transparent)]"
                       >
-                        <td
-                          className="sticky left-0 z-10 bg-[var(--md-surface-container-low)] group-hover:bg-[color-mix(in_oklab,var(--md-primary)_8%,var(--md-surface-container-low))] transition-colors px-4 py-3"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Checkbox
-                            checked={selected.includes(row.id)}
-                            onChange={() => toggleSelected(row.id)}
-                          />
-                        </td>
                         <td className="px-2 py-3 whitespace-nowrap text-[var(--md-on-surface)]">
                           {formatDateOnly(row.post_date)}{" "}
                           <span className="tabular text-[var(--md-on-surface-variant)]">
@@ -454,17 +384,8 @@ export default function StreakPosts() {
                         <td className="px-2 py-3 max-w-xs text-[var(--md-on-surface-variant)] break-words">
                           {row.description}
                         </td>
-                        <td
-                          className="px-2 py-3"
-                          onClick={(e) => e.stopPropagation()}
-                        >
+                        <td className="px-2 py-3">
                           <div className="flex items-center justify-end gap-1.5 pr-2 relative z-0">
-                            <IconButton
-                              tone="info"
-                              icon={Eye}
-                              label={t("common.view")}
-                              onClick={() => setViewing(row)}
-                            />
                             <IconButton
                               tone="primary"
                               icon={Pencil}
@@ -500,7 +421,6 @@ export default function StreakPosts() {
             </p>
             {paginated.map((row) => {
               const period = getPeriodOfDay(row.post_time);
-              const isSelected = selected.includes(row.id);
               return (
                 <SwipeRow
                   key={row.id}
@@ -508,25 +428,9 @@ export default function StreakPosts() {
                   onSwipeLeft={() => setDeleting(row)}
                   className="stagger-item"
                 >
-                  <div
-                    onClick={() => setViewing(row)}
-                    className={`m3-ripple rounded-[var(--radius-card)] p-4 flex flex-col gap-3 cursor-pointer transition-colors duration-300 ${
-                      isSelected
-                        ? "bg-[var(--md-primary-container)] text-[var(--md-on-primary-container)]"
-                        : "bg-[var(--md-surface-container-low)] text-[var(--md-on-surface)]"
-                    }`}
-                  >
+                  <div className="rounded-[var(--radius-card)] p-4 flex flex-col gap-3 bg-[var(--md-surface-container-low)] text-[var(--md-on-surface)]">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3 min-w-0">
-                        <div
-                          onClick={(e) => e.stopPropagation()}
-                          className="pt-0.5"
-                        >
-                          <Checkbox
-                            checked={isSelected}
-                            onChange={() => toggleSelected(row.id)}
-                          />
-                        </div>
                         <div className="min-w-0">
                           <p className="font-bold text-base break-words">
                             {row.duration}
@@ -569,14 +473,6 @@ export default function StreakPosts() {
         initial={editing}
       />
 
-      <StreakPostView
-        open={!!viewing}
-        onClose={() => setViewing(null)}
-        post={viewing}
-        onEdit={openEdit}
-        onDelete={(row) => setDeleting(row)}
-      />
-
       <ConfirmDialog
         open={!!deleting}
         onClose={() => setDeleting(null)}
@@ -589,14 +485,6 @@ export default function StreakPosts() {
       />
 
       <Fab icon={Plus} label={t("common.addNew")} onClick={openAdd} />
-
-      <ConfirmDialog
-        open={bulkDeleteOpen}
-        onClose={() => setBulkDeleteOpen(false)}
-        onConfirm={handleBulkDelete}
-        title={t("common.deleteSelected")}
-        body={`${t("common.deleteConfirmBody")} (${selected.length})`}
-      />
     </div>
   );
 }

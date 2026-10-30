@@ -44,13 +44,13 @@ export const CATEGORY_LABEL = {
   'ton-giao': 'Tôn giáo'
 }
 
-/** Màu chấm nhận diện danh mục — là dấu hiệu duy nhất mang màu, phần còn lại giữ trung tính */
+/** Màu nhận diện danh mục — dùng vai trò màu của theme (tự đổi theo màu chủ đạo, sáng/tối) */
 export const CATEGORY_DOT = {
-  'quoc-le': 'bg-rose-500',
-  'truyen-thong': 'bg-amber-500',
-  'ky-niem': 'bg-sky-500',
-  'quoc-te': 'bg-emerald-500',
-  'ton-giao': 'bg-violet-500'
+  'quoc-le': 'bg-primary',
+  'truyen-thong': 'bg-holiday',
+  'ky-niem': 'bg-tertiary',
+  'quoc-te': 'bg-chay',
+  'ton-giao': 'bg-secondary'
 }
 
 /** Danh sách ngày chay trong tháng âm lịch (Thập trai - 10 ngày chay/tháng) */

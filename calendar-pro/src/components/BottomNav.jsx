@@ -2,7 +2,10 @@ import { NavLink } from 'react-router-dom'
 import Icon from './Icon'
 import { useTranslation } from '../i18n/useTranslation'
 
-/** Thanh điều hướng dưới (di động): đường kẻ mảnh phía trên, tab đang chọn có vạch 2px và chữ đậm hơn. */
+/**
+ * Thanh điều hướng dưới (di động) kiểu "floating" của Expressive: viên thuốc nổi cách mép, nền tonal;
+ * mục đang chọn có chỉ báo 64×32 bung ngang bằng spring, icon đặc và nhích lên.
+ */
 export default function BottomNav() {
   const { t } = useTranslation()
   const ITEMS = [
@@ -14,7 +17,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 flex items-stretch justify-around border-t border-outline-variant bg-card pb-[env(safe-area-inset-bottom)] sm:hidden"
+      className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 flex items-stretch justify-around rounded-[32px] bg-surface-high px-2 shadow-elevated sm:hidden"
       aria-label={t('nav.menu')}
     >
       {ITEMS.map(({ to, label, icon }) => (
@@ -22,15 +25,17 @@ export default function BottomNav() {
           key={to}
           to={to}
           end={to === '/'}
-          className="focus-ring group state relative flex h-16 flex-1 flex-col items-center justify-center gap-1 [@media(max-height:480px)]:h-12 [@media(max-height:480px)]:gap-0"
+          className="focus-ring group relative flex h-[72px] flex-1 flex-col items-center justify-center gap-1 rounded-3xl [@media(max-height:480px)]:h-14 [@media(max-height:480px)]:gap-0"
         >
           {({ isActive }) => (
             <>
-              {isActive && <span className="absolute inset-x-6 top-0 h-0.5 rounded-b-full bg-primary" aria-hidden="true" />}
-              <span className={isActive ? 'text-primary' : 'text-ink-soft'}>
-                <Icon name={icon} size={24} weight={isActive ? 400 : 300} />
+              <span className="relative flex h-8 w-16 items-center justify-center">
+                <span className="nav-indicator absolute inset-0 rounded-full bg-secondary-container" data-active={isActive} />
+                <span className={`state relative flex h-8 w-16 items-center justify-center rounded-full ${isActive ? 'text-on-secondary-container' : 'text-on-surface-variant'}`}>
+                  <Icon name={icon} size={24} filled={isActive} weight={isActive ? 500 : 400} className="nav-icon" />
+                </span>
               </span>
-              <span className={`text-label-sm ${isActive ? 'text-primary' : 'text-ink-soft'}`}>{label}</span>
+              <span className={`text-label-md ${isActive ? 'font-bold text-on-surface' : 'text-on-surface-variant'}`}>{label}</span>
             </>
           )}
         </NavLink>

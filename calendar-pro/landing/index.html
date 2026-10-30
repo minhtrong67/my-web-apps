@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Calendar Pro — Lịch âm dương &amp; vạn niên · Material 3 Expressive</title>
+<meta name="description" content="Calendar Pro: lịch âm dương, lịch vạn niên, đếm ngược ngày lễ Việt Nam, ngày chay và rằm. Thiết kế Material 3 Expressive (2026), màu Rose, PWA dùng offline." />
+<meta property="og:title" content="Calendar Pro — Lịch âm dương &amp; vạn niên" />
+<meta property="og:description" content="Material 3 Expressive · Rose · 7 phông chữ · PWA" />
+<meta property="og:image" content="../public/og-image.png" />
+<link rel="icon" type="image/svg+xml" href="../public/favicon.svg" />
+<link rel="apple-touch-icon" href="../public/icons/apple-touch-icon.png" />
+<meta name="theme-color" content="#FFF8F7" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#1D1011" media="(prefers-color-scheme: dark)" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400..800&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --surface:#fff8f7; --low:#fff0ef; --container:#ffe9e9; --high:#ffe2e2; --on:#22181a; --on-var:#5b3f42;
+  --primary:#be003a; --on-primary:#fff; --pc:#ffdadb; --on-pc:#40000e; --sc:#ffdad4; --on-sc:#3a0905; --tc:#fcd7ff; --on-tc:#2c0a35; --tertiary:#7f4a8b;
+  --spring:cubic-bezier(.34,1.45,.55,1); --shadow:0 18px 50px -18px rgb(190 0 58 / .45);
+  --cookie:polygon(50.00% 0.00%,54.27% 1.14%,58.11% 3.98%,61.50% 7.10%,64.86% 9.16%,68.77% 9.75%,73.36% 9.53%,78.13% 9.83%,82.14% 11.70%,84.68% 15.32%,85.80% 19.96%,86.38% 24.52%,87.64% 28.27%,90.25% 31.23%,93.91% 34.02%,97.37% 37.31%,99.24% 41.32%,98.86% 45.73%,96.73% 50.00%,94.25% 53.87%,92.80% 57.55%,92.90% 61.50%,93.91% 65.98%,94.45% 70.73%,93.30% 75.00%,90.17% 78.13%,85.80% 80.04%,81.41% 81.41%,77.93% 83.29%,75.48% 86.38%,73.36% 90.47%,70.73% 94.45%,67.10% 96.98%,62.69% 97.37%,58.11% 96.02%,53.87% 94.25%,50.00% 93.46%,46.13% 94.25%,41.89% 96.02%,37.31% 97.37%,32.90% 96.98%,29.27% 94.45%,26.64% 90.47%,24.52% 86.38%,22.07% 83.29%,18.59% 81.41%,14.20% 80.04%,9.83% 78.13%,6.70% 75.00%,5.55% 70.73%,6.09% 65.98%,7.10% 61.50%,7.20% 57.55%,5.75% 53.87%,3.27% 50.00%,1.14% 45.73%,0.76% 41.32%,2.63% 37.31%,6.09% 34.02%,9.75% 31.23%,12.36% 28.27%,13.62% 24.52%,14.20% 19.96%,15.32% 15.32%,17.86% 11.70%,21.87% 9.83%,26.64% 9.53%,31.23% 9.75%,35.14% 9.16%,38.50% 7.10%,41.89% 3.98%,45.73% 1.14%); --flower:polygon(50.00% 0.00%,54.31% 0.73%,58.33% 2.78%,61.84% 5.82%,64.79% 9.36%,67.31% 12.89%,69.63% 15.99%,72.09% 18.45%,74.97% 20.24%,78.41% 21.59%,82.39% 22.82%,86.66% 24.33%,90.81% 26.44%,94.37% 29.31%,96.90% 32.93%,98.11% 37.11%,97.92% 41.55%,96.50% 45.93%,94.25% 50.00%,91.66% 53.64%,89.24% 56.92%,87.37% 60.01%,86.26% 63.20%,85.83% 66.71%,85.83% 70.69%,85.83% 75.09%,85.40% 79.71%,84.16% 84.16%,81.92% 88.04%,78.67% 90.94%,74.61% 92.63%,70.09% 93.09%,65.48% 92.52%,61.07% 91.30%,57.04% 89.93%,53.40% 88.89%,50.00% 88.50%,46.60% 88.89%,42.96% 89.93%,38.93% 91.30%,34.52% 92.52%,29.91% 93.09%,25.39% 92.63%,21.33% 90.94%,18.08% 88.04%,15.84% 84.16%,14.60% 79.71%,14.17% 75.09%,14.17% 70.69%,14.17% 66.71%,13.74% 63.20%,12.63% 60.01%,10.76% 56.92%,8.34% 53.64%,5.75% 50.00%,3.50% 45.93%,2.08% 41.55%,1.89% 37.11%,3.10% 32.93%,5.63% 29.31%,9.19% 26.44%,13.34% 24.33%,17.61% 22.82%,21.59% 21.59%,25.03% 20.24%,27.91% 18.45%,30.37% 15.99%,32.69% 12.89%,35.21% 9.36%,38.16% 5.82%,41.67% 2.78%,45.69% 0.73%); --scallop:polygon(50.00% 0.00%,54.25% 1.38%,58.06% 4.28%,61.71% 6.30%,65.88% 6.37%,70.63% 5.76%,75.00% 6.70%,78.00% 10.02%,79.84% 14.43%,81.99% 18.01%,85.57% 20.16%,89.98% 22.00%,93.30% 25.00%,94.24% 29.37%,93.63% 34.12%,93.70% 38.29%,95.72% 41.94%,98.62% 45.75%,100.00% 50.00%,98.62% 54.25%,95.72% 58.06%,93.70% 61.71%,93.63% 65.88%,94.24% 70.63%,93.30% 75.00%,89.98% 78.00%,85.57% 79.84%,81.99% 81.99%,79.84% 85.57%,78.00% 89.98%,75.00% 93.30%,70.63% 94.24%,65.88% 93.63%,61.71% 93.70%,58.06% 95.72%,54.25% 98.62%,50.00% 100.00%,45.75% 98.62%,41.94% 95.72%,38.29% 93.70%,34.12% 93.63%,29.37% 94.24%,25.00% 93.30%,22.00% 89.98%,20.16% 85.57%,18.01% 81.99%,14.43% 79.84%,10.02% 78.00%,6.70% 75.00%,5.76% 70.63%,6.37% 65.88%,6.30% 61.71%,4.28% 58.06%,1.38% 54.25%,0.00% 50.00%,1.38% 45.75%,4.28% 41.94%,6.30% 38.29%,6.37% 34.12%,5.76% 29.37%,6.70% 25.00%,10.02% 22.00%,14.43% 20.16%,18.01% 18.01%,20.16% 14.43%,22.00% 10.02%,25.00% 6.70%,29.37% 5.76%,34.12% 6.37%,38.29% 6.30%,41.94% 4.28%,45.75% 1.38%);
+}
+@media (prefers-color-scheme: dark) { :root {
+  --surface:#1d1011; --low:#261819; --container:#2b1c1d; --high:#362627; --on:#f8dcdd; --on-var:#d9c0c1;
+  --primary:#ffb2b7; --on-primary:#67001b; --pc:#92002a; --on-pc:#ffdadb; --sc:#5c3f3a; --on-sc:#ffdad4; --tc:#6a3373; --on-tc:#fcd7ff; --tertiary:#e9b3f5;
+  --shadow:0 18px 50px -18px rgb(0 0 0 / .7);
+} }
+* { box-sizing:border-box; margin:0 }
+html { scroll-behavior:smooth }
+body { font-family:'Google Sans Flex',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif; background:var(--surface); color:var(--on); line-height:1.5; -webkit-font-smoothing:antialiased; overflow-x:hidden }
+a { color:inherit; text-decoration:none }
+.wrap { max-width:1160px; margin:0 auto; padding:0 24px }
+nav { position:sticky; top:0; z-index:20; backdrop-filter:blur(14px); background:color-mix(in srgb,var(--surface) 82%,transparent) }
+nav .wrap { display:flex; align-items:center; gap:14px; height:72px }
+nav img { width:40px; height:40px }
+nav b { font-size:20px; letter-spacing:-.02em; flex:1 }
+.btn { display:inline-flex; align-items:center; gap:8px; height:52px; padding:0 28px; border-radius:999px; font-weight:650; font-size:16px; background:var(--primary); color:var(--on-primary); transition:border-radius .4s var(--spring),transform .4s var(--spring) }
+.btn:hover { transform:translateY(-2px) } .btn:active { border-radius:16px; transform:scale(.96) }
+.btn.tonal { background:var(--sc); color:var(--on-sc) }
+.btn.sm { height:44px; padding:0 22px; font-size:15px }
+.hero { position:relative; padding:72px 0 40px; display:grid; grid-template-columns:1.05fr 1fr; gap:40px; align-items:center }
+.eyebrow { display:inline-flex; gap:8px; align-items:center; padding:8px 16px; border-radius:999px; background:var(--tc); color:var(--on-tc); font-weight:650; font-size:14px }
+h1 { font-size:clamp(44px,7vw,84px); line-height:.98; letter-spacing:-.045em; font-weight:800; margin:22px 0 20px }
+h1 em { font-style:normal; color:var(--primary) }
+.lead { font-size:20px; color:var(--on-var); max-width:520px }
+.cta { display:flex; gap:12px; flex-wrap:wrap; margin-top:32px }
+.stage { position:relative; aspect-ratio:1; }
+.blob { position:absolute; inset:0; background:var(--pc); clip-path:var(--cookie); animation:spin 70s linear infinite }
+.blob.b2 { inset:auto -4% -6% auto; width:34%; height:34%; background:var(--tc); clip-path:var(--flower); animation-duration:40s; animation-direction:reverse }
+.stage .shot { position:absolute; left:-6%; right:-14%; top:14%; border-radius:28px; box-shadow:var(--shadow); animation:float 7s ease-in-out infinite }
+.shot img { display:block; width:100%; border-radius:28px }
+@keyframes spin { to { transform:rotate(360deg) } }
+@keyframes float { 50% { transform:translateY(-12px) rotate(.6deg) } }
+section { padding:72px 0 }
+h2 { font-size:clamp(32px,4.5vw,52px); letter-spacing:-.035em; line-height:1.05; font-weight:800 }
+.sub { color:var(--on-var); font-size:19px; margin-top:12px; max-width:620px }
+.grid { display:grid; gap:18px; margin-top:40px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)) }
+.card { background:var(--container); border-radius:32px; padding:26px; transition:transform .5s var(--spring) }
+.card:hover { transform:translateY(-6px) }
+.ico { width:56px; height:56px; display:grid; place-items:center; font-size:26px; background:var(--pc); clip-path:var(--cookie); margin-bottom:18px }
+.card:nth-child(2n) .ico { background:var(--tc); clip-path:var(--flower) } .card:nth-child(3n) .ico { background:var(--sc); clip-path:var(--scallop) }
+.card h3 { font-size:21px; letter-spacing:-.015em } .card p { color:var(--on-var); margin-top:6px; font-size:15.5px }
+.gallery { display:grid; gap:22px; margin-top:40px; grid-template-columns:repeat(2,1fr) }
+.gallery figure { background:var(--container); border-radius:36px; padding:14px 14px 20px; transition:transform .5s var(--spring) }
+.gallery figure:hover { transform:translateY(-6px) scale(1.01) }
+.gallery img { width:100%; display:block; border-radius:24px }
+.gallery figcaption { padding:16px 10px 0; font-weight:650; font-size:18px } .gallery figcaption span { display:block; color:var(--on-var); font-weight:400; font-size:15px; margin-top:2px }
+.fonts { display:flex; flex-wrap:wrap; gap:12px; margin-top:32px }
+.fonts span { padding:14px 24px; border-radius:999px; background:var(--high); font-size:20px; font-weight:650 }
+.fonts span:nth-child(2) { background:var(--primary); color:var(--on-primary) }
+.band { background:var(--primary); color:var(--on-primary); border-radius:48px; padding:56px 40px; text-align:center; position:relative; overflow:hidden }
+.band::before,.band::after { content:''; position:absolute; background:var(--on-primary); opacity:.12; clip-path:var(--cookie); width:320px; height:320px; animation:spin 60s linear infinite }
+.band::before { left:-90px; top:-120px } .band::after { right:-100px; bottom:-140px; clip-path:var(--flower) }
+.band h2,.band p,.band .cta { position:relative } .band p { margin:12px auto 0; opacity:.9; max-width:520px; font-size:19px } .band .cta { justify-content:center }
+.band .btn { background:var(--on-primary); color:var(--primary) }
+footer { padding:40px 0 56px; color:var(--on-var); text-align:center; font-size:15px }
+.reveal { opacity:0; transform:translateY(34px) scale(.96); transition:opacity .6s ease, transform .8s var(--spring) } .reveal.in { opacity:1; transform:none }
+@media (max-width:860px) { .hero { grid-template-columns:1fr; padding-top:40px } .stage { max-width:520px; margin:10px auto 0; width:100% } .gallery { grid-template-columns:1fr } .stage .shot { right:-6% } }
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation:none!important; transition:none!important } .reveal { opacity:1; transform:none } }
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <img src="../public/icons/icon-96.png" alt="" /><b>Calendar Pro</b>
+  <a class="btn sm tonal" href="#anh">Ảnh chụp</a>
+  <a class="btn sm" href="../dist/index.html" id="open">Mở ứng dụng</a>
+</div></nav>
+
+<main class="wrap">
+  <header class="hero">
+    <div>
+      <span class="eyebrow">✦ Material 3 Expressive · 2026</span>
+      <h1>Lịch âm dương <em>đẹp</em> &amp; mượt.</h1>
+      <p class="lead">Tra lịch vạn niên, ngày chay, rằm, đếm ngược ngày lễ Việt Nam — trong một ứng dụng PWA với màu Rose rực rỡ, chuyển động lò xo và 7 phông chữ để chọn.</p>
+      <div class="cta"><a class="btn" href="../dist/index.html" id="open2">Dùng ngay</a><a class="btn tonal" href="#tinh-nang">Xem tính năng</a></div>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <div class="blob"></div><div class="blob b2"></div>
+      <div class="shot"><img src="../screenshots/01-home.png" alt="" /></div>
+    </div>
+  </header>
+
+  <section id="tinh-nang">
+    <h2 class="reveal">Mọi thứ về ngày tháng, gọn trong một nơi</h2>
+    <p class="sub reveal">Thuật toán âm lịch thiên văn (GMT+7), hoạt động offline, hai ngôn ngữ Việt/Anh.</p>
+    <div class="grid">
+      <article class="card reveal"><div class="ico">📅</div><h3>Lịch âm dương</h3><p>Mỗi ô ngày hiển thị cả dương và âm, đánh dấu rằm, mùng một, ngày chay và ngày lễ.</p></article>
+      <article class="card reveal"><div class="ico">📖</div><h3>Lịch vạn niên</h3><p>Can Chi ngày/tháng/năm, con giáp, giờ hoàng đạo; quy đổi hai chiều dương ↔ âm.</p></article>
+      <article class="card reveal"><div class="ico">⏳</div><h3>Đếm ngược ngày lễ</h3><p>Đồng hồ số cuộn thời gian thực và thanh tiến trình dạng sóng cho từng sự kiện.</p></article>
+      <article class="card reveal"><div class="ico">🌿</div><h3>Ngày chay &amp; rằm</h3><p>Tự động đánh dấu Nhị trai (Mùng Một &amp; Rằm), nhắc bằng thông báo trình duyệt.</p></article>
+      <article class="card reveal"><div class="ico">🎨</div><h3>10 màu chủ đạo</h3><p>Rose mặc định; toàn bộ bảng màu M3 sinh tự động, có chế độ sáng, tối và tương phản cao.</p></article>
+      <article class="card reveal"><div class="ico">⚡</div><h3>PWA offline</h3><p>Cài vào màn hình chính, mở nhanh, chạy cả khi mất mạng. Phím tắt <b>Ctrl/Cmd + K</b>.</p></article>
+    </div>
+  </section>
+
+  <section id="anh">
+    <h2 class="reveal">Bốn màn hình, một phong cách</h2>
+    <p class="sub reveal">Hình cookie, bo góc lớn, màu tonal và chuyển động có độ nảy.</p>
+    <div class="gallery">
+      <figure class="reveal"><img loading="lazy" src="../screenshots/01-home.png" alt="Trang chủ" /><figcaption>Trang chủ<span>Ngày âm lịch dạng số cuộn, sự kiện sắp tới</span></figcaption></figure>
+      <figure class="reveal"><img loading="lazy" src="../screenshots/02-calendar.png" alt="Lịch tháng chế độ tối" /><figcaption>Lịch tháng · chế độ tối<span>Ngày chọn hình cookie, chi tiết ngày bên phải</span></figcaption></figure>
+      <figure class="reveal"><img loading="lazy" src="../screenshots/03-countdown.png" alt="Đếm ngược sự kiện" /><figcaption>Đếm ngược<span>Số cuộn và thanh tiến trình dạng sóng</span></figcaption></figure>
+      <figure class="reveal"><img loading="lazy" src="../screenshots/04-settings.png" alt="Cài đặt màu và phông chữ" /><figcaption>Cài đặt<span>10 màu chủ đạo và 7 phông chữ</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="reveal">Chọn phông chữ bạn thích</h2>
+    <p class="sub reveal">Tất cả đều đủ dấu tiếng Việt, tự host và chỉ tải khi chọn.</p>
+    <div class="fonts reveal"><span style="font-family:system-ui">System</span><span>Google Sans Flex</span><span style="font-family:'Roboto Flex',Roboto,sans-serif">Roboto Flex</span><span style="font-family:Roboto,sans-serif">Roboto</span><span style="font-family:Arial,sans-serif">Arial</span><span style="font-family:Inter,sans-serif">Inter</span><span style="font-family:'Be Vietnam Pro',sans-serif">Be Vietnam Pro</span></div>
+  </section>
+
+  <section>
+    <div class="band reveal">
+      <h2>Sẵn sàng thử?</h2>
+      <p>Mở ứng dụng, chọn màu và phông chữ của riêng bạn.</p>
+      <div class="cta"><a class="btn" href="../dist/index.html" id="open3">Mở Calendar Pro</a></div>
+    </div>
+  </section>
+</main>
+<footer>Thiết kế &amp; phát triển bởi <b>minhtrong67</b> · Calendar Pro</footer>
+<script>
+  // Khi deploy, đổi đường dẫn "Mở ứng dụng" bằng URL thật của app (mặc định trỏ tới bản build cục bộ ../dist)
+  var APP_URL = '';
+  if (APP_URL) document.querySelectorAll('#open,#open2,#open3').forEach(function (a) { a.href = APP_URL; });
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .15 });
+  document.querySelectorAll('.reveal').forEach(function (el, i) { el.style.transitionDelay = (i % 3) * 70 + 'ms'; io.observe(el); });
+</script>
+</body>
+</html>

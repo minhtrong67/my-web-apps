@@ -1,0 +1,122 @@
+{
+  "rose": {
+    "light": {
+      "primary": "#be003a",
+      "on-primary": "#ffffff",
+      "tertiary-container": "#fcd7ff"
+    },
+    "dark": {
+      "primary": "#ffb2b7",
+      "on-primary": "#67001b",
+      "tertiary-container": "#653272"
+    }
+  },
+  "mono": {
+    "light": {
+      "primary": "#000000",
+      "on-primary": "#e2e2e2",
+      "tertiary-container": "#747474"
+    },
+    "dark": {
+      "primary": "#ffffff",
+      "on-primary": "#1b1b1b",
+      "tertiary-container": "#919191"
+    }
+  },
+  "do": {
+    "light": {
+      "primary": "#c00009",
+      "on-primary": "#ffffff",
+      "tertiary-container": "#ffd7f4"
+    },
+    "dark": {
+      "primary": "#ffb4a9",
+      "on-primary": "#690002",
+      "tertiary-container": "#6d2f66"
+    }
+  },
+  "vang": {
+    "light": {
+      "primary": "#7d5700",
+      "on-primary": "#ffffff",
+      "tertiary-container": "#ffdad3"
+    },
+    "dark": {
+      "primary": "#ffba30",
+      "on-primary": "#422c00",
+      "tertiary-container": "#7a2f20"
+    }
+  },
+  "xanh-la": {
+    "light": {
+      "primary": "#006d32",
+      "on-primary": "#ffffff",
+      "tertiary-container": "#f6e473"
+    },
+    "dark": {
+      "primary": "#00e470",
+      "on-primary": "#003917",
+      "tertiary-container": "#504700"
+    }
+  },
+  "xanh-duong": {
+    "light": {
+      "primary": "#005faf",
+      "on-primary": "#ffffff",
+      "tertiary-container": "#97f0ff"
+    },
+    "dark": {
+      "primary": "#a6c8ff",
+      "on-primary": "#00315f",
+      "tertiary-container": "#004f58"
+    }
+  },
+  "tim": {
+    "light": {
+      "primary": "#8100f5",
+      "on-primary": "#ffffff",
+      "tertiary-container": "#d3e4ff"
+    },
+    "dark": {
+      "primary": "#d8baff",
+      "on-primary": "#440087",
+      "tertiary-container": "#004881"
+    }
+  },
+  "hong": {
+    "light": {
+      "primary": "#b90062",
+      "on-primary": "#ffffff",
+      "tertiary-container": "#f0dbff"
+    },
+    "dark": {
+      "primary": "#ffb1c7",
+      "on-primary": "#650032",
+      "tertiary-container": "#59367d"
+    }
+  },
+  "cam": {
+    "light": {
+      "primary": "#994700",
+      "on-primary": "#ffffff",
+      "tertiary-container": "#ffd9e2"
+    },
+    "dark": {
+      "primary": "#ffb68a",
+      "on-primary": "#522300",
+      "tertiary-container": "#772c49"
+    }
+  },
+  "ngoc-lam": {
+    "light": {
+      "primary": "#006a62",
+      "on-primary": "#ffffff",
+      "tertiary-container": "#bdf19d"
+    },
+    "dark": {
+      "primary": "#00dece",
+      "on-primary": "#003733",
+      "tertiary-container": "#26500f"
+    }
+  }
+}

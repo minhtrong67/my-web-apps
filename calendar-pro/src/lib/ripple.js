@@ -1,7 +1,8 @@
 /**
- * Hiệu ứng ripple M3 cho mọi phần tử có class ".state".
- * Dùng 1 listener ủy quyền duy nhất trên document (không gắn listener cho từng nút) và chỉ
- * animate transform/opacity nên không gây reflow.
+ * Hiệu ứng tương tác dùng chung — mỗi loại chỉ có MỘT listener ủy quyền trên document
+ * (không gắn listener cho từng nút) và chỉ animate transform / opacity nên không gây reflow.
+ *  1. Ripple M3 cho mọi phần tử có class ".state"
+ *  2. Spotlight: ánh sáng đi theo con trỏ trên mọi phần tử ".fx-spot"
  */
 export function initRipple() {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -27,4 +28,24 @@ export function initRipple() {
     },
     { passive: true }
   )
+
+  if (window.matchMedia('(hover: hover)').matches) {
+    let frame = 0
+    document.addEventListener(
+      'pointermove',
+      (e) => {
+        if (reduce.matches || frame) return
+        const target = e.target
+        frame = requestAnimationFrame(() => {
+          frame = 0
+          const el = target instanceof Element ? target.closest('.fx-spot') : null
+          if (!el) return
+          const r = el.getBoundingClientRect()
+          el.style.setProperty('--mx', `${e.clientX - r.left}px`)
+          el.style.setProperty('--my', `${e.clientY - r.top}px`)
+        })
+      },
+      { passive: true }
+    )
+  }
 }

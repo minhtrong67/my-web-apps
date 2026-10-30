@@ -28,41 +28,44 @@ function buildCells(year, month) {
   })
 }
 
-const DayCell = memo(function DayCell({ cell, selected, isToday, lunarWord, onSelect }) {
-  let tone = 'text-ink'
-  if (selected) tone = 'bg-primary text-on-primary'
-  else if (isToday) tone = 'border border-primary text-primary font-semibold'
+const DayCell = memo(function DayCell({ cell, selected, isToday, lunarWord, wave, onSelect }) {
+  let tone = 'text-on-surface'
+  if (selected) tone = 'text-on-primary'
+  else if (isToday) tone = 'text-primary font-bold shadow-[inset_0_0_0_2px_var(--primary)]'
   else if (cell.isSunday) tone = 'text-error'
 
   return (
     <button
       onClick={() => onSelect(cell.date)}
-      className={`state focus-ring mx-auto flex aspect-square w-full max-w-[3.75rem] flex-col lg:max-w-[4.25rem] items-center justify-center rounded-full transition-colors duration-150 ${tone} ${
+      style={{ '--wave': wave }}
+      className={`state day-wave focus-ring relative mx-auto flex aspect-square w-full max-w-[3.75rem] flex-col items-center justify-center rounded-full transition-[box-shadow,color] duration-effects ease-effects active:scale-90 lg:max-w-[4.5rem] ${tone} ${
         cell.inMonth ? '' : 'opacity-40'
       }`}
       aria-label={`${cell.label}, ${lunarWord} ${cell.lunarAria}`}
       aria-pressed={selected}
       aria-current={isToday ? 'date' : undefined}
     >
-      <span className="num text-body-lg leading-[1.125rem] sm:leading-5">{cell.day}</span>
+      {/* Ngày đang chọn: hình "cookie" 9 cánh nảy ra bằng spring */}
+      {selected && <span className="day-selected-shape shape-cookie absolute inset-[-3%] bg-primary" aria-hidden="true" />}
+      <span className="num relative text-title-md leading-[1.125rem] sm:leading-5">{cell.day}</span>
       <span
-        className={`num text-label-sm leading-[0.875rem] sm:leading-4 ${
-          selected ? 'opacity-80' : cell.isLunarMark ? 'font-semibold text-ink' : isToday || cell.isSunday ? 'opacity-70' : 'text-ink-soft'
+        className={`num relative text-label-sm leading-[0.875rem] sm:leading-4 ${
+          selected ? 'opacity-85' : cell.isLunarMark ? 'font-bold text-on-surface' : isToday || cell.isSunday ? 'opacity-75' : 'text-on-surface-variant'
         }`}
       >
         {cell.lunarLabel}
       </span>
       {(cell.isHoliday || cell.isChay) && (
-        <span className="absolute right-[12%] top-[12%] flex flex-col gap-0.5" aria-hidden="true">
-          {cell.isHoliday && <span className="h-1 w-1 rounded-full bg-amber-500" />}
-          {cell.isChay && <span className="h-1 w-1 rounded-full bg-emerald-500" />}
+        <span className="absolute right-[14%] top-[14%] flex flex-col gap-0.5" aria-hidden="true">
+          {cell.isHoliday && <span className={`h-1.5 w-1.5 rounded-full ${selected ? 'bg-on-primary' : 'bg-holiday'}`} />}
+          {cell.isChay && <span className={`h-1.5 w-1.5 rounded-full ${selected ? 'bg-on-primary/70' : 'bg-chay'}`} />}
         </span>
       )}
     </button>
   )
 })
 
-/** Lưới lịch tối giản: ngày đang chọn tô màu nhấn, hôm nay viền màu nhấn, ngày chủ nhật chữ đỏ. */
+/** Lưới lịch Expressive: ngày chọn = hình cookie màu chủ đạo, hôm nay = vòng viền, chủ nhật chữ đỏ; đổi tháng thì các ô nảy ra theo làn sóng chéo. */
 export default function CalendarGrid({ year, month, selectedDate, onSelect }) {
   const { t, lang } = useTranslation()
   const WEEKDAYS = weekdaysShort(lang)
@@ -74,7 +77,7 @@ export default function CalendarGrid({ year, month, selectedDate, onSelect }) {
 
   return (
     <div>
-      <div className="grid grid-cols-7 pb-2 text-center text-label-sm text-ink-faint">
+      <div className="grid grid-cols-7 pb-2 text-center text-label-md text-on-surface-variant">
         {WEEKDAYS.map((w, i) => (
           <div key={w} className={`py-2 ${i === 6 ? 'text-error' : ''}`}>
             {w}
@@ -82,13 +85,14 @@ export default function CalendarGrid({ year, month, selectedDate, onSelect }) {
         ))}
       </div>
       <div className="grid grid-cols-7 gap-y-1">
-        {cells.map((cell) => (
+        {cells.map((cell, i) => (
           <DayCell
             key={cell.key}
             cell={cell}
             selected={cell.key === selectedKey}
             isToday={cell.key === todayKey}
             lunarWord={lunarWord}
+            wave={Math.floor(i / 7) + (i % 7)}
             onSelect={onSelect}
           />
         ))}

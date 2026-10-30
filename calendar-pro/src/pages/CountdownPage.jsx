@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import CountdownCard from '../components/CountdownCard'
+import Icon from '../components/Icon'
 import Sheet from '../components/Sheet'
 import HolidayDetail from '../components/HolidayDetail'
 import { Page, PageHeader } from '../components/Page'
@@ -44,10 +45,11 @@ export default function CountdownPage() {
               key={f.id}
               onClick={() => setFilter(f.id)}
               aria-pressed={active}
-              className={`state focus-ring flex h-9 shrink-0 items-center rounded-lg border px-3.5 text-label-lg ${
-                active ? 'border-transparent bg-primary text-on-primary' : 'border-outline-variant text-ink-soft'
+              className={`state focus-ring flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-label-lg transition-[background-color,color,border-radius,box-shadow] duration-spatial-fast ease-spatial-fast active:scale-95 ${
+                active ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface-variant shadow-[inset_0_0_0_1px_var(--outline-variant)]'
               }`}
             >
+              {active && <Icon name="check" size={18} weight={600} className="animate-pop-in" />}
               {f.label}
             </button>
           )
@@ -56,7 +58,7 @@ export default function CountdownPage() {
 
       <section className="mt-4 sm:mt-6">
         {items.length === 0 ? (
-          <p className="rounded-2xl border border-outline-variant bg-card shadow-soft p-10 text-center text-body-md text-ink-soft">{t('countdown.empty')}</p>
+          <p className="rounded-3xl bg-surface-container p-10 text-center text-body-md text-on-surface-variant">{t('countdown.empty')}</p>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
             {items.map(({ holiday, next }, i) => (

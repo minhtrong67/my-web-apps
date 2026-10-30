@@ -272,7 +272,8 @@ button:not(:disabled),
 }
 
 .page-enter {
-  animation: fade-in-up 0.45s var(--ease-emphasized-decel) both;
+  /* backwards (không phải both): không giữ transform sau khi chạy xong, tránh tạo containing block cho phần tử fixed bên trong. */
+  animation: fade-in-up 0.45s var(--ease-emphasized-decel) backwards;
 }
 
 .anim-dialog-in { animation: dialog-in 0.38s var(--ease-spring-soft) both; }
@@ -294,7 +295,7 @@ button:not(:disabled),
 
 /* Danh sách hiện dần, mỗi phần tử trễ thêm một chút. */
 .stagger-item {
-  animation: fade-in-up 0.5s var(--ease-emphasized-decel) both;
+  animation: fade-in-up 0.5s var(--ease-emphasized-decel) backwards;
   animation-delay: var(--stagger-delay, 0ms);
 }
 

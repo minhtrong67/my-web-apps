@@ -22,6 +22,7 @@ English · [Tiếng Việt](README.vi.md)
 ## Table of contents
 
 - [Overview](#overview)
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Design system](#design-system)
 - [Customization](#customization)
@@ -39,12 +40,20 @@ English · [Tiếng Việt](README.vi.md)
 
 Streak Logger is a privacy-first web app for people who build habits. Sign in with Google, set a milestone (for example "no sugar since…") and the app counts the elapsed time live. Alongside it you keep a streak journal, and the statistics page turns those entries into charts. Everything syncs in real time across your devices through Firebase, and every account can only ever read its own data.
 
+## Screenshots
+
+| Sign in (light) | Streak Journal (light) |
+| :---: | :---: |
+| ![Sign in screen](screenshots/01-login.png) | ![Streak Journal page](screenshots/02-streak-journal.png) |
+| **Statistics (dark)** | **Settings (dark)** |
+| ![Statistics page](screenshots/03-statistics.png) | ![Settings page](screenshots/04-settings.png) |
+
 ## Features
 
 | Area | What you get |
 | --- | --- |
 | **Time Streak** | Live elapsed time (years, months, days, hours, minutes) since a milestone, with one-tap copy buttons and a countdown for future milestones. |
-| **Streak Journal** | Add, edit and view entries in full-screen sheets, delete with confirmation, a floating action button (FAB) to add. Search, sort and filter (time of day, date range), per-column search on desktop, swipe gestures on mobile (right to edit, left to delete) and bulk delete. |
+| **Streak Journal** | Add and edit entries in full-screen sheets, delete with confirmation, and a floating action button (FAB) that only appears on this page. Search, sort and filter (time of day, date range), per-column search on desktop and swipe gestures on mobile (right to edit, left to delete). |
 | **Statistics** | Highlight cards and **two pie charts** (distribution over time and by time of day) with full labels and values on the chart, plus **percentage progress bars** right below each pie. Views by day, week, month or year. Export a **detailed PDF** report or a compact **PNG** (figures and the two pie charts only). |
 | **Settings** | Display mode, theme color and font (collapsible sections), text size, language, **import and export of the journal** (CSV, JSON, Excel; export also Word, PDF, PNG), install prompt, reset to defaults, sign out and the author card. |
 | **Safety** | Every edit and delete goes through a confirmation dialog. Input is trimmed and validated on the client and again by Firestore Rules. |
@@ -59,7 +68,8 @@ The interface follows **Material 3 Expressive**:
 - **Motion**: spring easing with a slight overshoot, emphasized easing for page and sheet transitions, ripple and state layers on every interactive element, staggered list entrances. `prefers-reduced-motion` is respected.
 - **Components**: navigation drawer / rail, navigation bar with a pill indicator, connected button groups, tonal icon buttons, filled text fields, switches, snackbars (toasts), dialogs, full-screen sheets and bottom sheets.
 - **Action buttons** in every dialog, confirm dialog and sheet carry a **label, an icon and a role color** so each action is recognizable at a glance: Cancel (neutral, `X`), Save (primary, `Check`), Update (primary, `Save`), Delete (error, `Trash2`), Sign out and Reset (warning).
-- **Sheets vs. dialogs**: every add, edit and detail view is a full-screen sheet; dialogs are reserved for short confirmations. Updating or deleting always asks for confirmation first. Option lists on mobile use a bottom sheet.
+- **Sheets vs. dialogs**: every add and edit form is a full-screen sheet; dialogs are reserved for short confirmations. Updating or deleting always asks for confirmation first, and the two actions of every dialog, confirm dialog and sheet sit side by side on one row. Option lists on mobile use a bottom sheet.
+- **Header** shows the name of the page you are on instead of the app logo and name.
 - **Toasts** have four variants (`info`, `success`, `error`, `warning`), adapt to light and dark, pause on hover and show a countdown bar.
 - **Scroll to top** button appears after scrolling down, animates with a custom requestAnimationFrame easing (independent of the OS reduced-motion setting and of CSS `scroll-behavior`), and lifts above the FAB when one is shown.
 - **Custom dropdowns**: no native `<select>`. The listbox follows light/dark and the theme color, opens in a portal (never clipped by dialogs or accordions), flips upward when there is no room, is capped at 280px with a scrollbar and supports the keyboard.
@@ -175,7 +185,7 @@ Rows with a missing duration or an invalid date or time are skipped and reported
 
 ```
 src/
-  components/      layout, forms, export menu, swipe rows, brand mark...
+  components/      layout, page title, forms, export menu, swipe rows, brand mark...
     ui/            primitives: Button, Modal, Sheet, ConfirmDialog, Segmented, Toast helpers...
   context/         Auth, Theme (mode + color), Appearance (size + font), Lang, Toast
   hooks/           Firestore realtime hooks, overlays, media queries, scroll position, PWA install
@@ -186,6 +196,7 @@ src/
   utils/           validation, import, export, statistics, PDF report, ripple
 scripts/           generate-icons.mjs (favicon, app icons, splash screens)
 firestore.rules    Firestore security rules
+screenshots/       images used in this README
 ```
 
 ## Progressive Web App

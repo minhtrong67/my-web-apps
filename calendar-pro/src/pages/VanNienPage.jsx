@@ -59,9 +59,14 @@ export default function VanNienPage() {
 
       {/* Màn hình rộng: biểu mẫu cố định bên trái, kết quả bên phải */}
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-[22rem_minmax(0,1fr)] lg:items-start">
-        <section className="rounded-2xl border border-outline-variant bg-card shadow-soft lg:sticky lg:top-8">
-          {/* Tab dạng gạch chân */}
-          <div className="flex border-b border-outline-variant" role="tablist">
+        <section className="rounded-[32px] bg-surface-container lg:sticky lg:top-8">
+          {/* Tab dạng viên thuốc: chỉ báo trượt giữa 2 tab bằng spring */}
+          <div className="relative m-3 mb-0 flex rounded-full bg-surface-high p-1" role="tablist">
+            <span
+              aria-hidden="true"
+              className="slide-indicator absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-primary"
+              style={{ transform: `translateX(${mode === 'solar' ? 0 : 100}%)` }}
+            />
             <TabButton active={mode === 'solar'} onClick={() => setMode('solar')}>
               {t('vanNien.fromSolar')}
             </TabButton>
@@ -70,8 +75,8 @@ export default function VanNienPage() {
             </TabButton>
           </div>
 
-          <div className="p-4 sm:p-6">
-            <div className="grid grid-cols-3 gap-3 pt-2">
+          <div className="p-4 pt-5 sm:p-6 sm:pt-6">
+            <div className="grid grid-cols-3 gap-2.5">
               {mode === 'solar' ? (
                 <>
                   <Select label={t('vanNien.day')} value={solar.d} onChange={(v) => setSolar((s) => ({ ...s, d: v }))} options={DAYS} isYear={false} />
@@ -112,19 +117,18 @@ function TabButton({ active, onClick, children }) {
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`state focus-ring relative flex h-12 flex-1 items-center justify-center text-label-lg first:rounded-tl-2xl last:rounded-tr-2xl ${
-        active ? 'text-primary' : 'text-ink-soft'
+      className={`state focus-ring relative z-10 flex h-12 flex-1 items-center justify-center rounded-full text-label-lg transition-colors duration-effects ease-effects ${
+        active ? 'text-on-primary' : 'text-on-surface-variant'
       }`}
     >
       {children}
-      {active && <span className="absolute inset-x-5 bottom-0 h-0.5 bg-primary" aria-hidden="true" />}
     </button>
   )
 }
 
 function Select({ label, value, onChange, options, isYear }) {
   return (
-    <SelectField label={label} value={value} onChange={(e) => onChange(Number(e.target.value))} labelBg="bg-card">
+    <SelectField label={label} value={value} onChange={(e) => onChange(Number(e.target.value))}>
       {options.map((o) => (
         <option key={o} value={o}>
           {isYear ? o : pad2(o)}

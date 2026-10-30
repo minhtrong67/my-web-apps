@@ -1,231 +1,82 @@
+@import './theme/material-theme.css';
+@import './theme/motion.css';
+@import './theme/shapes.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ===========================================================================
-   Calendar Pro — Modern minimalist
-   Nguyên tắc: nền trung tính, đường kẻ mảnh thay cho đổ bóng, 1 màu nhấn dùng tiết chế
-   (nút chính, hôm nay / ngày đang chọn), bo góc nhỏ, chuyển động ngắn.
+   Calendar Pro — Material 3 Expressive (2026)
+   • Màu: DynamicScheme "vibrant" từ màu chủ đạo (mặc định Rose) — xem scripts/generate-theme.mjs
+   • Hình dạng: bo góc lớn (28–48px), nút biến hình khi nhấn, các hình cookie / scallop / flower
+   • Chuyển động: spring có độ nảy (spatial) + đường cong không nảy cho màu/độ trong suốt (effects)
+   • Bề mặt "tonal" thay cho viền; đổ bóng chỉ dùng cho lớp nổi
    =========================================================================== */
 
 :root {
   --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif;
-
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --ease-decel: cubic-bezier(0.05, 0.7, 0.1, 1);
-  --ease-accel: cubic-bezier(0.3, 0, 0.8, 0.15);
   --font-scale: 1;
   color-scheme: light;
-
-  /* Màu nhấn mặc định (Đơn sắc) — các theme màu khác ghi đè thang này bên dưới */
-  --accent-50: #FAFAFA; --accent-100: #F4F4F5; --accent-200: #E4E4E7;
-  --accent-300: #D4D4D8; --accent-400: #A1A1AA; --accent-500: #52525B;
-  --accent-600: #0A0A0B; --accent-700: #1E232C; --accent-800: #27272A;
-  --accent-900: #3F3F46;
-
-  /* Nền trang xám hồng rất nhạt; thẻ (surface-lowest) trắng nổi lên trên nền */
-  --surface: #F7F4F5;
-  --surface-lowest: #FFFFFF;
-  --surface-low: #FBF9FA;
-  --surface-container: #F3EFF0;
-  --surface-high: #ECE7E9;
-  --surface-highest: #E4DEE1;
-
-  /* Chữ: ink-faint ≥ 4.5:1 trên nền trắng */
-  --ink: #0A0A0B;
-  --ink-soft: #52525B;
-  --ink-faint: #71717A;
-
-  /* Đường kẻ: outline-variant cho viền thẻ / đường phân cách; outline cho viền ô nhập (≥ 3:1) */
-  --outline: #8E8E98;
-  --outline-variant: #E8E2E5;
-
-  /* Vai trò màu */
-  --primary: var(--accent-600);
-  --on-primary: #FFFFFF;
-  /* Nền nhạt của màu nhấn: dùng cho icon, nhãn, mục đang chọn, ô đếm ngược */
-  --primary-container: var(--accent-100);
-  --on-primary-container: var(--accent-800);
-  --secondary-container: var(--accent-100);
-  --on-secondary-container: var(--accent-800);
-  --tertiary: var(--primary);
-  --on-tertiary: var(--on-primary);
-  --tertiary-container: var(--surface-low);
-  --on-tertiary-container: var(--ink);
-  --error: #B42318; --on-error: #FFFFFF;
-  --error-container: #FEE4E2; --on-error-container: #912018;
-  --inverse-surface: #0A0A0B; --inverse-on-surface: #FAFAFA; --inverse-primary: var(--accent-200);
-
-  /* alias cũ */
-  --surface-soft: var(--surface-low);
-  --surface-raised: var(--surface-container);
-  --border-color: var(--outline-variant);
+  /* Giá trị dự phòng trước khi theme màu được áp dụng */
+  --shadow: #000;
 }
 
-/* Cỡ chữ tổng thể: co giãn trên html để mọi đơn vị rem (chữ + khoảng cách) tỉ lệ đồng đều như zoom */
 html {
   font-size: calc(16px * var(--font-scale));
-}
-
-.dark {
-  color-scheme: dark;
-  --surface: #0F1217;
-  --surface-lowest: #181C24;
-  --surface-low: #141820;
-  --surface-container: #1F242E;
-  --surface-high: #272D38;
-  --surface-highest: #2F3642;
-
-  --ink: #EEF2F8;
-  --ink-soft: #B2BCCB;
-  --ink-faint: #93A0B4;
-
-  --outline: #738095;
-  --outline-variant: #2A313C;
-
-  --primary: var(--accent-500);
-  --on-primary: #0A0A0B;
-  --primary-container: color-mix(in srgb, var(--accent-500) 22%, var(--surface-lowest));
-  --on-primary-container: var(--accent-200);
-  --secondary-container: color-mix(in srgb, var(--accent-500) 22%, var(--surface-lowest));
-  --on-secondary-container: var(--accent-200);
-  --error: #F97066; --on-error: #0A0A0B;
-  --error-container: #55160C; --on-error-container: #FEE4E2;
-  --inverse-surface: #F4F4F5; --inverse-on-surface: #13161C; --inverse-primary: var(--accent-700);
-}
-
-/* Người dùng bật "tương phản cao" ở hệ điều hành: đậm đường kẻ và chữ phụ */
-@media (prefers-contrast: more) {
-  :root { --outline-variant: #8E8E98; --ink-soft: #3F3F46; --ink-faint: #52525B; }
-  .dark { --outline-variant: #738095; --ink-soft: #D4D4D8; --ink-faint: #BDBDC6; }
-}
-
-/* ==== Màu nhấn ==== */
-.dark[data-color='mono'], .dark:root:not([data-color]) {
-  --accent-400: #A1A1AA; --accent-500: #FAFAFA; --accent-600: #FAFAFA;
-}
-
-[data-color='rose'] {
-  --accent-50: #FFF1F2; --accent-100: #FFE4E6; --accent-200: #FECDD3;
-  --accent-300: #FDA4AF; --accent-400: #FF637E; --accent-500: #FF2056;
-  --accent-600: #FF2056; --accent-700: #C70036; --accent-800: #A50036;
-  --accent-900: #8B0836;
-}
-.dark[data-color='rose'] { --accent-500: #FF2056; --accent-600: #FF637E; --accent-400: #FF637E; --on-primary: #FFFFFF; } /* chữ trên nền rose luôn trắng, cả chế độ tối */
-
-[data-color='do'] {
-  --accent-50: #FDF1EF; --accent-100: #FADBD5; --accent-200: #F3B3A8;
-  --accent-300: #EA8A79; --accent-400: #DE5F49; --accent-500: #C43C29;
-  --accent-600: #B3261E; --accent-700: #911D18; --accent-800: #711612;
-  --accent-900: #4E0F0C;
-}
-.dark[data-color='do'] { --accent-500: #E8604A; --accent-600: #EA7A63; --accent-400: #F0937D; }
-
-[data-color='vang'] {
-  --accent-50: #FEF8EC; --accent-100: #FCEAC1; --accent-200: #F9D783;
-  --accent-300: #F3BE45; --accent-400: #E8A61E; --accent-500: #C9860F;
-  --accent-600: #A5690B; --accent-700: #7E4F0A; --accent-800: #5A3808;
-  --accent-900: #3B2405;
-}
-.dark[data-color='vang'] { --accent-500: #F0B238; --accent-600: #F3C15E; --accent-400: #F6CD7C; }
-
-[data-color='xanh-la'] {
-  --accent-50: #EFF9F1; --accent-100: #D3F0DA; --accent-200: #A5E0B4;
-  --accent-300: #72CC8B; --accent-400: #45B466; --accent-500: #2C9750;
-  --accent-600: #1F7A3F; --accent-700: #175E31; --accent-800: #124A27;
-  --accent-900: #0B3319;
-}
-.dark[data-color='xanh-la'] { --accent-500: #4CB973; --accent-600: #62C787; --accent-400: #7ED29B; }
-
-[data-color='xanh-duong'] {
-  --accent-50: #EEF5FD; --accent-100: #CFE4FA; --accent-200: #9EC9F4;
-  --accent-300: #69ABEC; --accent-400: #3E8CDF; --accent-500: #226FC2;
-  --accent-600: #1857A0; --accent-700: #14447D; --accent-800: #103460;
-  --accent-900: #0A2140;
-}
-.dark[data-color='xanh-duong'] { --accent-500: #4E96E0; --accent-600: #6BA8E6; --accent-400: #8CBBEC; }
-
-[data-color='tim'] {
-  --accent-50: #F6F0FB; --accent-100: #E5D3F3; --accent-200: #CBA6E7;
-  --accent-300: #AE79D9; --accent-400: #9153C7; --accent-500: #7638AE;
-  --accent-600: #5E2C8C; --accent-700: #48226B; --accent-800: #351950;
-  --accent-900: #221035;
-}
-.dark[data-color='tim'] { --accent-500: #9E6BC9; --accent-600: #B085D4; --accent-400: #C29FDD; }
-
-[data-color='hong'] {
-  --accent-50: #FDF0F4; --accent-100: #FAD6E2; --accent-200: #F3AAC4;
-  --accent-300: #EA7EA5; --accent-400: #DE5688; --accent-500: #C93A6C;
-  --accent-600: #AD2557; --accent-700: #861D44; --accent-800: #641633;
-  --accent-900: #420E21;
-}
-.dark[data-color='hong'] { --accent-500: #ED6F98; --accent-600: #F088AB; --accent-400: #F4A0BC; }
-
-[data-color='cam'] {
-  --accent-50: #FEF3EB; --accent-100: #FCDFC2; --accent-200: #F8BC85;
-  --accent-300: #F29A4E; --accent-400: #E97D24; --accent-500: #C9640F;
-  --accent-600: #A54E0A; --accent-700: #7E3B09; --accent-800: #5C2B07;
-  --accent-900: #3D1B04;
-}
-.dark[data-color='cam'] { --accent-500: #F1954F; --accent-600: #F4AA71; --accent-400: #F6BB8D; }
-
-[data-color='ngoc-lam'] {
-  --accent-50: #EAF7F5; --accent-100: #C7EAE6; --accent-200: #93D6CE;
-  --accent-300: #5EBEB4; --accent-400: #35A398; --accent-500: #10847A;
-  --accent-600: #0C6A62; --accent-700: #0A514B; --accent-800: #073C37;
-  --accent-900: #042724;
-}
-.dark[data-color='ngoc-lam'] { --accent-500: #3FB6AB; --accent-600: #5FC5BB; --accent-400: #83D3CB; }
-
-/* ==== Nền tảng ==== */
-html {
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
-  /* Giữ chỗ cho thanh cuộn: khi mở dialog/sheet (khoá cuộn) layout không bị giật ngang */
   scrollbar-gutter: stable;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  /* Nền của chính thẻ html: nền không bao giờ "hở" sai màu khi cuộn quá đà / lúc khởi động PWA */
   background-color: var(--surface);
 }
-/* Bỏ độ trễ chạm 300ms và zoom khi chạm đúp trên các điều khiển */
-button, a, select, summary, [role='button'], [role='tab'] { touch-action: manipulation; }
+html.dark { color-scheme: dark; }
 html, body, #root { height: 100%; }
+button, a, select, summary, [role='button'], [role='tab'] { touch-action: manipulation; }
 
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--surface);
-  color: var(--ink);
+  color: var(--on-surface);
   font-family: var(--font-family);
   overscroll-behavior-y: none;
+  font-optical-sizing: auto;
 }
-
 * { border-color: var(--outline-variant); }
+::selection { background-color: var(--primary); color: var(--on-primary); }
 
-::selection { background-color: var(--ink); color: var(--surface); }
-
-::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background-color: var(--outline-variant); border-radius: 8px; }
+::-webkit-scrollbar-thumb { background-color: color-mix(in srgb, var(--outline) 45%, transparent); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--outline) 70%, transparent); background-clip: padding-box; }
 
+/* Viền focus rõ cho bàn phím (3px, bo theo hình) */
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.focus-ring:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+.num { font-variant-numeric: tabular-nums; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Đổi chế độ sáng/tối hoặc màu chủ đạo: mọi mặt phẳng chuyển màu mượt thay vì "giật" */
+html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
+  transition: background-color 0.45s var(--ease-effects), color 0.35s var(--ease-effects), border-color 0.35s var(--ease-effects), fill 0.35s var(--ease-effects), stroke 0.35s var(--ease-effects) !important;
+}
+
+/* ==== Hình dạng & bề mặt ==== */
 .solid-panel { background: var(--surface-container); }
-
+.surface-tonal { background: var(--surface-container); }
 .skeleton {
-  background-image: linear-gradient(90deg, var(--surface-container) 0px, var(--surface-high) 40px, var(--surface-container) 80px);
+  background-image: linear-gradient(90deg, var(--surface-container) 0px, var(--surface-high) 56px, var(--surface-container) 112px);
   background-size: 800px 100%;
-  animation: shimmer 1.6s infinite linear;
+  animation: shimmer 1.4s infinite linear;
 }
 
-/* Viền focus rõ cho bàn phím */
-.focus-ring:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* ==== Trạng thái hover / nhấn: một lớp phủ mờ cùng màu chữ (không ripple) ====
+/* ==== State layer + ripple + biến hình khi nhấn ====
    :where() giữ độ đặc hiệu = 0 để các class như "fixed"/"absolute" vẫn ghi đè được position. */
-:where(.state) { position: relative; overflow: hidden; -webkit-user-select: none; user-select: none; }
+:where(.state) { position: relative; overflow: hidden; -webkit-user-select: none; user-select: none; isolation: isolate; }
 .state::after {
   content: '';
   position: absolute;
@@ -234,82 +85,160 @@ body {
   background: currentColor;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.12s linear;
+  transition: opacity var(--dur-effects) var(--ease-effects);
 }
-/* Chỉ hover trên thiết bị có chuột — tránh trạng thái hover "dính" trên màn hình cảm ứng */
-@media (hover: hover) {
-  .state:hover::after { opacity: 0.05; }
-}
-.state:active::after { opacity: 0.09; }
+@media (hover: hover) { .state:hover::after { opacity: 0.08; } }
+.state:focus-visible::after { opacity: 0.1; }
+.state:active::after { opacity: 0.1; }
 .state:disabled::after { opacity: 0; }
-
-/* Chữ số đều nhau để đồng hồ đếm ngược không bị nhảy */
-.num { font-variant-numeric: tabular-nums; }
-
-/* ==== Chuyển động: ngắn, ít dịch chuyển ==== */
-.page-enter { animation: page-in 0.22s var(--ease-decel) backwards; }
-@keyframes page-in {
-  0% { opacity: 0; transform: translateY(4px); }
-  100% { opacity: 1; transform: translateY(0); }
+.ripple {
+  position: absolute;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.16;
+  transform: scale(0);
+  pointer-events: none;
+  animation: ripple 0.65s var(--ease-emphasized-decel) forwards;
 }
+@keyframes ripple { 0% { transform: scale(0); opacity: 0.2; } 70% { opacity: 0.14; } 100% { transform: scale(1); opacity: 0; } }
 
+/* Nút Expressive: hình dạng đổi khi nhấn (pill → bo vừa), nảy lại bằng spring khi nhả */
+.morph {
+  transition: border-radius var(--dur-spatial-fast) var(--ease-spatial-fast), transform var(--dur-spatial-fast) var(--ease-spatial-fast), background-color var(--dur-effects) var(--ease-effects), color var(--dur-effects) var(--ease-effects), box-shadow var(--dur-spatial) var(--ease-spatial);
+}
+.morph:active { border-radius: 0.875rem; transform: scale(0.96); }
+.morph-square:active { border-radius: 0.75rem; transform: scale(0.94); }
+.press { transition: transform var(--dur-spatial-fast) var(--ease-spatial-fast); }
+.press:active { transform: scale(0.95); }
+@media (hover: hover) { .lift { transition: transform var(--dur-spatial) var(--ease-spatial), box-shadow var(--dur-spatial) var(--ease-spatial); } .lift:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -14px color-mix(in srgb, var(--shadow) 35%, transparent); } }
+
+/* ==== Hiệu ứng ánh sáng theo con trỏ (spotlight) — JS đặt --mx/--my ==== */
+.fx-spot { position: relative; isolation: isolate; }
+.fx-spot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--primary) 20%, transparent), transparent 70%);
+  transition: opacity 0.4s var(--ease-effects);
+}
+@media (hover: hover) { .fx-spot:hover::before { opacity: 1; } }
+
+/* Hình trang trí xoay chậm / trôi nổi */
+.fx-spin-slow { animation: spin-slow 48s linear infinite; }
+.fx-spin-slower { animation: spin-slow 90s linear infinite reverse; }
+.fx-float { animation: float 7s ease-in-out infinite; }
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-8px) rotate(3deg); } }
+/* Quét sáng khi rê chuột vào thẻ nổi bật */
+.fx-shine { position: relative; overflow: hidden; }
+.fx-shine::after {
+  content: '';
+  position: absolute;
+  inset: -20% auto -20% -60%;
+  width: 40%;
+  background: linear-gradient(105deg, transparent, color-mix(in srgb, #fff 38%, transparent), transparent);
+  transform: skewX(-18deg);
+  pointer-events: none;
+  opacity: 0;
+}
+@media (hover: hover) { .fx-shine:hover::after { opacity: 1; animation: shine 0.9s var(--ease-emphasized) forwards; } }
+@keyframes shine { to { transform: translateX(520%) skewX(-18deg); opacity: 0; } }
+
+/* ==== Chuyển động trang & phần tử ==== */
+.page-enter { animation: page-in var(--dur-spatial-slow) var(--ease-spatial-slow) backwards; }
+@keyframes page-in { 0% { opacity: 0; transform: translateY(28px) scale(0.985); } 100% { opacity: 1; transform: none; } }
+
+/* Xuất hiện lần lượt: thẻ nảy lên theo thứ tự (--i do JSX hoặc nth-child đặt) */
 .stagger-item {
-  animation: stagger-in 0.28s var(--ease-decel) backwards;
-  animation-delay: calc(min(var(--i, 0), 6) * 25ms);
+  animation: stagger-in var(--dur-spatial) var(--ease-spatial) backwards;
+  animation-delay: calc(min(var(--i, 0), 9) * 55ms);
 }
-@keyframes stagger-in {
-  0% { opacity: 0; transform: translateY(6px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
+@keyframes stagger-in { 0% { opacity: 0; transform: translateY(26px) scale(0.94); } 100% { opacity: 1; transform: none; } }
 
-/* Chuyển tháng: trượt ngang nhẹ theo hướng điều hướng */
-.slide-next { animation: slide-next 0.22s var(--ease-decel) backwards; }
-.slide-prev { animation: slide-prev 0.22s var(--ease-decel) backwards; }
-@keyframes slide-next { 0% { opacity: 0; transform: translateX(16px); } 100% { opacity: 1; transform: translateX(0); } }
-@keyframes slide-prev { 0% { opacity: 0; transform: translateX(-16px); } 100% { opacity: 1; transform: translateX(0); } }
+/* Chuyển tháng: trượt + nảy theo hướng điều hướng */
+.slide-next { animation: slide-next var(--dur-spatial) var(--ease-spatial) backwards; }
+.slide-prev { animation: slide-prev var(--dur-spatial) var(--ease-spatial) backwards; }
+@keyframes slide-next { 0% { opacity: 0; transform: translateX(44px) scale(0.98); } 100% { opacity: 1; transform: none; } }
+@keyframes slide-prev { 0% { opacity: 0; transform: translateX(-44px) scale(0.98); } 100% { opacity: 1; transform: none; } }
+
+/* Ô ngày "gợn sóng" theo đường chéo khi đổi tháng (--wave đặt ở JSX = hàng + cột) */
+.day-wave { animation: day-wave var(--dur-spatial) var(--ease-spatial) backwards; animation-delay: calc(var(--wave, 0) * 22ms); }
+@keyframes day-wave { 0% { opacity: 0; transform: scale(0.55); } 100% { opacity: 1; transform: none; } }
+
+/* Ngày đang chọn: hình cookie nảy ra + xoay nhẹ */
+.day-selected-shape { animation: day-pop var(--dur-spatial) var(--ease-spatial-fast) both; }
+@keyframes day-pop { 0% { transform: scale(0.3) rotate(-60deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
 
 /* Scrim */
-.scrim-in { animation: fade-in 0.2s linear both; }
-.scrim-out { animation: fade-out 0.16s linear forwards; }
+.scrim-in { animation: fade-in 0.25s linear both; }
+.scrim-out { animation: fade-out 0.2s linear forwards; }
 @keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
 @keyframes fade-out { 0% { opacity: 1; } 100% { opacity: 0; } }
 
-/* Bottom sheet: vào bằng decel, ra bằng accel (có thể bắt đầu từ vị trí đang kéo) */
-.animate-drawer-up { animation: drawer-up 0.3s var(--ease-decel) backwards; }
-.animate-drawer-down { animation: drawer-down 0.2s var(--ease-accel) forwards; }
+/* Bottom sheet: vào bằng spring (nảy nhẹ), ra bằng accel */
+.animate-drawer-up { animation: drawer-up var(--dur-spatial-slow) var(--ease-spatial-slow) backwards; }
+.animate-drawer-down { animation: drawer-down 0.24s var(--ease-emphasized-accel) forwards; }
 @keyframes drawer-up { 0% { transform: translateY(100%); } 100% { transform: translateY(0); } }
 @keyframes drawer-down { 0% { transform: translateY(var(--drag-y, 0px)); } 100% { transform: translateY(100%); } }
-
 /* Menu trượt (di động) */
-.animate-drawer-left { animation: drawer-left 0.3s var(--ease-decel) both; }
-.animate-drawer-left-out { animation: drawer-left-out 0.2s var(--ease-accel) forwards; }
+.animate-drawer-left { animation: drawer-left var(--dur-spatial-slow) var(--ease-spatial-slow) both; }
+.animate-drawer-left-out { animation: drawer-left-out 0.24s var(--ease-emphasized-accel) forwards; }
 @keyframes drawer-left { 0% { transform: translateX(-100%); } 100% { transform: translateX(0); } }
 @keyframes drawer-left-out { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-
-/* Hộp thoại / bảng tìm kiếm */
-.animate-palette-in { animation: palette-in 0.2s var(--ease-decel) both; }
-.animate-palette-out { animation: palette-out 0.12s var(--ease-accel) forwards; }
-@keyframes palette-in { 0% { opacity: 0; transform: scale(0.97); } 100% { opacity: 1; transform: scale(1); } }
-@keyframes palette-out { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.98); } }
-
-.animate-toast-out { animation: toast-out 0.16s var(--ease-accel) forwards; }
-@keyframes toast-out { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(6px); } }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    animation-delay: 0ms !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
+/* Hộp thoại / bảng tìm kiếm: phóng ra từ giữa với spring */
+.animate-palette-in { animation: palette-in var(--dur-spatial) var(--ease-spatial) both; }
+.animate-palette-out { animation: palette-out 0.16s var(--ease-emphasized-accel) forwards; }
+@keyframes palette-in { 0% { opacity: 0; transform: scale(0.86) translateY(14px); } 100% { opacity: 1; transform: none; } }
+@keyframes palette-out { 0% { opacity: 1; transform: none; } 100% { opacity: 0; transform: scale(0.94); } }
+.animate-toast-out { animation: toast-out 0.2s var(--ease-emphasized-accel) forwards; }
+@keyframes toast-out { 0% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(14px) scale(0.94); } }
+@media (min-width: 768px) {
+  .animate-drawer-up { animation: palette-in var(--dur-spatial) var(--ease-spatial) backwards; }
+  .animate-drawer-down { animation: palette-out 0.16s var(--ease-emphasized-accel) forwards; }
 }
 
-/* Ẩn thanh cuộn ngang cho danh sách ngang (đếm ngược, tuần) */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+/* ==== Thanh điều hướng Expressive ==== */
+/* Chỉ báo "viên thuốc" của mục đang chọn: bung ngang bằng spring */
+.nav-indicator { transform: scaleX(0.35); opacity: 0; transition: transform var(--dur-spatial-fast) var(--ease-spatial-fast), opacity var(--dur-effects) var(--ease-effects), background-color var(--dur-effects) var(--ease-effects); }
+[aria-current='page'] .nav-indicator, .nav-indicator[data-active='true'] { transform: scaleX(1); opacity: 1; }
+.nav-icon { transition: transform var(--dur-spatial-fast) var(--ease-spatial-fast); }
+[aria-current='page'] .nav-icon { transform: translateY(-1px) scale(1.08); }
+/* Chỉ báo trượt của sidebar */
+.slide-indicator { transition: transform var(--dur-spatial) var(--ease-spatial), height var(--dur-spatial-fast) var(--ease-spatial-fast); }
 
-/* ==== Material Symbols Outlined (chỉ dùng làm bộ icon nét mảnh) ==== */
+/* ==== Loading indicator: biến hình giữa các hình M3 Expressive ==== */
+.loader-shape {
+  background: var(--primary);
+  clip-path: var(--shape-cookie);
+  animation: shape-morph 3.6s var(--ease-spatial-fast) infinite, spin-slow 2.4s linear infinite;
+}
+.loader-shape[data-tone='container'] { background: var(--primary-container); }
+
+/* ==== Thanh tiến trình dạng sóng (wavy) ==== */
+.wavy-move { animation: wavy-move 1.4s linear infinite; }
+@keyframes wavy-move { to { transform: translateX(-24px); } }
+
+/* ==== Cuộn để hiện (scroll-driven) — chỉ khi trình duyệt hỗ trợ ==== */
+@supports (animation-timeline: view()) {
+  .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 65%; }
+  @keyframes reveal { from { opacity: 0; transform: translateY(32px) scale(0.95); } to { opacity: 1; transform: none; } }
+}
+
+/* ==== View Transition: đổi sáng/tối theo vòng tròn lan từ điểm bấm ==== */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
+
+/* ==== Số cuộn (odometer) ==== */
+.odo { display: inline-block; height: 1.15em; line-height: 1.15; overflow: hidden; vertical-align: bottom; }
+.odo-strip { display: flex; flex-direction: column; transition: transform var(--dur-spatial) var(--ease-spatial); will-change: transform; }
+.odo-strip > span { height: 1.15em; line-height: 1.15; display: block; text-align: center; }
+
+/* ==== Material Symbols (bộ icon) ==== */
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
   font-weight: normal;
@@ -323,17 +252,21 @@ body {
   white-space: nowrap;
   word-wrap: normal;
   direction: ltr;
-  /* Khung cố định + cắt phần thừa: nếu font icon chưa/không tải được thì chữ ligature không làm vỡ bố cục */
   overflow: hidden;
   -webkit-font-feature-settings: 'liga';
   font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
+  transition: font-variation-settings var(--dur-effects) var(--ease-effects);
 }
-/* Ẩn tên icon dạng chữ cho tới khi font icon tải xong (tránh nhấp nháy "home", "settings"...) */
 html:not(.icons-ready) .material-symbols-outlined { opacity: 0; }
 
-/* Từ md trở lên, bottom sheet trở thành hộp thoại ở giữa nên dùng chuyển động scale/fade */
-@media (min-width: 768px) {
-  .animate-drawer-up { animation: palette-in 0.2s var(--ease-decel) backwards; }
-  .animate-drawer-down { animation: palette-out 0.12s var(--ease-accel) forwards; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .loader-shape { animation: none; }
 }

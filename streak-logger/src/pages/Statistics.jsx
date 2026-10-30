@@ -33,9 +33,9 @@ function StatCard({ icon: Icon, label, value, sub, delay = 0, tone = 0 }) {
       className={`stagger-item card-hover rounded-[var(--radius-card)] p-4 sm:p-5 flex flex-col gap-4 h-full ${STAT_TONES[tone % STAT_TONES.length]}`}
       style={{ '--stagger-delay': `${delay}ms` }}
     >
-      <div className="flex items-center gap-2 opacity-80">
+      <div className="flex items-start gap-2 opacity-80">
         <Icon size={18} className="shrink-0" />
-        <p className="text-xs font-semibold truncate">{label}</p>
+        <p className="text-xs font-semibold leading-tight line-clamp-2">{label}</p>
       </div>
       <div className="min-w-0">
         <p className="text-3xl font-bold tabular truncate">{value}</p>
@@ -66,15 +66,19 @@ const fmtPercent = (p) => `${Number.isInteger(p) ? p : p.toFixed(1)}%`
 function renderPieLabel({ cx, cy, midAngle, outerRadius, payload }) {
   if (!payload || payload.percent < 4) return null
   const RAD = Math.PI / 180
-  const r = outerRadius + 16
-  const x = cx + r * Math.cos(-midAngle * RAD)
-  const y = cy + r * Math.sin(-midAngle * RAD)
+  const cos = Math.cos(-midAngle * RAD)
+  const sin = Math.sin(-midAngle * RAD)
+  const x = cx + (outerRadius + 22) * cos
+  const y = cy + (outerRadius + 22) * sin
   const anchor = x > cx ? 'start' : 'end'
   return (
-    <text x={x} y={y} textAnchor={anchor} dominantBaseline="central" fill="var(--md-on-surface)">
-      <tspan x={x} dy="-0.6em" fontSize={12} fontWeight={700}>{payload.name}</tspan>
-      <tspan x={x} dy="1.25em" fontSize={11} fill="var(--md-on-surface-variant)">{`${payload.count} · ${fmtPercent(payload.percent)}`}</tspan>
-    </text>
+    <g>
+      <line x1={cx + (outerRadius + 2) * cos} y1={cy + (outerRadius + 2) * sin} x2={cx + (outerRadius + 16) * cos} y2={cy + (outerRadius + 16) * sin} stroke="var(--md-outline)" strokeWidth={1.5} />
+      <text x={x} y={y} textAnchor={anchor} dominantBaseline="central" fill="var(--md-on-surface)">
+        <tspan x={x} dy="-0.6em" fontSize={12} fontWeight={700}>{payload.name}</tspan>
+        <tspan x={x} dy="1.25em" fontSize={11} fill="var(--md-on-surface-variant)">{`${payload.count} · ${fmtPercent(payload.percent)}`}</tspan>
+      </text>
+    </g>
   )
 }
 
@@ -132,7 +136,7 @@ function PieCard({ title, slices, emptyText }) {
         <>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart margin={{ top: 16, right: 16, bottom: 16, left: 16 }}>
-              <Pie data={slices} dataKey="count" nameKey="name" outerRadius="62%" paddingAngle={slices.length > 1 ? 1.5 : 0} label={renderPieLabel} labelLine={{ stroke: 'var(--md-outline)' }} isAnimationActive animationDuration={700}>
+              <Pie data={slices} dataKey="count" nameKey="name" outerRadius="62%" paddingAngle={slices.length > 1 ? 1.5 : 0} label={renderPieLabel} labelLine={false} isAnimationActive animationDuration={700}>
                 {slices.map((s) => (
                   <Cell key={s.key} fill={s.color} stroke="var(--md-surface-container-low)" strokeWidth={3} />
                 ))}

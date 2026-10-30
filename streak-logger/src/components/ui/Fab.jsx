@@ -1,8 +1,11 @@
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 /**
  * Nút hành động nổi (FAB) của Material 3 Expressive. Trên màn hình lớn là FAB mở rộng có nhãn,
  * trên mobile chỉ còn biểu tượng và nằm phía trên thanh điều hướng dưới.
+ * FAB được vẽ qua portal vào <body>: phần tử `position: fixed` nằm trong vùng có transform/animation
+ * sẽ bị định vị theo vùng đó thay vì theo màn hình, khiến nút không hiện đúng chỗ.
  * Khi hiển thị, FAB đặt biến CSS `--fab-offset` để nút "lên đầu trang" tự nâng lên, không chồng nhau.
  */
 export default function Fab({ icon: Icon, label, onClick }) {
@@ -11,7 +14,7 @@ export default function Fab({ icon: Icon, label, onClick }) {
     return () => document.documentElement.style.removeProperty('--fab-offset')
   }, [])
 
-  return (
+  return createPortal(
     <button
       type="button"
       onClick={onClick}
@@ -21,6 +24,7 @@ export default function Fab({ icon: Icon, label, onClick }) {
     >
       <Icon size={26} strokeWidth={2.4} />
       <span className="hidden lg:inline">{label}</span>
-    </button>
+    </button>,
+    document.body,
   )
 }
