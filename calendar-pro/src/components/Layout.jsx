@@ -4,34 +4,27 @@ import { createPortal } from 'react-dom'
 import Sidebar from './Sidebar'
 import BottomNav from './BottomNav'
 import NavRail from './NavRail'
-import Header from './Header'
+import Header, { usePageTitle } from './Header'
 import CommandPalette from './CommandPalette'
 import Icon from './Icon'
-import { useSettings } from '../contexts/SettingsContext'
 import { useTranslation } from '../i18n/useTranslation'
-import { useReminders } from '../hooks/useReminders'
 import { useExitTransition } from '../hooks/useExitTransition'
 import { useModal } from '../hooks/useModal'
 
 export default function Layout() {
   const location = useLocation()
-  const { settings } = useSettings()
   const { t } = useTranslation()
+  const pageTitle = usePageTitle()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const drawerRef = useRef(null)
   const { mounted: drawerMounted, closing: drawerClosing } = useExitTransition(drawerOpen, 240)
   useModal(drawerOpen, () => setDrawerOpen(false), drawerRef)
 
-  useReminders(settings.notificationsEnabled, {
-    notifyLunarDays: settings.notifyLunarDays,
-    notifyHolidayIds: settings.notifyHolidayIds,
-    notifyHour: settings.notifyHour,
-    notifyMinute: settings.notifyMinute,
-    notifyTiming: settings.notifyTiming,
-    notifyBeforeDays: settings.notifyBeforeDays,
-    lang: settings.language
-  })
+  // Tiêu đề tab trình duyệt theo trang đang xem
+  useEffect(() => {
+    document.title = `${pageTitle} · ${t('app.name')}`
+  }, [pageTitle, t])
 
   // Mỗi lần chuyển trang: đóng ngăn kéo mobile và cuộn về đầu trang (tức thì, không cuộn mượt)
   useEffect(() => {

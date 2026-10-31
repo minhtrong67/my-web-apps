@@ -60,11 +60,6 @@ body {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Đổi chế độ sáng/tối hoặc màu chủ đạo: mọi mặt phẳng chuyển màu mượt thay vì "giật" */
-html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
-  transition: background-color 0.45s var(--ease-effects), color 0.35s var(--ease-effects), border-color 0.35s var(--ease-effects), fill 0.35s var(--ease-effects), stroke 0.35s var(--ease-effects) !important;
-}
-
 /* ==== Hình dạng & bề mặt ==== */
 .solid-panel { background: var(--surface-container); }
 .surface-tonal { background: var(--surface-container); }
@@ -228,10 +223,12 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   @keyframes reveal { from { opacity: 0; transform: translateY(32px) scale(0.95); } to { opacity: 1; transform: none; } }
 }
 
-/* ==== View Transition: đổi sáng/tối theo vòng tròn lan từ điểm bấm ==== */
-::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-::view-transition-old(root) { z-index: 1; }
-::view-transition-new(root) { z-index: 2; }
+/* ==== View Transition cho đổi giao diện ====
+   Chỉ dùng khi người dùng chủ động bấm đổi (.vt-circle): ảnh mới lan ra theo vòng tròn từ điểm bấm
+   (clip-path do JS animate). Theme đổi do hệ điều hành thì áp tức thì, không animation. */
+html.vt-circle::view-transition-old(root), html.vt-circle::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+html.vt-circle::view-transition-old(root) { z-index: 1; }
+html.vt-circle::view-transition-new(root) { z-index: 2; }
 
 /* ==== Số cuộn (odometer) ==== */
 .odo { display: inline-block; height: 1.15em; line-height: 1.15; overflow: hidden; vertical-align: bottom; }

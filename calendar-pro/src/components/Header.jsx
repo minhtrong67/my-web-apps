@@ -1,15 +1,34 @@
+import { useLocation } from 'react-router-dom'
 import Icon from './Icon'
 import { useSettings } from '../contexts/SettingsContext'
 import { useTranslation } from '../i18n/useTranslation'
 import { withThemeTransition } from '../lib/themeTransition'
 
+/** Khoá dịch tiêu đề theo đường dẫn (khớp với tên mục trong menu điều hướng) */
+const TITLE_KEYS = [
+  { match: (p) => p === '/', key: 'nav.home' },
+  { match: (p) => p.startsWith('/lich'), key: 'nav.calendarFull' },
+  { match: (p) => p.startsWith('/van-nien'), key: 'nav.vanNienFull' },
+  { match: (p) => p.startsWith('/dem-nguoc'), key: 'nav.countdownFull' },
+  { match: (p) => p.startsWith('/cai-dat'), key: 'nav.settings' }
+]
+
+/** Tên trang đang xem (dùng cho header di động và tiêu đề tab trình duyệt) */
+export function usePageTitle() {
+  const { pathname } = useLocation()
+  const { t } = useTranslation()
+  const found = TITLE_KEYS.find((x) => x.match(pathname))
+  return found ? t(found.key) : t('app.name')
+}
+
 /**
- * Top app bar (chỉ hiện trên di động, sm:hidden): nút menu tonal, tên ứng dụng, đổi sáng/tối và ngôn ngữ.
- * Đổi sáng/tối dùng View Transition: giao diện mới lan ra theo vòng tròn từ đúng điểm bấm.
+ * Top app bar (chỉ hiện trên di động, sm:hidden): nút menu tonal, TÊN TRANG đang xem, đổi sáng/tối và ngôn ngữ.
+ * Tên trang đổi bằng hiệu ứng trượt-nảy mỗi lần điều hướng. Đổi sáng/tối dùng View Transition lan tròn từ điểm bấm.
  */
 export default function Header({ onMenuClick }) {
   const { isDark, update } = useSettings()
   const { t, lang, toggleLang } = useTranslation()
+  const title = usePageTitle()
 
   return (
     <header
@@ -23,7 +42,9 @@ export default function Header({ onMenuClick }) {
       >
         <Icon name="menu" size={24} />
       </button>
-      <p className="min-w-0 flex-1 truncate text-title-lg text-on-surface">{t('app.name')}</p>
+      <p key={title} className="animate-rise min-w-0 flex-1 truncate pl-1 text-title-lg text-on-surface">
+        {title}
+      </p>
 
       <div className="flex shrink-0 items-center gap-1">
         <button

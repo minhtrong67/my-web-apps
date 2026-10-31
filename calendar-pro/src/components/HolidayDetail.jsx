@@ -1,30 +1,19 @@
 import Icon from './Icon'
-import Button from './Button'
 import RollingNumber from './RollingNumber'
 import WavyProgress from './WavyProgress'
 import { holidayIconName } from '../lib/iconMap'
 import { diffParts, formatVNDate } from '../lib/dateUtils'
 import CategoryBadge from './CategoryBadge'
 import { useNow } from '../hooks/useNow'
-import { useSettings } from '../contexts/SettingsContext'
 import { useTranslation } from '../i18n/useTranslation'
 
 export default function HolidayDetail({ holiday, nextDate }) {
   const now = useNow(1000)
-  const { settings, update } = useSettings()
   const { t, lang } = useTranslation()
   const iconName = holidayIconName(holiday.icon)
   const { days, hours, minutes, seconds } = diffParts(nextDate, now)
   const isTodayEvent = days === 0
-  const isNotifyOn = settings.notifyHolidayIds.includes(holiday.id)
   const progress = 1 - Math.min(days, 365) / 365
-
-  function toggleNotify() {
-    const set = new Set(settings.notifyHolidayIds)
-    if (set.has(holiday.id)) set.delete(holiday.id)
-    else set.add(holiday.id)
-    update({ notifyHolidayIds: Array.from(set) })
-  }
 
   return (
     <div className="flex flex-col gap-3">
@@ -69,16 +58,6 @@ export default function HolidayDetail({ holiday, nextDate }) {
         <p className="mt-1.5 text-body-md text-on-surface-variant">{holiday.desc}</p>
       </div>
 
-      <Button
-        variant={isNotifyOn ? 'primary' : 'secondary'}
-        size="lg"
-        className="mt-1 w-full"
-        icon={(p) => <Icon name={isNotifyOn ? 'notifications_active' : 'notifications'} filled={isNotifyOn} {...p} />}
-        onClick={toggleNotify}
-        aria-pressed={isNotifyOn}
-      >
-        {isNotifyOn ? t('holidayDetail.notifyOn') : t('holidayDetail.notifyOff')}
-      </Button>
     </div>
   )
 }

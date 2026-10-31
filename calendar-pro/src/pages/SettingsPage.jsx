@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Icon from '../components/Icon'
 import Button from '../components/Button'
-import SelectField from '../components/SelectField'
+import Accordion from '../components/Accordion'
 import { Page, PageHeader } from '../components/Page'
 import Switch from '../components/Switch'
 import ConfirmDialog from '../components/ConfirmDialog'
@@ -10,37 +10,28 @@ import { withThemeTransition } from '../lib/themeTransition'
 import THEME_JSON from '../theme/swatches.json'
 import { useSettings, COLOR_OPTIONS, LANGUAGE_OPTIONS, FONT_SIZE_OPTIONS } from '../contexts/SettingsContext'
 import { useToast } from '../contexts/ToastContext'
-import { useNotificationPermission } from '../hooks/useReminders'
 import { usePwaInstall } from '../hooks/usePwaInstall'
-import { HOLIDAYS } from '../data/holidays'
-import { pad2, formatVNDate } from '../lib/dateUtils'
+import { formatVNDate } from '../lib/dateUtils'
 import { useTranslation } from '../i18n/useTranslation'
 
-const HOURS = Array.from({ length: 24 }, (_, i) => i)
-const MINUTES = Array.from({ length: 60 }, (_, i) => i)
-const BEFORE_DAYS_OPTIONS = [1, 2, 3, 5, 7]
 const PREVIEW_DATE = new Date(2026, 7, 7) // 07/08/2026 — cố định để bản xem trước cỡ chữ luôn nhất quán
 
 export default function SettingsPage() {
   const { settings, effectiveColor, isDark, update, reset } = useSettings()
   const { notify } = useToast()
   const { t, lang } = useTranslation()
-  const { permission, requestPermission, supported } = useNotificationPermission()
   const { canInstall, installed, promptInstall } = usePwaInstall()
-  const [requesting, setRequesting] = useState(false)
-  const [holidayListOpen, setHolidayListOpen] = useState(false)
   const [confirmResetOpen, setConfirmResetOpen] = useState(false)
-
-  // Mục "Phông chữ" hiển thị mẫu bằng chính từng font → tải sẵn các font web (mỗi font vài chục KB, chỉ khi mở trang này)
-  useEffect(() => {
-    FONT_OPTIONS.forEach((f) => loadFont(f.id))
-  }, [])
 
   const THEME_MODES = [
     { id: 'light', label: t('settings.light'), icon: 'light_mode' },
     { id: 'dark', label: t('settings.dark'), icon: 'dark_mode' },
     { id: 'system', label: t('settings.system'), icon: 'devices' }
   ]
+
+  const effectiveColorOption = COLOR_OPTIONS.find((c) => c.id === effectiveColor)
+  const currentFont = getFont(settings.fontFamily)
+  const swatch = THEME_JSON[effectiveColor]?.[isDark ? 'dark' : 'light']
 
   function handleReset() {
     reset()
@@ -54,47 +45,11 @@ export default function SettingsPage() {
     }
   }
 
-  async function handleToggleNotifications(next) {
-    if (next) {
-      setRequesting(true)
-      const result = await requestPermission()
-      setRequesting(false)
-      if (result !== 'granted') {
-        notify(t('settings.notifyDeniedMsg'), { type: 'warning', title: t('settings.notifyDeniedTitle') })
-        return
-      }
-      notify(t('settings.notifyEnabledMsg'), { type: 'success', title: t('settings.notifyEnabledTitle') })
-    }
-    update({ notificationsEnabled: next })
-  }
-
   function handleRandomColor() {
     const others = COLOR_OPTIONS.filter((c) => c.id !== settings.color)
     const pick = others[Math.floor(Math.random() * others.length)] ?? COLOR_OPTIONS[0]
     update({ color: pick.id, dailyColorRotation: false })
     notify(t('settings.colorChanged', pick.label), { type: 'success' })
-  }
-
-  const permissionLabel = !supported
-    ? t('settings.notifyUnsupported')
-    : permission === 'granted'
-      ? t('settings.notifyGranted')
-      : permission === 'denied'
-        ? t('settings.notifyDenied')
-        : t('settings.notifyDefault')
-
-  const selectedHolidayCount = settings.notifyHolidayIds.length
-  const allHolidaysSelected = selectedHolidayCount === HOLIDAYS.length
-
-  function toggleHoliday(id) {
-    const set = new Set(settings.notifyHolidayIds)
-    if (set.has(id)) set.delete(id)
-    else set.add(id)
-    update({ notifyHolidayIds: Array.from(set) })
-  }
-
-  function toggleSelectAllHolidays() {
-    update({ notifyHolidayIds: allHolidaysSelected ? [] : HOLIDAYS.map((h) => h.id) })
   }
 
   return (
@@ -129,8 +84,19 @@ export default function SettingsPage() {
         <Segmented value={lang} onChange={(id) => update({ language: id })} options={LANGUAGE_OPTIONS.map((l) => ({ id: l.id, label: l.label }))} />
       </Section>
 
-      {/* Màu sắc chủ đề */}
-      <Section title={t('settings.colorTitle')} subtitle={t('settings.colorSubtitle')}>
+      {/* Màu sắc chủ đề — accordion */}
+      <div className="mt-8 sm:mt-10" aria-hidden="true" />
+      <Accordion
+        icon="palette"
+        title={t('settings.colorTitle')}
+        subtitle={t('settings.colorSubtitle')}
+        summary={
+          <>
+            {swatch && <span className="h-3.5 w-3.5 shrink-0 rounded-full" style={{ background: swatch.primary }} />}
+            <span className="truncate">{effectiveColorOption?.label}</span>
+          </>
+        }
+      >
         <div className="flex flex-wrap gap-3.5" role="group" aria-label={t('settings.colorTitle')}>
           {COLOR_OPTIONS.map((c) => {
             const active = !settings.dailyColorRotation && settings.color === c.id
@@ -153,42 +119,35 @@ export default function SettingsPage() {
                   }}
                 />
                 {active && (
-                  <Icon
-                    name="check"
-                    size={26}
-                    weight={600}
-                    className="animate-pop-in absolute inset-0 m-auto"
-                    style={{ color: scheme['on-primary'] }}
-                  />
+                  <Icon name="check" size={26} weight={600} className="animate-pop-in absolute inset-0 m-auto" style={{ color: scheme['on-primary'] }} />
                 )}
               </button>
             )
           })}
         </div>
-        <p className="mt-4 text-label-lg text-on-surface-variant">
-          {COLOR_OPTIONS.find((c) => c.id === effectiveColor)?.label}
-        </p>
 
-        <div className="mt-3 border-t border-outline-variant/70">
+        <div className="mt-4 border-t border-outline-variant/70">
           <Row
             icon="autorenew"
             title={t('settings.dailyRotationTitle')}
-            desc={
-              settings.dailyColorRotation
-                ? t('settings.dailyRotationOn', COLOR_OPTIONS.find((c) => c.id === effectiveColor)?.label)
-                : t('settings.dailyRotationOff')
-            }
+            desc={settings.dailyColorRotation ? t('settings.dailyRotationOn', effectiveColorOption?.label) : t('settings.dailyRotationOff')}
           >
             <Switch checked={settings.dailyColorRotation} onChange={(v) => update({ dailyColorRotation: v })} label={t('settings.dailyRotationTitle')} />
           </Row>
         </div>
-        <Button variant="secondary" icon={(p) => <Icon name="shuffle" {...p} />} onClick={handleRandomColor} className="mt-3">
+        <Button variant="secondary" icon={(p) => <Icon name="shuffle" {...p} />} onClick={handleRandomColor} className="mt-2">
           {t('settings.randomColorNow')}
         </Button>
-      </Section>
+      </Accordion>
 
-      {/* Phông chữ */}
-      <Section title={t('settings.fontTitle')} subtitle={t('settings.fontSubtitle')}>
+      {/* Phông chữ — accordion (tải trước các font mẫu khi mở lần đầu) */}
+      <Accordion
+        icon="text_fields"
+        title={t('settings.fontTitle')}
+        subtitle={t('settings.fontSubtitle')}
+        summary={<span className="truncate" style={{ fontFamily: currentFont.stack }}>{currentFont.label}</span>}
+        onOpenChange={(open) => open && FONT_OPTIONS.forEach((f) => loadFont(f.id))}
+      >
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3" role="group" aria-label={t('settings.fontTitle')}>
           {FONT_OPTIONS.map((f) => {
             const active = settings.fontFamily === f.id
@@ -213,23 +172,23 @@ export default function SettingsPage() {
             )
           })}
         </div>
-        <p className="mt-4 rounded-3xl bg-surface-high p-4 text-title-md font-medium text-on-surface" style={{ fontFamily: getFont(settings.fontFamily).stack }}>
+        <p className="mt-4 rounded-3xl bg-surface-high p-4 text-title-md font-medium text-on-surface" style={{ fontFamily: currentFont.stack }}>
           {t('settings.fontPreviewSample')}
         </p>
-      </Section>
+      </Accordion>
 
-      {/* Cỡ chữ */}
+      {/* Cỡ chữ — 3 mức */}
       <Section title={t('settings.fontSizeTitle')} subtitle={t('settings.fontSizeSubtitle')}>
         <Segmented
           value={settings.fontSize}
           onChange={(id) => update({ fontSize: id })}
           options={FONT_SIZE_OPTIONS.map((s) => ({
             id: s.id,
-            label: s.label,
+            label: t(s.labelKey),
             render: (
-              <span className="flex items-baseline gap-1.5">
-                <span style={{ fontSize: `${14 * s.scale}px` }} className="leading-none">Aa</span>
-                <span className="hidden text-label-md sm:inline">{s.label}</span>
+              <span className="flex items-baseline gap-2">
+                <span style={{ fontSize: `${14 * s.scale}px` }} className="font-bold leading-none">Aa</span>
+                <span className="text-label-md">{t(s.labelKey)}</span>
               </span>
             )
           }))}
@@ -239,163 +198,14 @@ export default function SettingsPage() {
         </p>
       </Section>
 
-      {/* Thông báo */}
-      <Section title={t('settings.notifyTitle')} subtitle={t('settings.notifySubtitle')}>
-        <div className="divide-y divide-outline-variant">
-          <Row icon="notifications" title={t('settings.notifyEnable')} desc={requesting ? t('settings.notifyRequesting') : permissionLabel}>
-            <Switch
-              checked={settings.notificationsEnabled}
-              onChange={handleToggleNotifications}
-              label={t('settings.notifyEnable')}
-              disabled={requesting || !supported}
-            />
-          </Row>
-
-          {settings.notificationsEnabled && (
-            <>
-              {/* Giờ thông báo */}
-              <div className="py-5">
-                <p className="mb-4 flex items-center gap-4 text-body-lg text-on-surface">
-                  <Icon name="schedule" size={22} className="text-on-surface-variant" />
-                  {t('settings.notifyHourTitle')}
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <SelectField
-                    label={t('common.hour')}
-                    value={settings.notifyHour}
-                    onChange={(e) => update({ notifyHour: Number(e.target.value) })}
-                  >
-                    {HOURS.map((h) => (
-                      <option key={h} value={h}>
-                        {pad2(h)}:00
-                      </option>
-                    ))}
-                  </SelectField>
-                  <SelectField
-                    label={t('common.minute')}
-                    value={settings.notifyMinute}
-                    onChange={(e) => update({ notifyMinute: Number(e.target.value) })}
-                  >
-                    {MINUTES.map((m) => (
-                      <option key={m} value={m}>
-                        :{pad2(m)}
-                      </option>
-                    ))}
-                  </SelectField>
-                </div>
-                <p className="mt-3 text-body-sm text-on-surface-variant">{t('settings.notifyHourNote')}</p>
-              </div>
-
-              {/* Chế độ: đúng ngày hay báo trước */}
-              <div className="py-5">
-                <p className="mb-4 flex items-center gap-4 text-body-lg text-on-surface">
-                  <Icon name="alarm" size={22} className="text-on-surface-variant" />
-                  {t('settings.notifyTimingTitle')}
-                </p>
-                <Segmented
-                  value={settings.notifyTiming}
-                  onChange={(id) => update({ notifyTiming: id })}
-                  options={[
-                    { id: 'on-day', label: t('settings.onDay') },
-                    { id: 'before', label: t('settings.before') }
-                  ]}
-                />
-                {settings.notifyTiming === 'before' && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {BEFORE_DAYS_OPTIONS.map((d) => {
-                      const active = settings.notifyBeforeDays === d
-                      return (
-                        <button
-                          key={d}
-                          onClick={() => update({ notifyBeforeDays: d })}
-                          aria-pressed={active}
-                          className={`state focus-ring flex h-10 items-center rounded-full px-4 text-label-lg transition-[background-color,color,box-shadow] duration-spatial-fast ease-spatial-fast active:scale-95 ${
-                            active ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface-variant shadow-[inset_0_0_0_1px_var(--outline-variant)]'
-                          }`}
-                        >
-                          {t('settings.beforeDays', d)}
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Ngày chay / rằm / mùng một */}
-              <Row icon="eco" title={t('settings.vegetarianReminderTitle')} desc={t('settings.vegetarianReminderDesc')}>
-                <Switch checked={settings.notifyLunarDays} onChange={(v) => update({ notifyLunarDays: v })} label={t('settings.vegetarianReminderTitle')} />
-              </Row>
-
-              {/* Danh sách ngày lễ tuỳ chọn */}
-              <div>
-                <button
-                  onClick={() => setHolidayListOpen((v) => !v)}
-                  className="state focus-ring flex w-full items-center gap-4 rounded-2xl py-4 text-left"
-                  aria-expanded={holidayListOpen}
-                >
-                  <Icon name="celebration" size={22} className="text-on-surface-variant" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-body-lg text-on-surface">{t('settings.selectHolidaysTitle')}</p>
-                    <p className="text-body-sm text-on-surface-variant">{t('settings.selectedCount', selectedHolidayCount, HOLIDAYS.length)}</p>
-                  </div>
-                  <Icon name="expand_more" size={22} className={`shrink-0 text-on-surface-variant transition-transform duration-200 ${holidayListOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {holidayListOpen && (
-                  <div className="mb-4 overflow-hidden rounded-3xl bg-surface-high">
-                    <button
-                      onClick={toggleSelectAllHolidays}
-                      className="state focus-ring flex w-full items-center gap-4 border-b border-outline-variant/60 px-4 py-3.5 text-left text-label-lg text-on-surface"
-                    >
-                      <Icon name={allHolidaysSelected ? 'check_box' : 'check_box_outline_blank'} size={24} filled={allHolidaysSelected} />
-                      {allHolidaysSelected ? t('settings.deselectAll') : t('settings.selectAll')}
-                    </button>
-                    <div className="max-h-72 overflow-y-auto">
-                      {HOLIDAYS.map((h) => {
-                        const checked = settings.notifyHolidayIds.includes(h.id)
-                        return (
-                          <button
-                            key={h.id}
-                            onClick={() => toggleHoliday(h.id)}
-                            className="state focus-ring flex w-full items-center gap-4 px-4 py-2.5 text-left"
-                            aria-pressed={checked}
-                          >
-                            <Icon
-                              name={checked ? 'check_box' : 'check_box_outline_blank'}
-                              size={24}
-                              filled={checked}
-                              className={checked ? 'shrink-0 text-on-surface' : 'shrink-0 text-on-surface-variant'}
-                            />
-                            <span className="min-w-0 flex-1">
-                              <span className="block truncate text-body-lg text-on-surface">{h.name}</span>
-                              <span className="block text-body-sm text-on-surface-variant">{t(`category.${h.category}`)}</span>
-                            </span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-        <p className="mt-3 text-body-sm text-on-surface-variant">{t('settings.notifyFootnote')}</p>
-      </Section>
-
       <div className="mt-8 sm:mt-10">
         <Button variant="tertiary" size="lg" icon={(p) => <Icon name="restart_alt" {...p} />} onClick={() => setConfirmResetOpen(true)} className="w-full sm:w-auto">
           {t('settings.resetBtn')}
         </Button>
       </div>
 
-      {/* Giới thiệu */}
-      <Section title={t('settings.aboutTitle')}>
-        <p className="text-body-md text-on-surface-variant">{t('settings.aboutDesc')}</p>
-        <p className="mt-3 text-body-sm text-on-surface-variant">
-          {t('settings.aboutDevBy')} <span className="font-medium text-on-surface">minhtrong67</span>
-        </p>
-      </Section>
+      {/* Thông tin tác giả & Claude AI — khối nổi bật */}
+      <Credits t={t} />
 
       <ConfirmDialog
         open={confirmResetOpen}
@@ -406,6 +216,50 @@ export default function SettingsPage() {
         danger
       />
     </Page>
+  )
+}
+
+/**
+ * Khối ghi công nổi bật: nền màu chủ đạo, hai hình Expressive xoay chậm, hai "nhân vật":
+ * tác giả (hình cookie, chữ cái đầu) và Claude AI (hình flower, icon lấp lánh). Có quét sáng khi rê chuột.
+ */
+function Credits({ t }) {
+  return (
+    <section className="reveal fx-shine relative mt-8 overflow-hidden rounded-[36px] bg-primary p-6 text-on-primary shadow-fab sm:mt-10 sm:p-8" aria-labelledby="credits-title">
+      <span className="fx-spin-slow shape-cookie pointer-events-none absolute -right-16 -top-16 h-56 w-56 bg-primary-container opacity-25" aria-hidden="true" />
+      <span className="fx-spin-slower shape-flower pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 bg-tertiary-container opacity-20" aria-hidden="true" />
+
+      <div className="relative">
+        <span className="inline-flex items-center gap-2 rounded-full bg-on-primary/15 px-3.5 py-1.5 text-label-lg backdrop-blur-sm">
+          <Icon name="favorite" size={18} filled /> <span id="credits-title">{t('settings.creditsHeading')}</span>
+        </span>
+
+        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+          <div className="flex items-center gap-4">
+            <span className="fx-float shape-cookie flex h-16 w-16 shrink-0 items-center justify-center bg-primary-container text-on-primary-container">
+              <span className="text-headline-md leading-none">M</span>
+            </span>
+            <div className="min-w-0">
+              <p className="text-headline-sm leading-tight">minhtrong67</p>
+              <p className="mt-0.5 text-body-sm opacity-85">{t('settings.creditsAuthorRole')}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span className="fx-float shape-flower flex h-16 w-16 shrink-0 items-center justify-center bg-tertiary-container text-on-tertiary-container [animation-delay:-3s]">
+              <Icon name="auto_awesome" size={32} filled />
+            </span>
+            <div className="min-w-0">
+              <p className="text-headline-sm leading-tight">{t('settings.creditsAiName')}</p>
+              <p className="mt-0.5 text-body-sm opacity-85">{t('settings.creditsAiRole')}</p>
+            </div>
+          </div>
+        </div>
+
+        <p className="mt-6 border-t border-on-primary/20 pt-4 text-body-md opacity-90">{t('settings.creditsThanks')}</p>
+        <p className="mt-1 text-body-sm opacity-75">{t('settings.aboutDesc')}</p>
+      </div>
+    </section>
   )
 }
 
@@ -454,13 +308,14 @@ function Segmented({ value, onChange, options }) {
             key={o.id}
             onClick={(e) => onChange(o.id, e)}
             aria-pressed={active}
-            className={`state focus-ring flex h-12 flex-1 items-center justify-center gap-2 text-label-lg transition-[border-radius,background-color,color,transform] duration-spatial-fast ease-spatial-fast active:scale-95 ${
+            aria-label={o.label}
+            className={`state focus-ring flex h-12 min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap px-2 text-label-lg transition-[border-radius,background-color,color,transform] duration-spatial-fast ease-spatial-fast active:scale-95 ${
               active ? 'rounded-full bg-primary text-on-primary' : 'rounded-xl bg-secondary-container text-on-secondary-container'
             }`}
           >
             {o.render ?? (
               <>
-                {o.icon && <Icon name={o.icon} size={20} filled={active} />}
+                {o.icon && <Icon name={o.icon} size={20} filled={active} className="hidden min-[360px]:inline-flex" />}
                 {o.label}
               </>
             )}

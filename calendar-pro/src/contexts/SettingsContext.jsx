@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, useCallback } from 'react'
-import { HOLIDAYS } from '../data/holidays'
 import { getFont, loadFont, DEFAULT_FONT_ID } from '../lib/fonts'
+import { applyThemeDom } from '../lib/themeTransition'
 import COLOR_SEEDS from '../theme/colors.json'
 
 const SettingsContext = createContext(null)
@@ -15,11 +15,11 @@ export const LANGUAGE_OPTIONS = [
  *  Bảng màu đầy đủ (primary / secondary / tertiary / surface...) được sinh từ seed bởi scripts/generate-theme.mjs. */
 export const COLOR_OPTIONS = COLOR_SEEDS.map(({ id, label, seed }) => ({ id, label, hex: seed }))
 
+/** 3 cỡ chữ: nhỏ / vừa (mặc định) / lớn — hệ số nhân kích thước chữ toàn app */
 export const FONT_SIZE_OPTIONS = [
-  { id: 'nho', label: 'Nhỏ', scale: 0.925 },
-  { id: 'vua', label: 'Vừa', scale: 1 },
-  { id: 'lon', label: 'Lớn', scale: 1.08 },
-  { id: 'rat-lon', label: 'Rất lớn', scale: 1.16 }
+  { id: 'nho', labelKey: 'settings.sizeSmall', scale: 0.925 },
+  { id: 'vua', labelKey: 'settings.sizeMedium', scale: 1 },
+  { id: 'lon', labelKey: 'settings.sizeLarge', scale: 1.1 }
 ]
 
 const DEFAULTS = {
@@ -28,14 +28,7 @@ const DEFAULTS = {
   dailyColorRotation: false,
   language: 'vi', // 'vi' | 'en'
   fontSize: 'vua',
-  fontFamily: DEFAULT_FONT_ID,
-  notificationsEnabled: false,
-  notifyLunarDays: true,
-  notifyHolidayIds: HOLIDAYS.map((h) => h.id),
-  notifyHour: 8,
-  notifyMinute: 0,
-  notifyTiming: 'on-day', // 'on-day' | 'before'
-  notifyBeforeDays: 1
+  fontFamily: DEFAULT_FONT_ID
 }
 
 /** Giữ đúng 1 thẻ <meta name="theme-color"> (không media) theo màu --surface đang dùng (đã gồm màu chủ đạo).
@@ -65,6 +58,9 @@ function loadSettings() {
     if (!raw) return DEFAULTS
     const saved = JSON.parse(raw)
     if (saved.color === 'm3') saved.color = 'rose' // theme "Xanh Material" cũ → Rose
+    if (saved.fontSize === 'rat-lon') saved.fontSize = 'lon' // cỡ "Rất lớn" đã bỏ → "Lớn"
+    // Tính năng thông báo đã gỡ: dọn các khoá cũ khỏi dữ liệu đã lưu
+    for (const key of Object.keys(saved)) if (key === 'notificationsEnabled' || key.startsWith('notify')) delete saved[key]
     return { ...DEFAULTS, ...saved }
   } catch {
     return DEFAULTS
@@ -95,7 +91,7 @@ export function SettingsProvider({ children }) {
   const effectiveColor = settings.dailyColorRotation ? getDailyColorId() : settings.color
 
   const firstRun = useRef(true)
-  const lastTheme = useRef(`${isDark}|${effectiveColor}`)
+  const lastTheme = useRef('')
 
   // Font: áp ngay stack (font dự phòng hiển thị trong lúc tải), tải font web theo nhu cầu
   useEffect(() => {
@@ -105,33 +101,39 @@ export function SettingsProvider({ children }) {
     loadFont(font.id)
   }, [settings.fontFamily])
 
+  // Giao diện (sáng/tối + màu chủ đạo). Mọi lần đổi — kể cả khi hệ điều hành tự đổi sáng/tối — đi qua
+  // applyThemeDom: một cú chuyển cảnh GPU (View Transition) thay vì animate từng phần tử → mượt, không giật.
   useEffect(() => {
-    const root = document.documentElement
     const themeKey = `${isDark}|${effectiveColor}`
-    if (!firstRun.current && lastTheme.current !== themeKey) {
-      // Đổi sáng/tối hoặc màu: bật chuyển màu mượt cho toàn trang trong ~0.6s
-      root.classList.add('theme-anim')
-      window.clearTimeout(root.__themeAnimTimer)
-      root.__themeAnimTimer = window.setTimeout(() => root.classList.remove('theme-anim'), 650)
+    if (lastTheme.current === themeKey) return
+    const root = document.documentElement
+    const apply = () => {
+      root.classList.toggle('dark', isDark)
+      root.setAttribute('data-color', effectiveColor)
+      root.style.colorScheme = isDark ? 'dark' : 'light'
+      root.style.backgroundColor = '' // nền do CSS (--surface) đảm nhiệm sau khi app đã chạy
+      applyThemeColorMeta()
     }
+    const first = firstRun.current
     firstRun.current = false
     lastTheme.current = themeKey
-    root.classList.toggle('dark', isDark)
-    root.setAttribute('data-color', effectiveColor)
+    if (first) apply()
+    else applyThemeDom(apply)
+  }, [isDark, effectiveColor])
+
+  // Các cài đặt còn lại: ngôn ngữ, cỡ chữ, lưu trữ
+  useEffect(() => {
+    const root = document.documentElement
     root.setAttribute('lang', settings.language === 'en' ? 'en' : 'vi')
     const scale = FONT_SIZE_OPTIONS.find((s) => s.id === settings.fontSize)?.scale ?? 1
     root.style.setProperty('--font-scale', String(scale))
-
-    root.style.colorScheme = isDark ? 'dark' : 'light'
-    root.style.backgroundColor = '' // nền do CSS (--surface) đảm nhiệm sau khi app đã chạy
-    applyThemeColorMeta()
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
       localStorage.removeItem(LEGACY_STORAGE_KEY)
     } catch {
       /* ignore quota errors */
     }
-  }, [settings, isDark, effectiveColor])
+  }, [settings])
 
   const update = useCallback((patch) => {
     setSettings((prev) => ({ ...prev, ...patch }))

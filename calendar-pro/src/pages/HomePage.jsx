@@ -136,20 +136,6 @@ export default function HomePage() {
               })}
             </div>
           </section>
-
-          {/* Gợi ý bật thông báo */}
-          <section className="flex items-center gap-4 rounded-[28px] bg-tertiary-container p-4 text-on-tertiary-container">
-            <span className="fx-spin-slow shape-flower flex h-12 w-12 shrink-0 items-center justify-center bg-tertiary text-on-tertiary">
-              <Icon name="notifications_active" size={24} filled className="[animation:none]" />
-            </span>
-            <p className="text-body-md">
-              {t('home.notifyHintPrefix')}{' '}
-              <Link to="/cai-dat" className="font-semibold underline underline-offset-4">
-                {t('home.notifyHintLink')}
-              </Link>{' '}
-              {t('home.notifyHintSuffix')}
-            </p>
-          </section>
         </div>
       </div>
 

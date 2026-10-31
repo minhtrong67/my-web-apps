@@ -4,7 +4,7 @@ Chụp đúng 4 ảnh giới thiệu vào thư mục screenshots/ (dùng cho REA
   01-home.png        Trang chủ (sáng)
   02-calendar.png    Lịch tháng + chi tiết ngày (tối)
   03-countdown.png   Đếm ngược ngày lễ (sáng)
-  04-settings.png    Cài đặt: màu chủ đạo + phông chữ (sáng)
+  04-settings.png    Cài đặt: accordion màu/phông chữ, cỡ chữ 3 mức, khối tác giả & Claude AI (sáng)
 
 Chạy:  npm run build && python3 scripts/screenshots.py
 Cần:   pip install playwright && playwright install chromium
@@ -63,10 +63,9 @@ try:
             page.evaluate("document.fonts.ready")
             page.wait_for_timeout(1800)  # đợi animation vào trang (stagger, số cuộn, sóng) kết thúc
             if route.endswith("cai-dat"):
-                page.evaluate(
-                    "(() => { const h=[...document.querySelectorAll('h2')].find(e=>/Màu sắc/i.test(e.textContent)); if(h){ window.scrollTo({top:h.getBoundingClientRect().top+scrollY-48,behavior:'instant'}) } })()"
-                )
-                page.wait_for_timeout(1200)
+                # Cuộn xuống cuối: thấy các accordion (đang đóng, kèm giá trị hiện tại), cỡ chữ 3 mức và khối tác giả / Claude AI
+                page.evaluate("window.scrollTo({top: document.documentElement.scrollHeight, behavior: 'instant'})")
+                page.wait_for_timeout(1400)
             page.mouse.move(1380, 860)
             page.screenshot(path=str(OUT / name))
             ctx.close()
