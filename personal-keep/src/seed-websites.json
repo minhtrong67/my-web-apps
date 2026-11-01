@@ -1,0 +1,530 @@
+[
+{
+"name": "Leaflet",
+"category": "tool",
+"desc": "",
+"url": "https://leafletjs.com/"
+},
+{
+"name": "OpenStreetMap",
+"category": "tool",
+"desc": "",
+"url": "https://www.openstreetmap.org/#map=10/15.2037/104.2300"
+},
+{
+"name": "vite",
+"category": "tool",
+"desc": "",
+"url": "https://vite.dev/"
+},
+{
+"name": "Idea coding project sheets",
+"category": "utility",
+"desc": "",
+"url": "https://docs.google.com/spreadsheets/d/1uoH3xOtcyEBgthIaKIFtAJEaZa0vatkzy1_A0HEtmUY/edit?pli=1&gid=0#gid=0"
+},
+{
+"name": "Review công ty",
+"category": "utility",
+"desc": "",
+"url": "https://reviewtopcongty.com/"
+},
+{
+"name": "Catppuccin wallpaper",
+"category": "utility",
+"desc": "wallpaper",
+"url": "https://files.orangc.net/media/walls-catppuccin-mocha/"
+},
+{
+"name": "CozyPixels",
+"category": "utility",
+"desc": "Aesthetic wallpaper collection gathered over a year! Catppuccin, Nord, One Dark themes & cozy vibes. Free for everyone to enjoy",
+"url": "https://github.com/SleepyCatHey/CozyPixels"
+},
+{
+"name": "PixelPlayer",
+"category": "mobile",
+"desc": "android music app",
+"url": "https://github.com/PixelPlayerHQ/PixelPlayer"
+},
+{
+"name": "ONLYOFFICE",
+"category": "desktop",
+"desc": "phần mềm thay thế office 365",
+"url": "https://www.onlyoffice.com/"
+},
+{
+"name": "M365 Copilot",
+"category": "tool",
+"desc": "",
+"url": "https://m365.cloud.microsoft/apps/?ui=en-US&rs=US&auth=1&origindomain=Office"
+},
+{
+"name": "Supabase",
+"category": "tool",
+"desc": "",
+"url": "https://supabase.com/"
+},
+{
+"name": "Primereact component",
+"category": "tool",
+"desc": "",
+"url": "https://v9.primereact.org/datatable/"
+},
+{
+"name": "Primereact icon list",
+"category": "tool",
+"desc": "",
+"url": "https://v9.primereact.org/icons/#list"
+},
+{
+"name": "Tortoise SVN",
+"category": "tool",
+"desc": "",
+"url": "https://tortoisesvn.net/downloads.html"
+},
+{
+"name": "JSON Unescape",
+"category": "tool",
+"desc": "",
+"url": "https://jsonformatter.org/json-unescape"
+},
+{
+"name": "JSON Viewer",
+"category": "tool",
+"desc": "",
+"url": "https://jsonformatter.org/json-viewer"
+},
+{
+"name": "Raycast Theme",
+"category": "tool",
+"desc": "",
+"url": "https://www.ray.so/themes/chris/almost-cyan"
+},
+{
+"name": "Code Image",
+"category": "tool",
+"desc": "",
+"url": "https://www.ray.so/"
+},
+{
+"name": "Icon Maker",
+"category": "tool",
+"desc": "",
+"url": "https://www.ray.so/icon"
+},
+{
+"name": "Wallpaperhub",
+"category": "utility",
+"desc": "",
+"url": "https://www.wallpaperhub.app/"
+},
+{
+"name": "Simple Icons",
+"category": "tool",
+"desc": "",
+"url": "https://simpleicons.org/"
+},
+{
+"name": "Extract Pics",
+"category": "tool",
+"desc": "extract images from website",
+"url": "https://extract.pics/"
+},
+{
+"name": "Free APIs",
+"category": "tool",
+"desc": "",
+"url": "https://free-apis.github.io/#/"
+},
+{
+"name": "update test",
+"category": "utility",
+"desc": "",
+"url": "https://www.google.com/"
+},
+{
+"name": "500px",
+"category": "utility",
+"desc": "web tìm ảnh đẹp siêu nét, đề xuất từ chrome",
+"url": "https://500px.com/"
+},
+{
+"name": "IGG Games",
+"category": "utility",
+"desc": "web tải game crack",
+"url": "https://igg-games.com/"
+},
+{
+"name": "dbdiagram",
+"category": "tool",
+"desc": "web vẽ database",
+"url": "https://dbdiagram.io/home"
+},
+{
+"name": "Google Fonts",
+"category": "tool",
+"desc": "web tìm font",
+"url": "https://fonts.google.com/"
+},
+{
+"name": "PrimeReact",
+"category": "tool",
+"desc": "lib",
+"url": "https://primereact.dev/"
+},
+{
+"name": "getdesign.md",
+"category": "tool",
+"desc": "web tìm design",
+"url": "https://getdesign.md/"
+},
+{
+"name": "angular",
+"category": "utility",
+"desc": "trang chủ angular framework",
+"url": "https://angular.dev/"
+},
+{
+"name": "PWA builder",
+"category": "tool",
+"desc": "Web tạo icon pack cho PWA",
+"url": "https://www.pwabuilder.com/imageGenerator"
+},
+{
+"name": "Repo Remover",
+"category": "tool",
+"desc": "Web xóa nhiều repo trên github cùng 1 lúc",
+"url": "https://reporemover.xyz/"
+},
+{
+"name": "Review công ty",
+"category": "utility",
+"desc": "Web check var công ty",
+"url": "https://1900.com.vn/"
+},
+{
+"name": "Revo Uninstaller",
+"category": "desktop",
+"desc": "Trình gỡ cài đặt ứng dụng trên pc",
+"url": "https://www.revouninstaller.com/"
+},
+{
+"name": "Smart Launcher 6",
+"category": "mobile",
+"desc": "App custom giao diện",
+"url": "https://play.google.com/store/apps/details?id=ginlemon.flowerfree&pcampaignid=web_share"
+},
+{
+"name": "storyset",
+"category": "utility",
+"desc": "Web tìm ảnh banner",
+"url": "https://storyset.com/"
+},
+{
+"name": "Transfer it",
+"category": "tool",
+"desc": "Web up file chia sẽ link cùa nhà MEGA",
+"url": "https://transfer.it/start"
+},
+{
+"name": "uBlock Origin Lite",
+"category": "extension",
+"desc": "Extension chặn quảng cáo uy tính nhất quả đất",
+"url": "https://chromewebstore.google.com/detail/ddkjiahejlhfcafbddmgiahcphecmpfh?utm_source=item-share-cb"
+},
+{
+"name": "UHD Wallpaper",
+"category": "utility",
+"desc": "Web tìm ảnh wallpaper đẹp cho pc",
+"url": "https://www.uhdpaper.com/"
+},
+{
+"name": "uiGradients",
+"category": "utility",
+"desc": "Web tìm màu gradient",
+"url": "https://uigradients.com/#VeryBlue"
+},
+{
+"name": "Vercel Bulk Manager",
+"category": "tool",
+"desc": "Web xóa nhiều project trên vercel cùng 1 lúc",
+"url": "https://vercel-bulk-manager.vercel.app/"
+},
+{
+"name": "Wallpaper Flare",
+"category": "utility",
+"desc": "Web tìm ảnh wallpaper đẹp cho pc",
+"url": "https://www.wallpaperflare.com/"
+},
+{
+"name": "YouTube Columns Adjuster",
+"category": "extension",
+"desc": "Extension custom hàng video trên YouTube",
+"url": "https://chromewebstore.google.com/detail/ghnannfbpcdnhpbljedhdigiboghiojo?utm_source=item-share-cb"
+},
+{
+"name": "Photo editor",
+"category": "tool",
+"desc": "Add text, stickers, effects and filters to your photos. Edit your photos online.",
+"url": "https://www.iloveimg.com/photo-editor"
+},
+{
+"name": "HexEd.it",
+"category": "tool",
+"desc": "",
+"url": "https://hexed.it/"
+},
+{
+"name": "IconKitchen",
+"category": "tool",
+"desc": "",
+"url": "https://icon.kitchen/"
+},
+{
+"name": "SVG to PNG Converter",
+"category": "tool",
+"desc": "Công cụ chuyển đổi SVG sang PNG",
+"url": "https://cloudconvert.com/svg-to-png"
+},
+{
+"name": "Spotify Downloader",
+"category": "tool",
+"desc": "Web tải nhạc spotify, album, playlist",
+"url": "https://spotidown.co/"
+},
+{
+"name": "9mod",
+"category": "utility",
+"desc": "tải apk mod",
+"url": "https://9mod.com/"
+},
+{
+"name": "Lockify – Hide & Encrypt Files",
+"category": "mobile",
+"desc": "Lockify là ứng dụng kho lưu trữ riêng tư giúp ẩn ảnh, video và tập tin, đồng thời lưu trữ an toàn các tài liệu nhạy cảm như thẻ Aadhaar, thẻ PAN, phiếu lương và các tập tin cá nhân - tất cả đều được mã hóa thực sự trên thiết bị, hoàn toàn ngoại tuyến và không có quảng cáo.",
+"url": "https://play.google.com/store/apps/details?id=com.leo.lockify&pcampaignid=web_share"
+},
+{
+"name": "SpotiDownloader",
+"category": "tool",
+"desc": "Web tải nhạc spotify, album, playlist",
+"url": "https://spotidownloader.com/en"
+},
+{
+"name": "Tab Board",
+"category": "extension",
+"desc": "QUẢN LÝ TAB / BOOKMARK VỚI kanban-style",
+"url": "https://chromewebstore.google.com/detail/nnjgfniebelebmohhnkojfpejikdbjbp?utm_source=item-share-cb"
+},
+{
+"name": "Sweezy Cursors",
+"category": "tool",
+"desc": "custom cursor",
+"url": "https://sweezy-cursors.com/"
+},
+{
+"name": "J2TEAM Launch",
+"category": "utility",
+"desc": "web công nghệ j2team",
+"url": "https://launch.j2team.dev/"
+},
+{
+"name": "1000 random names",
+"category": "utility",
+"desc": "1000 tên ngẫu nhiên",
+"url": "https://1000randomnames.com/"
+},
+{
+"name": "File Pilot",
+"category": "extension",
+"desc": "trình quản lý file cho windows",
+"url": "https://filepilot.tech/download"
+},
+{
+"name": "Plant UML",
+"category": "tool",
+"desc": "web vẽ sơ đồ use case,...",
+"url": "https://plantuml.com/"
+},
+{
+"name": "4K Wallpaper",
+"category": "utility",
+"desc": "Web tìm ảnh wallpaper đẹp cho pc",
+"url": "https://4kwallpapers.com/"
+},
+{
+"name": "8mbvideo",
+"category": "tool",
+"desc": "Web nén video 8mb cho discord",
+"url": "https://8mb.video/"
+},
+{
+"name": "Backdrops - Wallpapers",
+"category": "mobile",
+"desc": "App tìm wallpaper đẹp cho điện thọai",
+"url": "https://play.google.com/store/apps/details?id=com.backdrops.wallpapers&pcampaignid=web_share"
+},
+{
+"name": "backiee",
+"category": "utility",
+"desc": "Web tìm ảnh wallpaper đẹp cho pc",
+"url": "https://backiee.com/"
+},
+{
+"name": "cobalt tool",
+"category": "tool",
+"desc": "Web download mp3, mp4",
+"url": "https://cobalt.tools/"
+},
+{
+"name": "Color Hunt",
+"category": "tool",
+"desc": "Web tìm màu đẹp",
+"url": "https://colorhunt.co/"
+},
+{
+"name": "CurseForge",
+"category": "utility",
+"desc": "Web tải mod, shader cho minecraft java",
+"url": "https://www.curseforge.com/minecraft"
+},
+{
+"name": "emojicopy",
+"category": "tool",
+"desc": "Web copy emoji",
+"url": "https://emojicopy.com/"
+},
+{
+"name": "Fine Lock (only for Samsung)",
+"category": "mobile",
+"desc": "App custom samsung icon",
+"url": "https://play.google.com/store/apps/details?id=yuh.yuh.finelock&pcampaignid=web_share"
+},
+{
+"name": "Flaticon",
+"category": "utility",
+"desc": "Web tìm icon đẹp",
+"url": "https://www.flaticon.com/"
+},
+{
+"name": "Free Photo Collage Maker",
+"category": "tool",
+"desc": "Công cụ tạo ảnh ghép miễn phí",
+"url": "https://pixlr.com/vn/photo-collage/"
+},
+{
+"name": "Free YouTube Thumbnail Resizer",
+"category": "tool",
+"desc": "Công cụ thay đổi kích thước hình thu nhỏ YouTube miễn phí",
+"url": "https://www.lightxeditor.com/photo-editing/youtube-thumbnail-resizer/"
+},
+{
+"name": "Gemini AI Watermark Removal",
+"category": "tool",
+"desc": "Xóa logo Gemini",
+"url": "https://banana.ovo.re/"
+},
+{
+"name": "Get started with Tailwind CSS",
+"category": "utility",
+"desc": "Cài đặt Tailwind CSS cho Vite",
+"url": "https://tailwindcss.com/docs/installation/using-vite"
+},
+{
+"name": "Good Lock",
+"category": "mobile",
+"desc": "App custom samsung icon",
+"url": "https://play.google.com/store/apps/details?id=com.samsung.android.goodlock&pcampaignid=web_share"
+},
+{
+"name": "Google Antigravity",
+"category": "desktop",
+"desc": "AI IDE của Google",
+"url": "https://antigravity.google/"
+},
+{
+"name": "Google Translate",
+"category": "extension",
+"desc": "Extension Google dịch",
+"url": "https://chromewebstore.google.com/detail/aapbdbdomjkkjkaonfhkkikfgjllcleb?utm_source=item-share-cb"
+},
+{
+"name": "Icon Pack Studio",
+"category": "mobile",
+"desc": "App custom icon pack",
+"url": "https://play.google.com/store/apps/details?id=ginlemon.iconpackstudio&pcampaignid=web_share"
+},
+{
+"name": "ICONS",
+"category": "utility",
+"desc": "Web tìm icon đẹp",
+"url": "https://icons8.com/icons"
+},
+{
+"name": "J2TEAM Security",
+"category": "tool",
+"desc": "Web J2TEAM",
+"url": "https://j2team.org/"
+},
+{
+"name": "Japanese Character Name Generator",
+"category": "tool",
+"desc": "Công cụ tạo tên ký tự tiếng Nhật",
+"url": "https://reedsy.com/resources/character-name-generator/language/japanese/"
+},
+{
+"name": "MarkLiveEdit",
+"category": "tool",
+"desc": "Markdown file preview",
+"url": "https://markdownlivepreview.dev/"
+},
+{
+"name": "Material Chrome Themes",
+"category": "extension",
+"desc": "Extension custom thanh tab trên chrome",
+"url": "https://material-theme.com/docs/reference/chrome-themes/"
+},
+{
+"name": "Material Icons for GitHub",
+"category": "extension",
+"desc": "Extension hiển thị material icon cho file và folder trên github web",
+"url": "https://chromewebstore.google.com/detail/bggfcpfjbdkhfhfmkjpbhnkhnpjjeomc?utm_source=item-share-cb"
+},
+{
+"name": "Media Harvest : X (twitter) Media Downloader",
+"category": "extension",
+"desc": "Extension tải video trên X",
+"url": "https://chromewebstore.google.com/detail/hpcgabhdlnapolkkjpejieegfpehfdok?utm_source=item-share-cb"
+},
+{
+"name": "MYNT: Material You New Tab",
+"category": "extension",
+"desc": "Extension custom trang chủ chrome",
+"url": "https://chromewebstore.google.com/detail/jjpokbgpiljgndebfoljdeihhkpcpfgl?utm_source=item-share-cb"
+},
+{
+"name": "OnePro (Dark) - Icon Pack",
+"category": "mobile",
+"desc": "App custom icon dark theme",
+"url": "https://play.google.com/store/apps/details?id=com.eatos.onedarkpro&pcampaignid=web_share"
+},
+{
+"name": "Parabolic",
+"category": "mobile",
+"desc": "GUI của yt-dlp tải video mp3, mp4 trên nhiều nền tảng MXH",
+"url": "https://github.com/NickvisionApps/Parabolic?tab=readme-ov-file"
+},
+{
+"name": "Phone Simulator — Mobile Emulator Tool",
+"category": "extension",
+"desc": "Extension giả lập thiết bị responsive",
+"url": "https://chromewebstore.google.com/detail/hahdnalbjglbhcnjdkjhdkmhjkkgjkcd?utm_source=item-share-cb"
+},
+{
+"name": "Postimages",
+"category": "tool",
+"desc": "Web up ảnh lấy link",
+"url": "https://postimages.org/"
+}
+]
