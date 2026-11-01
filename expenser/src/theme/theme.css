@@ -15,6 +15,12 @@
   --md-expense-container: var(--md-error-container);
   --md-on-expense-container: var(--md-on-error-container);
 
+  /* Warning role (amber) - used by toasts; not part of the generated scheme */
+  --md-warning: #8a5100;
+  --md-on-warning: #ffffff;
+  --md-warning-container: #ffddb3;
+  --md-on-warning-container: #2c1700;
+
   /* Shape scale (M3 Expressive) */
   --shape-xs: 4px;
   --shape-sm: 8px;
@@ -30,6 +36,10 @@
   --motion-spatial: linear(0, 0.198, 0.536, 0.81, 0.969, 1.034, 1.046, 1.034, 1.019, 1.007, 1.001, 0.998, 0.998, 0.999, 0.999, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
   --motion-spatial-fast: linear(0, 0.159, 0.445, 0.701, 0.877, 0.974, 1.017, 1.028, 1.025, 1.017, 1.009, 1.004, 1.001, 1, 0.999, 0.999, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
   --motion-effects: cubic-bezier(0.34, 0.8, 0.34, 1);
+  /* Smooth, overshoot-free curves for things that enter / leave the screen (dialogs, sheets, menus, toasts) */
+  --motion-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --motion-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --motion-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --motion-standard: cubic-bezier(0.2, 0, 0, 1);
 
   /* Elevation (tonal surfaces do most of the work; shadows are for floating layers) */
@@ -40,5 +50,11 @@
   --state-hover: 0.08;
   --state-focus: 0.1;
   --state-press: 0.1;
+}
+.dark {
+  --md-warning: #ffb95c;
+  --md-on-warning: #4a2800;
+  --md-warning-container: #6a3c00;
+  --md-on-warning-container: #ffddb3;
 }
 .dark { --state-hover: 0.08; --state-focus: 0.1; --state-press: 0.12; }

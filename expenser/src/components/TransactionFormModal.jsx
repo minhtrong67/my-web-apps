@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
 import MoneyInput from './ui/MoneyInput';
@@ -77,16 +77,14 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
     try {
       if (editingTx) {
         await updateTransaction(editingTx.id, payload, editingTx);
-        toast.success(t('tx.updated'));
       } else {
         await addTransaction(payload);
         remember(payload);
-        toast.success(t('tx.added'));
       }
       onClose();
     } catch (err) {
       console.error(err);
-      toast.error(t('tx.saveError'));
+      notify.error(t('tx.saveError'));
     } finally {
       setSaving(false);
     }
@@ -106,7 +104,7 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
       title={editingTx ? t('tx.editTitle') : t('tx.addTitle')}
       variant="sheet"
       footer={
-        <div className="flex justify-end gap-2">
+        <div className="grid grid-cols-2 gap-2 w-full">
           <Button type="button" variant="text" onClick={onClose} disabled={saving}>
             {t('common.cancel')}
           </Button>

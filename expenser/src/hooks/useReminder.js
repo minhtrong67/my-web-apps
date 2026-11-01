@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import { useAuth } from '../contexts/AuthContext';
 import { useSettings } from '../contexts/SettingsContext';
 import { useI18n } from '../i18n';
@@ -81,13 +81,12 @@ export function useReminderSettings() {
       const result = await requestPermission();
       setPermission(result);
       if (result !== 'granted') {
-        toast.error(t(result === 'unsupported' ? 'reminder.unsupported' : 'reminder.denied'));
+        notify.warning(t(result === 'unsupported' ? 'reminder.unsupported' : 'reminder.denied'));
         return;
       }
       update({ reminder: { enabled: true, time: normalizeTime(reminder.time) } });
-      toast.success(t('reminder.on', { time: normalizeTime(reminder.time) }));
     } catch {
-      toast.error(t('reminder.error'));
+      notify.error(t('reminder.error'));
     } finally {
       setBusy(false);
     }
@@ -99,7 +98,6 @@ export function useReminderSettings() {
     await removeServerReminder(user?.uid);
     await syncWorkerConfig({ enabled: false }, t, lang).catch(() => {});
     setBusy(false);
-    toast(t('reminder.off'));
   }, [lang, reminder, t, update, user?.uid]);
 
   const setTime = useCallback(
@@ -114,11 +112,11 @@ export function useReminderSettings() {
     try {
       const result = permission === 'granted' ? 'granted' : await requestPermission();
       setPermission(result);
-      if (result !== 'granted') return toast.error(t('reminder.denied'));
+      if (result !== 'granted') return notify.warning(t('reminder.denied'));
       await showReminder(t, lang);
-      toast.success(t('reminder.testSent'));
+      notify.success(t('reminder.testSent'));
     } catch {
-      toast.error(t('reminder.error'));
+      notify.error(t('reminder.error'));
     }
   }, [lang, permission, t]);
 

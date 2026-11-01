@@ -8,7 +8,7 @@
 <br />
 *A fast, open-source personal expense tracker with a Material 3 Expressive interface.*
 
-[![Live demo](https://img.shields.io/badge/Live%20demo-expenser--quan--ly--chi--tieu.vercel.app-006E1C?style=for-the-badge&logo=vercel&logoColor=white)](https://expenser-quan-ly-chi-tieu.vercel.app/)
+[![Live demo](https://img.shields.io/badge/Live%20demo-expenser--quan--ly--chi--tieu.vercel.app-006E1C?style=for-the-badge&logo=vercel&logoColor=white)](https://expenser-eight.vercel.app/)
 
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
@@ -18,7 +18,7 @@
 ![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8?logo=pwa&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-006E1C)
 
-[Dùng thử](https://expenser-quan-ly-chi-tieu.vercel.app/) ·
+[Dùng thử](https://expenser-eight.vercel.app/) ·
 [Tính năng](#-tính-năng) ·
 [Cài đặt](#-bắt-đầu) ·
 [Nhắc nhở hàng ngày](#-nhắc-nhở-hàng-ngày-thông-báo-đẩy) ·
@@ -297,7 +297,7 @@ npm run build
 
 Triển khai thư mục `dist/` cùng thư mục `api/` lên **Vercel** (đã có `vercel.json`: SPA rewrite, chuyển hướng `/landing.html` → `/welcome`). Nhớ thêm tên miền triển khai vào **Authorized domains** của Firebase Auth. Nếu không dùng Vercel, ứng dụng vẫn chạy tĩnh được (Firebase Hosting, Netlify…) 
 
-SEO & chia sẻ mạng xã hội: thẻ Open Graph / Twitter Card, canonical, JSON-LD (`WebApplication`), `robots.txt` và `sitemap.xml` đã có sẵn cho `https://expenser-quan-ly-chi-tieu.vercel.app/`; ảnh chia sẻ là `public/og-image.png` (1200×630).
+SEO & chia sẻ mạng xã hội: thẻ Open Graph / Twitter Card, canonical, JSON-LD (`WebApplication`), `robots.txt` và `sitemap.xml` đã có sẵn cho `https://expenser-eight.vercel.app/`; ảnh chia sẻ là `public/og-image.png` (1200×630).
 
 ## 🌍 Trình duyệt hỗ trợ
 

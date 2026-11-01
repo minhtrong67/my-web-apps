@@ -9,7 +9,7 @@ import FabStack from './FabStack';
 import RouteFallback from '../ui/RouteFallback';
 import { NAV_ITEMS } from './navConfig';
 import { useT } from '../../i18n';
-import { usePageTitle } from '../../hooks/usePageTitle';
+import { useSeo } from '../../hooks/useSeo';
 import { useReminderRuntime } from '../../hooks/useReminder';
 
 export default function AppLayout() {
@@ -66,7 +66,7 @@ export default function AppLayout() {
 
   const current = NAV_ITEMS.find((n) => (n.end ? location.pathname === n.to : location.pathname.startsWith(n.to)));
   const title = current ? t(current.labelKey) : 'Expenser';
-  usePageTitle(`${title} · Expenser`);
+  useSeo({ title: `${title} · Expenser`, noindex: true });
 
   return (
     <div className="min-h-dvh bg-surface">
@@ -74,7 +74,7 @@ export default function AppLayout() {
         {t('common.skipToContent')}
       </a>
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className={`flex min-h-dvh flex-col transition-[padding] duration-500 ease-spatial ${sidebarOpen ? 'lg:pl-[19rem]' : 'lg:pl-0'}`}>
+      <div className={`flex min-h-dvh flex-col transition-[padding] duration-[420ms] ease-smooth ${sidebarOpen ? 'lg:pl-[19rem]' : 'lg:pl-0'}`}>
         <div ref={sentinelRef} className="absolute top-0 h-px w-px" aria-hidden="true" />
         <Topbar title={title} scrolled={scrolled} onSearchClick={() => setPaletteOpen(true)} onMenuClick={() => setSidebarOpen((o) => !o)} />
         <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 pb-40 pt-2 sm:px-6 sm:pt-4 lg:px-8 lg:pb-28">

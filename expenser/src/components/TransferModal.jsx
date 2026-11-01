@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
 import MoneyInput from './ui/MoneyInput';
@@ -49,10 +49,9 @@ export default function TransferModal({ open, onClose, defaultFromWalletId }) {
     setSaving(true);
     try {
       await transferBetweenWallets(form);
-      toast.success(t('transfer.success'));
       onClose();
     } catch {
-      toast.error(t('transfer.error'));
+      notify.error(t('transfer.error'));
     } finally {
       setSaving(false);
     }

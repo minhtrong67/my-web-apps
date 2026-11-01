@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import Icon from '../ui/Icon';
 import { useT } from '../../i18n';
+import { usePresence } from '../../hooks/usePresence';
+import { scrollToTop } from '../../utils/scroll';
 
 /**
  * Bottom-right column for floating buttons. It always holds the "back to top"
@@ -11,6 +13,7 @@ import { useT } from '../../i18n';
 export default function FabStack({ onSlot }) {
   const t = useT();
   const [showTop, setShowTop] = useState(false);
+  const { present: topPresent, closing: topClosing } = usePresence(showTop, 260);
 
   useEffect(() => {
     let raf = 0;
@@ -28,13 +31,13 @@ export default function FabStack({ onSlot }) {
 
   return (
     <div className="fab-stack">
-      {showTop && (
+      {topPresent && (
         <button
           type="button"
           aria-label={t('common.scrollTop')}
           title={t('common.scrollTop')}
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="state-layer morph morph-sq flex h-12 w-12 animate-scale-in items-center justify-center bg-surface-container-high text-primary shadow-elev-2"
+          onClick={scrollToTop}
+          className={`state-layer morph morph-sq flex h-12 w-12 ${topClosing ? 'animate-scale-out' : 'animate-scale-in'} items-center justify-center bg-surface-container-high text-primary shadow-elev-2`}
         >
           <Icon name="arrow_upward" size={24} />
         </button>

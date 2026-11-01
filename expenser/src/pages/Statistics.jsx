@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import { ResponsiveContainer, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import Icon from '../components/ui/Icon';
 import IconButton from '../components/ui/IconButton';
@@ -184,17 +184,17 @@ export default function StatisticsPage() {
 
   async function handleExport(format) {
     if (filtered.length === 0) {
-      toast.error(t('stats.exportEmpty'));
+      notify.warning(t('stats.exportEmpty'));
       return;
     }
     setExporting(format);
     try {
       const { exportRangeReport } = await import('../utils/exportImport');
       await exportRangeReport({ title: periodLabel, start, end, transactions, categories, getCategory, getWallet, format, t });
-      toast.success(t('stats.exported'));
+      notify.success(t('stats.exported'));
     } catch (err) {
       console.error(err);
-      toast.error(t('stats.exportError'));
+      notify.error(t('stats.exportError'));
     } finally {
       setExporting(null);
     }

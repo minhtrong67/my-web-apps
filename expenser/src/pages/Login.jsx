@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import AuthLayout, { AuthCard } from './AuthLayout';
 import Button from '../components/ui/Button';
 import Icon from '../components/ui/Icon';
@@ -20,10 +20,9 @@ export default function Login() {
     const res = await loginWithGoogle();
     setGoogleLoading(false);
     if (res.success) {
-      toast.success(t('auth.loginSuccess'));
       navigate(redirectTo, { replace: true });
     } else if (res.error) {
-      toast.error(res.error);
+      notify.error(res.error);
     }
   }
 

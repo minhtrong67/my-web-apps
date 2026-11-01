@@ -21,6 +21,18 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'favicon.svg', 'icons/*.png'],
+      workbox: {
+        // Optional fonts (Settings > Font) are not precached - only Roboto Flex, the default, ships offline.
+        // Once a user picks another font its files are cached on first use.
+        globIgnores: ['**/inter-*', '**/google-sans-flex-*', '**/be-vietnam-pro-*', '**/roboto-[!f]*'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => /\.woff2$/.test(url.pathname),
+            handler: 'CacheFirst',
+            options: { cacheName: 'fonts', expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 365 } },
+          },
+        ],
+      },
       manifest: {
         id: '/',
         name: "Expenser — Quản lý chi tiêu",
@@ -31,8 +43,8 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         display: 'standalone',
-        theme_color: '#f3fcec',
-        background_color: '#f3fcec',
+        theme_color: '#4CAF50',
+        background_color: '#4CAF50',
         categories: ['finance', 'productivity'],
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },

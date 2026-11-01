@@ -6,6 +6,7 @@ import { SettingsProvider } from './contexts/SettingsContext';
 import ProtectedRoute from './routes/ProtectedRoute';
 import PublicRoute from './routes/PublicRoute';
 import SplashScreen from './components/ui/SplashScreen';
+import { useSmoothAnchors } from './hooks/useSmoothAnchors';
 
 // Every page is its own chunk, fetched only when visited. The signed-in shell
 // (Firestore data layer + app chrome) is one lazy module too, so the login
@@ -23,30 +24,16 @@ const SettingsPage = lazy(() => import('./pages/Settings'));
 const Landing = lazy(() => import('./pages/Landing'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
-// Toasts are M3 snackbars: inverse surface, so they are dark on the light theme and light on the dark
-// theme. Styles are CSS variables, so a theme switch re-colours toasts already on screen.
+// Notifications are rendered by src/utils/notify.jsx (themed success / error / warning / info cards);
+// the Toaster only positions and stacks them.
 function ThemedToaster() {
-  return (
-    <Toaster
-      position="top-center"
-      containerStyle={{ top: 'max(1rem, env(safe-area-inset-top))' }}
-      toastOptions={{
-        duration: 3500,
-        style: {
-          background: 'var(--md-inverse-surface)',
-          color: 'var(--md-inverse-on-surface)',
-          borderRadius: '16px',
-          fontSize: '14px',
-          lineHeight: '20px',
-          padding: '12px 16px',
-          maxWidth: 'min(92vw, 420px)',
-          boxShadow: 'var(--elev-3)',
-        },
-        success: { iconTheme: { primary: 'var(--md-inverse-primary)', secondary: 'var(--md-inverse-surface)' } },
-        error: { iconTheme: { primary: 'var(--md-error-container)', secondary: 'var(--md-inverse-surface)' } },
-      }}
-    />
-  );
+  return <Toaster position="top-center" containerStyle={{ top: 'max(1rem, env(safe-area-inset-top))' }} toastOptions={{ duration: 3000 }} />;
+}
+
+// Mounts the global "#section" smooth-scroll handler.
+function SmoothAnchors() {
+  useSmoothAnchors();
+  return null;
 }
 
 export default function App() {
@@ -55,6 +42,7 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <ThemedToaster />
+          <SmoothAnchors />
           <Suspense fallback={<SplashScreen />}>
             <Routes>
               {/* Intro page: always reachable (Settings > About links here for signed-in users) */}

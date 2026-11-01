@@ -20,6 +20,7 @@ const ROLES = [
   'surface-container-high', 'surface-container-highest',
   // Semantic money colours
   'income', 'on-income', 'income-container', 'on-income-container',
+  'warning', 'on-warning', 'warning-container', 'on-warning-container',
   'expense', 'on-expense', 'expense-container', 'on-expense-container',
 ];
 
@@ -29,7 +30,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Roboto Flex Variable"', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Noto Sans"', 'sans-serif'],
+        sans: ['var(--app-font)'],
       },
       colors: Object.fromEntries(ROLES.map((r) => [r, role(r)])),
       // M3 type scale
@@ -70,6 +71,8 @@ export default {
         'elev-3': 'var(--elev-3)',
       },
       transitionTimingFunction: {
+        decelerate: 'var(--motion-decelerate)',
+        smooth: 'var(--motion-smooth)',
         spatial: 'var(--motion-spatial)',
         'spatial-fast': 'var(--motion-spatial-fast)',
         effects: 'var(--motion-effects)',
@@ -94,26 +97,43 @@ export default {
           '100%': { transform: 'translateY(0)' },
         },
         'scale-in': {
-          '0%': { opacity: 0, transform: 'scale(0.92)' },
+          '0%': { opacity: 0, transform: 'scale(0.96)' },
           '100%': { opacity: 1, transform: 'scale(1)' },
         },
         'menu-in': {
-          '0%': { opacity: 0, transform: 'scale(0.95) translateY(-4px)' },
+          '0%': { opacity: 0, transform: 'scale(0.97) translateY(-6px)' },
           '100%': { opacity: 1, transform: 'scale(1) translateY(0)' },
         },
+        'fade-out': { '0%': { opacity: 1 }, '100%': { opacity: 0 } },
+        'sheet-down': { to: { transform: 'translateY(100%)' } },
+        'sheet-out-right': { to: { transform: 'translateX(100%)' } },
+        'scale-out': { to: { opacity: 0, transform: 'scale(0.96)' } },
+        'menu-out': { to: { opacity: 0, transform: 'scale(0.96) translateY(-4px)' } },
+        'toast-in': {
+          '0%': { opacity: 0, transform: 'translateY(-16px) scale(0.96)' },
+          '100%': { opacity: 1, transform: 'translateY(0) scale(1)' },
+        },
+        'toast-out': { to: { opacity: 0, transform: 'translateY(-10px) scale(0.96)' } },
         shimmer: {
           '0%': { backgroundPosition: '-400px 0' },
           '100%': { backgroundPosition: '400px 0' },
         },
       },
       animation: {
-        'fade-in': 'fade-in 200ms var(--motion-effects)',
-        'fade-through': 'fade-through 450ms var(--motion-spatial) both',
-        'slide-up': 'slide-up 500ms var(--motion-spatial) both',
-        'sheet-up': 'sheet-up 500ms var(--motion-spatial) both',
-        'sheet-right': 'sheet-right 500ms var(--motion-spatial) both',
-        'scale-in': 'scale-in 400ms var(--motion-spatial) both',
-        'menu-in': 'menu-in 300ms var(--motion-spatial-fast) both',
+        'fade-in': 'fade-in 320ms var(--motion-smooth) both',
+        'fade-through': 'fade-through 420ms var(--motion-decelerate) both',
+        'slide-up': 'slide-up 480ms var(--motion-decelerate) both',
+        'sheet-up': 'sheet-up 520ms var(--motion-decelerate) both',
+        'sheet-right': 'sheet-right 520ms var(--motion-decelerate) both',
+        'scale-in': 'scale-in 420ms var(--motion-decelerate) both',
+        'menu-in': 'menu-in 260ms var(--motion-decelerate) both',
+        'fade-out': 'fade-out 320ms var(--motion-smooth) both',
+        'sheet-down': 'sheet-down 340ms var(--motion-accelerate) both',
+        'sheet-out-right': 'sheet-out-right 340ms var(--motion-accelerate) both',
+        'scale-out': 'scale-out 260ms var(--motion-smooth) both',
+        'menu-out': 'menu-out 200ms var(--motion-smooth) both',
+        'toast-in': 'toast-in 460ms var(--motion-decelerate) both',
+        'toast-out': 'toast-out 300ms var(--motion-smooth) both',
         shimmer: 'shimmer 1.6s infinite linear',
       },
     },

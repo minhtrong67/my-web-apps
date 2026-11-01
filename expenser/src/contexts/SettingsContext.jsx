@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { flushSync } from 'react-dom';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { I18nContext, LANGUAGES, createT, detectLanguage } from '../i18n';
 import { setFormatLocale } from '../utils/format';
@@ -19,7 +20,30 @@ import {
   isValidHex,
 } from '../theme';
 
+import { DEFAULT_FONT, FONT_IDS, applyFont, loadFont } from '../theme/fonts';
+
 const SettingsContext = createContext(null);
+
+// Appearance changes (theme mode, accent colour, font, text size) cross-fade through the browser's
+// View Transitions API: it snapshots the old page, applies the change, and blends the snapshots on the
+// GPU. That stays smooth on big screens, unlike transitioning every element's colour on the main thread.
+// Browsers without it (or users who prefer reduced motion) simply get the instant change.
+let transitionActive = false;
+function runWithTransition(apply) {
+  const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (!document.startViewTransition || reduce || transitionActive) {
+    apply();
+    return;
+  }
+  transitionActive = true;
+  const vt = document.startViewTransition(() => {
+    flushSync(apply); // the new DOM must be complete when the callback returns
+  });
+  vt.finished.finally(() => {
+    transitionActive = false;
+  });
+}
+let lastAccentChange = 0;
 
 const FONT_SCALES = { sm: 0.92, md: 1, lg: 1.1 };
 
@@ -34,6 +58,7 @@ export const THEME_MODES = [
 const DEFAULT_SETTINGS = {
   themeMode: 'system', // light | dark | system
   fontSize: 'md', // sm | md | lg
+  fontFamily: DEFAULT_FONT, // system | google-sans-flex | roboto-flex | roboto | arial | inter | be-vietnam-pro
   language: detectLanguage(), // vi | en
   reminder: DEFAULT_REMINDER, // daily notification: { enabled, time: 'HH:MM' } - per device
   accentColor: DEFAULT_ACCENT, // '' = the supplied theme (theme.css); or any #RRGGBB accent
@@ -55,6 +80,7 @@ export function SettingsProvider({ children }) {
     merged.reminder = { enabled: !!merged.reminder?.enabled, time: normalizeTime(merged.reminder?.time) };
     if (merged.fontSize === 'xl') merged.fontSize = 'lg'; // removed size
     if (!FONT_SCALES[merged.fontSize]) merged.fontSize = 'md';
+    if (!FONT_IDS.includes(merged.fontFamily)) merged.fontFamily = DEFAULT_FONT;
     return merged;
   }, [stored]);
 
@@ -87,6 +113,17 @@ export function SettingsProvider({ children }) {
     document.documentElement.style.setProperty('--font-scale', String(FONT_SCALES[settings.fontSize] || 1));
   }, [settings.fontSize]);
 
+  // Font family: download the chosen font first, then switch, so text never flashes a fallback face.
+  useEffect(() => {
+    let cancelled = false;
+    loadFont(settings.fontFamily).then(() => {
+      if (!cancelled) applyFont(settings.fontFamily);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [settings.fontFamily]);
+
   // ---- Language ----------------------------------------------------------------
   const lang = settings.language;
   const i18n = useMemo(() => {
@@ -103,14 +140,36 @@ export function SettingsProvider({ children }) {
   }, [lang, i18n]);
 
   // ---- Actions -----------------------------------------------------------------
-  const update = useCallback((patch) => setStored((prev) => ({ ...DEFAULT_SETTINGS, ...prev, ...patch })), [setStored]);
+  const update = useCallback(
+    async (patch) => {
+      const apply = () => {
+        setStored((prev) => ({ ...DEFAULT_SETTINGS, ...prev, ...patch }));
+        if (patch.fontFamily) applyFont(patch.fontFamily);
+        if (patch.fontSize) document.documentElement.style.setProperty('--font-scale', String(FONT_SCALES[patch.fontSize] || 1));
+      };
+      // Fetch a new font first so text never flashes a fallback face mid-transition.
+      if (patch.fontFamily) await loadFont(patch.fontFamily);
+      let animate = 'themeMode' in patch || 'fontFamily' in patch || 'fontSize' in patch;
+      if ('accentColor' in patch) {
+        // A colour dragged in the native picker fires continuously - only animate the first change of a burst.
+        const now = Date.now();
+        animate = animate || now - lastAccentChange > 1500;
+        lastAccentChange = now;
+      }
+      if (animate) runWithTransition(apply);
+      else apply();
+    },
+    [setStored],
+  );
 
   const cycleThemeMode = useCallback(() => {
-    setStored((prev) => {
-      const order = THEME_MODES.map((m) => m.id);
-      const current = { ...DEFAULT_SETTINGS, ...prev }.themeMode;
-      return { ...DEFAULT_SETTINGS, ...prev, themeMode: order[(order.indexOf(current) + 1) % order.length] };
-    });
+    runWithTransition(() =>
+      setStored((prev) => {
+        const order = THEME_MODES.map((m) => m.id);
+        const current = { ...DEFAULT_SETTINGS, ...prev }.themeMode;
+        return { ...DEFAULT_SETTINGS, ...prev, themeMode: order[(order.indexOf(current) + 1) % order.length] };
+      }),
+    );
   }, [setStored]);
 
   const toggleLanguage = useCallback(() => {
@@ -122,7 +181,7 @@ export function SettingsProvider({ children }) {
 
   // Resets appearance only - the language is an explicit choice, so it stays.
   const resetSettings = useCallback(
-    () => setStored((prev) => ({ ...DEFAULT_SETTINGS, language: { ...DEFAULT_SETTINGS, ...prev }.language })),
+    () => runWithTransition(() => setStored((prev) => ({ ...DEFAULT_SETTINGS, language: { ...DEFAULT_SETTINGS, ...prev }.language }))),
     [setStored],
   );
 

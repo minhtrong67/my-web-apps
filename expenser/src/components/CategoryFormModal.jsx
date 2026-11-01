@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import Modal from './ui/Modal';
 import Field from './ui/Field';
 import Button from './ui/Button';
@@ -39,14 +39,12 @@ export default function CategoryFormModal({ open, onClose, editing, defaultType 
     try {
       if (editing) {
         await updateCategory(editing.id, payload);
-        toast.success(t('cat.updated'));
       } else {
         await addCategory(payload);
-        toast.success(t('cat.added'));
       }
       onClose();
     } catch {
-      toast.error(t('cat.saveError'));
+      notify.error(t('cat.saveError'));
     } finally {
       setSaving(false);
     }

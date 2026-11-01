@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Icon from '../components/ui/Icon';
 import { useSettings, THEME_MODES } from '../contexts/SettingsContext';
 import { useI18n } from '../i18n';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSeo } from '../hooks/useSeo';
 import { formatMoney } from '../utils/format';
 
 const POINTS = ['auth.p1', 'auth.p2', 'auth.p3', 'auth.p4'];
@@ -12,7 +12,7 @@ export default function AuthLayout({ children }) {
   const { t, lang } = useI18n();
   const { settings, cycleThemeMode, toggleLanguage } = useSettings();
   const mode = THEME_MODES.find((m) => m.id === settings.themeMode) || THEME_MODES[2];
-  usePageTitle(t('meta.title'));
+  useSeo({ title: t('meta.title'), description: t('meta.description'), locale: lang });
 
   return (
     <div className="flex min-h-dvh bg-background">

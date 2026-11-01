@@ -1,29 +1,40 @@
 import { useEffect, useState } from 'react';
 import { useT } from '../../i18n';
-import IconButton from './IconButton';
+import Icon from './Icon';
+import { usePresence } from '../../hooks/usePresence';
+import { scrollToTop } from '../../utils/scroll';
 
-export default function ScrollToTop() {
+/** Floating "back to top" button with eased scrolling. `className` positions it (default: bottom-right). */
+export default function ScrollToTop({ className = 'bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-5 sm:bottom-8 sm:right-8', threshold = 360 }) {
   const t = useT();
   const [visible, setVisible] = useState(false);
+  const { present, closing } = usePresence(visible, 260);
 
   useEffect(() => {
+    let raf = 0;
     function onScroll() {
-      setVisible(window.scrollY > 320);
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setVisible(window.scrollY > threshold));
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, [threshold]);
 
-  if (!visible) return null;
+  if (!present) return null;
 
   return (
-    <IconButton
-      icon="arrow_upward"
-      label={t('common.scrollTop')}
-      variant="outlined"
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bg-surface-container-low bottom-[calc(10.5rem+env(safe-area-inset-bottom))] right-5 z-30 animate-scale-in shadow-elev-2 lg:bottom-8 lg:right-8"
-    />
+    <button
+      type="button"
+      aria-label={t('common.scrollTop')}
+      title={t('common.scrollTop')}
+      onClick={scrollToTop}
+      className={`state-layer morph morph-sq fixed z-30 flex h-12 w-12 items-center justify-center bg-surface-container-high text-primary shadow-elev-2 ${closing ? 'animate-scale-out' : 'animate-scale-in'} ${className}`}
+    >
+      <Icon name="arrow_upward" size={24} />
+    </button>
   );
 }

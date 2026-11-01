@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import Icon from '../components/ui/Icon';
 import Button from '../components/ui/Button';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
@@ -42,22 +42,21 @@ export default function WalletsPage() {
   async function handleDelete() {
     const used = usageByWallet.get(deleteTarget.id) || 0;
     if (used > 0) {
-      toast.error(t('wallet.inUse', { n: used }));
+      notify.warning(t('wallet.inUse', { n: used }));
       setDeleteTarget(null);
       return;
     }
     if (wallets.length <= 1) {
-      toast.error(t('wallet.keepOne'));
+      notify.warning(t('wallet.keepOne'));
       setDeleteTarget(null);
       return;
     }
     setDeleting(true);
     try {
       await deleteWallet(deleteTarget.id);
-      toast.success(t('wallet.deleted'));
       setDeleteTarget(null);
     } catch {
-      toast.error(t('wallet.deleteError'));
+      notify.error(t('wallet.deleteError'));
     } finally {
       setDeleting(false);
     }

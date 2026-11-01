@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import Emoji from '../components/ui/Emoji';
 import TextInput from '../components/ui/TextInput';
 import SegmentedButton from '../components/ui/SegmentedButton';
@@ -47,17 +47,16 @@ export default function CategoriesPage() {
   async function handleDelete() {
     const used = usageByCategory.get(deleteTarget.id) || 0;
     if (used > 0) {
-      toast.error(t('cat.inUse', { n: used }));
+      notify.warning(t('cat.inUse', { n: used }));
       setDeleteTarget(null);
       return;
     }
     setDeleting(true);
     try {
       await deleteCategory(deleteTarget.id);
-      toast.success(t('cat.deleted'));
       setDeleteTarget(null);
     } catch {
-      toast.error(t('cat.deleteError'));
+      notify.error(t('cat.deleteError'));
     } finally {
       setDeleting(false);
     }

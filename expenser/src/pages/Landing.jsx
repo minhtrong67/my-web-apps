@@ -10,7 +10,8 @@ import shotDashboard from '../../screenshots/image01.png';
 import shotTransactions from '../../screenshots/image02.png';
 import shotStatistics from '../../screenshots/image03.png';
 import shotMobile from '../../screenshots/image04.png';
-import { usePageTitle } from '../hooks/usePageTitle';
+import { useSeo } from '../hooks/useSeo';
+import ScrollToTop from '../components/ui/ScrollToTop';
 import { formatMoney, formatNumber, getAmountSuggestions } from '../utils/format';
 
 // ---- small building blocks -----------------------------------------------------------
@@ -648,14 +649,12 @@ function Footer() {
 export default function Landing() {
   const { t, lang } = useI18n();
   const { user } = useAuth();
-  usePageTitle(t('meta.title'));
+  useSeo({ title: t('meta.title'), description: t('meta.description'), locale: lang });
 
-  // Keep the document language + description in sync with the language switch.
+  // Keep the document language in sync with the language switch.
   useEffect(() => {
     document.documentElement.lang = lang;
-    const desc = document.querySelector('meta[name="description"]');
-    if (desc) desc.setAttribute('content', t('meta.description'));
-  }, [lang, t]);
+  }, [lang]);
 
   return (
     <div className="min-h-dvh bg-surface text-on-surface">
@@ -672,6 +671,7 @@ export default function Landing() {
         <FinalCta user={user} />
       </main>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 }

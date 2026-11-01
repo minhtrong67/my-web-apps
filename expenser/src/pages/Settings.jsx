@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import Icon from '../components/ui/Icon';
 import Button from '../components/ui/Button';
 import Toggle from '../components/ui/Toggle';
@@ -8,6 +8,8 @@ import TextInput from '../components/ui/TextInput';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import ExportMenu from '../components/ui/ExportMenu';
 import SegmentedButton from '../components/ui/SegmentedButton';
+import SelectField from '../components/ui/SelectField';
+import { FONT_OPTIONS, preloadAllFonts } from '../theme/fonts';
 import AuthorCredit from '../components/ui/AuthorCredit';
 import { useAuth } from '../contexts/AuthContext';
 import { useSettings, THEME_MODES } from '../contexts/SettingsContext';
@@ -167,11 +169,11 @@ export default function SettingsPage() {
     const res = await changePassword(pwForm.current, pwForm.next);
     setPwSaving(false);
     if (res.success) {
-      toast.success(t('settings.pwChanged'));
+      notify.success(t('settings.pwChanged'));
       setPwForm({ current: '', next: '', confirm: '' });
       setPwOpen(false);
     } else {
-      toast.error(res.error);
+      notify.error(res.error);
     }
   }
 
@@ -179,8 +181,8 @@ export default function SettingsPage() {
     setInstalling(true);
     const accepted = await promptInstall();
     setInstalling(false);
-    if (accepted) toast.success(t('settings.installed'));
-    else if (!canInstall) toast.error(t('settings.installUnsupported'));
+    if (accepted) notify.success(t('settings.installed'));
+    else if (!canInstall) notify.info(t('settings.installUnsupported'));
   }
 
   // Runs an async data task with a busy flag + uniform error toast.
@@ -190,7 +192,7 @@ export default function SettingsPage() {
       await fn();
     } catch (err) {
       console.error(err);
-      toast.error(t(errorKey));
+      notify.error(t(errorKey));
     } finally {
       setBusy(null);
     }
@@ -199,32 +201,32 @@ export default function SettingsPage() {
   const realTx = transactions.filter((tx) => tx.type !== 'transfer');
 
   function exportTransactions(type) {
-    if (realTx.length === 0) return toast.error(t('settings.exportEmpty'));
+    if (realTx.length === 0) return notify.warning(t('settings.exportEmpty'));
     return run('tx-export', async () => {
       const { exportCSV, exportExcel, exportJSON } = await import('../utils/exportImport');
       const file = 'expenser-transactions';
       if (type === 'csv') exportCSV(realTx, getCategory, getWallet, file, t);
       if (type === 'excel') await exportExcel(realTx, getCategory, getWallet, file, t);
       if (type === 'json') exportJSON(realTx, getCategory, getWallet, file, t);
-      toast.success(t('settings.exported'));
+      notify.success(t('settings.exported'));
     }, 'settings.exportError');
   }
 
   function exportCats(type) {
-    if (categories.length === 0) return toast.error(t('settings.catExportEmpty'));
+    if (categories.length === 0) return notify.warning(t('settings.catExportEmpty'));
     return run('cat-export', async () => {
       const { exportCategories } = await import('../utils/exportImport');
       await exportCategories(categories, type, 'expenser-categories', t);
-      toast.success(t('settings.exported'));
+      notify.success(t('settings.exported'));
     }, 'settings.exportError');
   }
 
   function exportEverything() {
-    if (realTx.length === 0 && categories.length === 0) return toast.error(t('settings.exportEmpty'));
+    if (realTx.length === 0 && categories.length === 0) return notify.warning(t('settings.exportEmpty'));
     return run('all', async () => {
       const { exportAll } = await import('../utils/exportImport');
       await exportAll({ transactions, categories, getCategory, getWallet, t });
-      toast.success(t('settings.exportAllDone'));
+      notify.success(t('settings.exportAllDone'));
     }, 'settings.exportError');
   }
 
@@ -240,9 +242,9 @@ export default function SettingsPage() {
       const { parseImportFile } = await import('../utils/exportImport');
       const { rows, errors } = await parseImportFile(file, t);
       const imported = await importTransactions(rows);
-      if (imported > 0) toast.success(t('settings.imported', { n: imported }));
-      if (errors.length) toast.error(t('settings.importSkipped', { n: errors.length }));
-      if (rows.length === 0 && errors.length === 0) toast.error(t('settings.importEmpty'));
+      if (imported > 0) notify.success(t('settings.imported', { n: imported }));
+      if (errors.length) notify.warning(t('settings.importSkipped', { n: errors.length }));
+      if (rows.length === 0 && errors.length === 0) notify.warning(t('settings.importEmpty'));
     });
 
   const importCats = (e) =>
@@ -250,9 +252,9 @@ export default function SettingsPage() {
       const { parseCategoryFile } = await import('../utils/exportImport');
       const { rows, errors } = await parseCategoryFile(file, t);
       const added = await importCategories(rows);
-      if (added > 0) toast.success(t('settings.catImported', { n: added }));
-      else if (errors.length === 0) toast(t('settings.catImportNone'));
-      if (errors.length) toast.error(t('settings.importSkipped', { n: errors.length }));
+      if (added > 0) notify.success(t('settings.catImported', { n: added }));
+      else if (errors.length === 0) notify.info(t('settings.catImportNone'));
+      if (errors.length) notify.warning(t('settings.importSkipped', { n: errors.length }));
     });
 
   const txFormats = [
@@ -396,6 +398,18 @@ export default function SettingsPage() {
         </div>
         <Divider />
         <div>
+          <p className="text-title-sm text-on-surface">{t('settings.fontFamily')}</p>
+          <p className="mb-3 mt-0.5 text-body-sm text-on-surface-variant">{t('settings.fontFamilyHint')}</p>
+          <SelectField
+            label={t('settings.fontFamily')}
+            value={settings.fontFamily}
+            onChange={(e) => update({ fontFamily: e.target.value })}
+            onOpen={preloadAllFonts}
+            options={FONT_OPTIONS.map((f) => ({ value: f.id, label: f.id === 'system' ? t('settings.fontFamily.system') : f.name, style: { fontFamily: f.stack } }))}
+          />
+        </div>
+        <Divider />
+        <div>
           <p className="mb-2 text-title-sm text-on-surface">{t('settings.fontSize')}</p>
           <SegmentedButton ariaLabel={t('settings.fontSize')} value={settings.fontSize} onChange={(fontSize) => update({ fontSize })} options={FONT_SIZES.map((id) => ({ id, label: t(`settings.font.${id}`) }))} />
         </div>
@@ -482,7 +496,7 @@ export default function SettingsPage() {
         onConfirm={() => {
           resetSettings();
           setResetOpen(false);
-          toast.success(t('settings.resetDone'));
+          notify.success(t('settings.resetDone'));
         }}
         danger={false}
         confirmText={t('settings.resetBtn')}

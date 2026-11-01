@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import Modal from './ui/Modal';
 import Field from './ui/Field';
 import Button from './ui/Button';
@@ -37,14 +37,12 @@ export default function WalletFormModal({ open, onClose, editing }) {
     try {
       if (editing) {
         await updateWallet(editing.id, payload);
-        toast.success(t('wallet.updated'));
       } else {
         await addWallet(payload);
-        toast.success(t('wallet.added'));
       }
       onClose();
     } catch {
-      toast.error(t('wallet.saveError'));
+      notify.error(t('wallet.saveError'));
     } finally {
       setSaving(false);
     }

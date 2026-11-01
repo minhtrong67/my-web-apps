@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import AuthLayout, { AuthCard } from './AuthLayout';
 import TextInput from '../components/ui/TextInput';
 import Button from '../components/ui/Button';
@@ -42,9 +42,8 @@ export default function Register() {
     const res = await register(form.name, form.email.trim(), form.password);
     setLoading(false);
     if (res.success) {
-      toast.success(t('auth.registered'));
       navigate('/', { replace: true });
-    } else toast.error(res.error);
+    } else notify.error(res.error);
   }
 
   async function handleGoogle() {
@@ -52,9 +51,8 @@ export default function Register() {
     const res = await loginWithGoogle();
     setGoogleLoading(false);
     if (res.success) {
-      toast.success(t('auth.registered'));
       navigate('/', { replace: true });
-    } else if (res.error) toast.error(res.error);
+    } else if (res.error) notify.error(res.error);
   }
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));

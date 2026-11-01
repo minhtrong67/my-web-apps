@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import AuthLayout, { AuthCard } from './AuthLayout';
 import TextInput from '../components/ui/TextInput';
 import Button from '../components/ui/Button';
@@ -28,8 +28,8 @@ export default function ForgotPassword() {
     setLoading(false);
     if (res.success) {
       setSent(true);
-      toast.success(t('auth.resetSent'));
-    } else toast.error(res.error);
+      notify.success(t('auth.resetSent'));
+    } else notify.error(res.error);
   }
 
   return (

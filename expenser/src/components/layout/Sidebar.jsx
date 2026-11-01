@@ -15,7 +15,7 @@ export default function Sidebar({ open, onClose }) {
       {open && <div className="fixed inset-0 z-30 animate-fade-in bg-scrim/32 lg:hidden" onClick={onClose} aria-hidden="true" />}
       <aside
         aria-label={t('nav.menu')}
-        className={`fixed inset-y-0 left-0 z-40 flex w-[19rem] max-w-[85vw] flex-col rounded-r-2xl bg-surface-container-low transition-transform duration-500 ease-spatial lg:rounded-none ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-[19rem] max-w-[85vw] flex-col rounded-r-2xl bg-surface-container-low transition-transform duration-[420ms] ease-decelerate lg:rounded-none ${
           open ? 'translate-x-0 shadow-elev-3 lg:shadow-none' : '-translate-x-full'
         }`}
       >

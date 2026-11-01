@@ -24,7 +24,7 @@ export default function MobileNav() {
               {({ isActive }) => (
                 <>
                   <span
-                    className={`flex h-8 items-center justify-center rounded-full transition-[width,background-color] duration-300 ease-spatial-fast group-active:scale-95 ${
+                    className={`flex h-8 items-center justify-center rounded-full transition-[width,background-color] duration-300 ease-smooth group-active:scale-95 ${
                       isActive ? 'w-16 bg-secondary-container text-on-secondary-container' : 'w-8'
                     }`}
                   >

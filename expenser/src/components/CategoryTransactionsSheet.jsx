@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Modal from './ui/Modal';
 import Emoji from './ui/Emoji';
 import EmptyState from './ui/EmptyState';
@@ -12,8 +12,12 @@ import { getCategoryEmoji } from '../utils/categoryEmoji';
  * No edit / delete actions - it is only for looking things up.
  * `category`: { id, name, color, value, pct } or null (closed). `transactions`: already filtered to the period.
  */
-export default function CategoryTransactionsSheet({ category, transactions, onClose }) {
+export default function CategoryTransactionsSheet({ category: categoryProp, transactions, onClose }) {
   const { t } = useI18n();
+  // Keep showing the last category while the sheet plays its exit animation.
+  const [lastCategory, setLastCategory] = useState(categoryProp);
+  if (categoryProp && categoryProp !== lastCategory) setLastCategory(categoryProp);
+  const category = categoryProp || lastCategory;
   const { getCategory, getWallet } = useData();
 
   const items = useMemo(() => {
@@ -39,7 +43,7 @@ export default function CategoryTransactionsSheet({ category, transactions, onCl
   const color = category?.color || '#64748B';
 
   return (
-    <Modal open={!!category} onClose={onClose} variant="drawer" title={category?.name || ''}>
+    <Modal open={!!categoryProp} onClose={onClose} variant="drawer" title={category?.name || ''}>
       {category && (
         <div className="space-y-4">
           <div className="flex items-center gap-3 rounded-2xl bg-surface-container p-3">

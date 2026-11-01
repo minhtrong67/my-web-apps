@@ -7,4 +7,4 @@ Disallow: /wallets
 Disallow: /statistics
 Disallow: /settings
 
-Sitemap: https://expenser-quan-ly-chi-tieu.vercel.app/sitemap.xml
+Sitemap: https://expenser-eight.vercel.app/sitemap.xml

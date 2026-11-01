@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { notify } from '../utils/notify';
 import Icon from '../components/ui/Icon';
 import Emoji from '../components/ui/Emoji';
 import Button from '../components/ui/Button';
@@ -109,10 +109,9 @@ export default function TransactionsPage() {
     setDeleting(true);
     try {
       await deleteTransaction(deleteTarget);
-      toast.success(t('tx.deleted'));
       setDeleteTarget(null);
     } catch {
-      toast.error(t('tx.deleteError'));
+      notify.error(t('tx.deleteError'));
     } finally {
       setDeleting(false);
     }

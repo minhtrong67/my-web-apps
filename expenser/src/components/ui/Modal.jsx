@@ -2,6 +2,10 @@ import { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useT } from '../../i18n';
 import IconButton from './IconButton';
+import { usePresence } from '../../hooks/usePresence';
+
+// How long the exit animation runs before the overlay unmounts (matches tailwind animate-*-out).
+const EXIT_MS = 340;
 
 // Several dialogs can stack (e.g. a confirm over a form) - only unlock page
 // scrolling once the last one closes.
@@ -24,6 +28,7 @@ const DIALOG_WIDTH = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg' };
  */
 export default function Modal({ open, onClose, title, children, size = 'md', variant = 'dialog', footer }) {
   const t = useT();
+  const { present, closing } = usePresence(open, EXIT_MS);
   const panelRef = useRef(null);
   const titleId = useId();
   const onCloseRef = useRef(onClose);
@@ -54,7 +59,7 @@ export default function Modal({ open, onClose, title, children, size = 'md', var
       onCloseRef.current?.();
       return;
     }
-    panel.style.transition = 'transform 400ms var(--motion-spatial)';
+    panel.style.transition = 'transform 380ms var(--motion-decelerate)';
     panel.style.transform = '';
   }
 
@@ -97,30 +102,31 @@ export default function Modal({ open, onClose, title, children, size = 'md', var
     };
   }, [open]);
 
-  if (!open) return null;
+  if (!present) return null;
 
   const isSheet = variant === 'sheet';
   const isDrawer = variant === 'drawer';
 
   const wrapperClass = isSheet ? 'justify-end' : isDrawer ? 'items-end justify-center sm:items-stretch sm:justify-end' : 'items-center justify-center p-4';
+  // Enter = springy slide / scale; exit = quicker, no overshoot (keeps the layer feeling responsive).
   const panelClass = isSheet
-    ? 'h-dvh animate-sheet-right bg-surface sm:max-w-xl sm:rounded-l-2xl'
+    ? `h-dvh ${closing ? 'animate-sheet-out-right' : 'animate-sheet-right'} bg-surface sm:max-w-xl sm:rounded-l-2xl`
     : isDrawer
-      ? 'max-h-[85dvh] animate-sheet-up rounded-t-2xl sm:h-dvh sm:max-h-none sm:max-w-md sm:animate-sheet-right sm:rounded-l-2xl sm:rounded-tr-none'
-      : `max-h-[90dvh] animate-scale-in rounded-2xl ${DIALOG_WIDTH[size] || DIALOG_WIDTH.md}`;
+      ? `max-h-[85dvh] ${closing ? 'animate-sheet-down sm:animate-sheet-out-right' : 'animate-sheet-up sm:animate-sheet-right'} rounded-t-2xl sm:h-dvh sm:max-h-none sm:max-w-md sm:rounded-l-2xl sm:rounded-tr-none`
+      : `max-h-[90dvh] ${closing ? 'animate-scale-out' : 'animate-scale-in'} rounded-2xl ${DIALOG_WIDTH[size] || DIALOG_WIDTH.md}`;
 
   return createPortal(
-    <div className={`fixed inset-0 z-50 flex ${wrapperClass}`}>
-      <div className="absolute inset-0 animate-fade-in bg-scrim/32" onClick={onClose} aria-hidden="true" />
+    <div className={`fixed inset-0 z-50 flex ${wrapperClass} ${closing ? 'pointer-events-none' : ''}`}>
+      <div className={`absolute inset-0 bg-scrim/32 ${closing ? 'animate-fade-out' : 'animate-fade-in'}`} onClick={onClose} aria-hidden="true" />
       <div
         ref={panelRef}
-        data-modal
+        data-modal={closing ? undefined : ''}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
         style={isSheet || isDrawer ? { paddingTop: isSheet ? 'env(safe-area-inset-top, 0px)' : undefined, paddingBottom: 'env(safe-area-inset-bottom, 0px)' } : undefined}
-        className={`relative z-10 flex w-full flex-col ${isSheet ? '' : 'bg-surface-container-high'} overflow-hidden shadow-elev-3 outline-none ${panelClass}`}
+        className={`relative z-10 flex w-full flex-col ${isSheet ? '' : 'bg-surface-container-high'} overflow-hidden shadow-elev-3 outline-none will-change-transform ${panelClass}`}
       >
         {isDrawer && (
           <div
