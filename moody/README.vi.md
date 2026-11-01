@@ -106,7 +106,7 @@ theme.css  ──►  index.css (vai trò --c-* + component)  ──►  tailwin
 | Cài đặt → Giới thiệu | Mở lại trang giới thiệu khi cần. |
 | Đăng xuất | Quay về trang giới thiệu. |
 
-Các thẻ chia sẻ (Open Graph, Twitter Card, JSON-LD, canonical, hreflang, `robots.txt`, `sitemap.xml`) trỏ tới URL triển khai **https://moody-mood-tracker.vercel.app/**.
+Các thẻ chia sẻ (Open Graph, Twitter Card, JSON-LD, canonical, hreflang, `robots.txt`, `sitemap.xml`) trỏ tới URL triển khai **https://moody-inky-iota.vercel.app/**.
 
 ## Toast theo theme
 

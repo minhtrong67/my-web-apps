@@ -13,7 +13,7 @@ export default function BottomSheet({
   open, title, onClose, children, footer, fullScreen = false, dismissOnBackdrop = true
 }) {
   const { t } = useI18n()
-  const { mounted, visible } = useMountTransition(open, 300)
+  const { mounted, visible } = useMountTransition(open, 280)
   useBodyScrollLock(mounted)
   useEscape(open, onClose)
 
@@ -26,15 +26,15 @@ export default function BottomSheet({
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center" role="presentation">
       <div
-        className={`absolute inset-0 scrim transition-opacity duration-300 ease-out ${visible ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 scrim transition-opacity ${visible ? 'duration-300 ease-out' : 'duration-200 ease-in'} ${visible ? 'opacity-100' : 'opacity-0'}`}
         onClick={dismissOnBackdrop ? onClose : undefined}
       />
       <div
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative flex flex-col w-full text-popover-foreground shadow-elev-3 overflow-hidden transition-transform duration-500 ease-spring ${panelSize} ${visible ? 'translate-y-0' : 'translate-y-full'}`}
-        style={{ willChange: visible ? 'auto' : 'transform' }}
+        className={`relative flex flex-col w-full text-popover-foreground shadow-elev-3 overflow-hidden transition-transform ${visible ? 'duration-[450ms] ease-[var(--ease-emphasized-decel)]' : 'duration-[250ms] ease-[var(--ease-emphasized-accel)]'} ${panelSize} ${visible ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ willChange: 'transform' }}
       >
         {fullScreen ? (
           <header

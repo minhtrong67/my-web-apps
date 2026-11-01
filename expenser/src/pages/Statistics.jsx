@@ -6,6 +6,7 @@ import IconButton from '../components/ui/IconButton';
 import Chip from '../components/ui/Chip';
 import ExportMenu from '../components/ui/ExportMenu';
 import EmptyState from '../components/ui/EmptyState';
+import CategoryTransactionsSheet from '../components/CategoryTransactionsSheet';
 import { ChartSkeleton } from '../components/ui/Skeleton';
 import { useData } from '../contexts/DataContext';
 import { useI18n } from '../i18n';
@@ -64,16 +65,17 @@ function ChartCard({ title, subtitle, children }) {
 }
 
 // One labelled progress bar: dot + name on the left, amount + % on the right.
-function ProgressRow({ name, color, value, pct }) {
-  return (
-    <li>
+function ProgressRow({ name, color, value, pct, onClick, hint }) {
+  const body = (
+    <>
       <div className="mb-1 flex items-center justify-between gap-2 text-body-sm">
         <span className="flex min-w-0 items-center gap-1.5 font-medium text-on-surface">
           <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />
           <span className="wrap-any">{name}</span>
         </span>
-        <span className="shrink-0 tabular-nums text-on-surface-variant">
+        <span className="flex shrink-0 items-center gap-0.5 tabular-nums text-on-surface-variant">
           {formatMoney(value)} · {pct}%
+          {onClick && <Icon name="chevron_right" size={16} />}
         </span>
       </div>
       <div
@@ -86,6 +88,17 @@ function ProgressRow({ name, color, value, pct }) {
       >
         <div className="h-full rounded-full transition-[width] duration-500 ease-emphasized" style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
+    </>
+  );
+  return (
+    <li>
+      {onClick ? (
+        <button type="button" onClick={onClick} aria-label={hint} className="state-layer -mx-2 block w-[calc(100%+1rem)] rounded-xl px-2 py-1.5 text-left">
+          {body}
+        </button>
+      ) : (
+        body
+      )}
     </li>
   );
 }
@@ -98,6 +111,7 @@ export default function StatisticsPage() {
   const [range, setRange] = useSessionState('statistics.range', 'month');
   const [anchorTs, setAnchorTs] = useSessionState('statistics.anchor', () => Date.now());
   const [exporting, setExporting] = useState(null);
+  const [sheetCategory, setSheetCategory] = useState(null); // category row opened in the read-only sheet
 
   // Memoised so downstream useMemo's really are cached (fresh Date objects every render defeated them).
   const period = useMemo(() => getPeriod(range, anchorTs), [range, anchorTs]);
@@ -140,7 +154,7 @@ export default function StatisticsPage() {
     return Object.entries(map)
       .map(([id, value]) => {
         const cat = getCategory(id);
-        return { name: cat?.name || t('common.other'), value, color: cat?.color || '#94A3B8', pct: total ? Math.round((value / total) * 100) : 0 };
+        return { id: String(id), name: cat?.name || t('common.other'), value, color: cat?.color || '#94A3B8', pct: total ? Math.round((value / total) * 100) : 0 };
       })
       .sort((a, b) => b.value - a.value);
   }, [filtered, getCategory, t]);
@@ -324,13 +338,15 @@ export default function StatisticsPage() {
             ) : (
               <ul className="space-y-3">
                 {categoryData.map((c) => (
-                  <ProgressRow key={c.name} name={c.name} color={c.color} value={c.value} pct={c.pct} />
+                  <ProgressRow key={c.id} name={c.name} color={c.color} value={c.value} pct={c.pct} hint={t('stats.viewCategory', { name: c.name })} onClick={() => setSheetCategory(c)} />
                 ))}
               </ul>
             )}
           </ChartCard>
         </>
       )}
+
+      <CategoryTransactionsSheet category={sheetCategory} transactions={filtered} onClose={() => setSheetCategory(null)} />
     </div>
   );
 }

@@ -33,6 +33,7 @@
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --font-scale: 1;
+  --font-sans: 'Google Sans Flex Variable', 'Google Sans Flex', 'Google Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-round: 'Google Sans Flex Round', 'Google Sans Flex Variable', system-ui, sans-serif;
   color-scheme: light;
 
@@ -101,6 +102,11 @@
 
 html {
   font-size: calc(16px * var(--font-scale));
+  /* Cuộn mượt khi bấm link neo / navlink; chừa chỗ cho thanh điều hướng cố định ở đầu trang. */
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(5rem + var(--safe-top));
+  /* Giữ chỗ cho thanh cuộn để trang không giật ngang khi mở / đóng sheet, dialog (khóa cuộn nền). */
+  scrollbar-gutter: stable;
 }
 
 html, body, #root {
@@ -108,7 +114,7 @@ html, body, #root {
 }
 
 body {
-  font-family: 'Google Sans Flex Variable', 'Google Sans Flex', 'Google Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   font-optical-sizing: auto;
   background: var(--c-surface);
   color: var(--c-on-surface);
@@ -154,6 +160,24 @@ input::placeholder, textarea::placeholder {
 select option {
   background: var(--c-popover);
   color: var(--c-popover-foreground);
+}
+
+/* Thanh cuộn tùy biến: mảnh, bo tròn, màu theo theme (Firefox dùng scrollbar-width/color; Chrome/Safari dùng ::-webkit-scrollbar). */
+* { scrollbar-width: thin; scrollbar-color: var(--c-outline-variant) transparent; }
+@supports selector(::-webkit-scrollbar) {
+  * { scrollbar-width: auto; scrollbar-color: auto; }
+  ::-webkit-scrollbar { width: 14px; height: 14px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-corner { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--c-outline-variant);
+    border-radius: 999px;
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    min-height: 40px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--c-outline); background-clip: padding-box; border: 4px solid transparent; }
+  ::-webkit-scrollbar-thumb:active { background: var(--c-primary); background-clip: padding-box; border: 4px solid transparent; }
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -345,7 +369,8 @@ select option {
     color: var(--c-on-surface);
     font-size: 1rem;
     border: none;
-    box-shadow: inset 0 0 0 0 transparent;
+    /* Viền mảnh luôn hiện để ô nhập / dropdown không chìm vào nền thẻ; hover và focus đậm dần. */
+    box-shadow: inset 0 0 0 1px var(--c-outline);
     outline: none;
     transition: box-shadow 0.2s var(--spring-fast-effects), border-radius 0.4s var(--spring-fast-spatial),
       background-color 0.2s var(--spring-fast-effects);
@@ -364,7 +389,35 @@ select option {
     padding-right: 48px;
   }
   .field-input.has-leading { padding-left: 48px; }
-  .field-input:hover:not(:focus):not(:disabled) { box-shadow: inset 0 0 0 1px var(--c-on-surface-variant); }
+  .select-btn { cursor: pointer; padding-right: 48px; }
+  .select-btn.is-open { box-shadow: inset 0 0 0 2px var(--c-primary); }
+  .select-list {
+    z-index: 80;
+    margin: 0;
+    padding: 8px;
+    list-style: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--c-surface-container);
+    border-radius: var(--shape-lg);
+    box-shadow: 0 0 0 1px var(--c-outline-variant), 0 8px 24px color-mix(in srgb, #000 22%, transparent);
+  }
+  .select-opt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: var(--shape-md);
+    font-size: 0.9375rem;
+    color: var(--c-on-surface);
+    cursor: pointer;
+    user-select: none;
+  }
+  .select-opt.is-active { background: color-mix(in srgb, var(--c-on-surface) 8%, transparent); }
+  .select-opt.is-selected { background: var(--c-secondary-container); color: var(--c-on-secondary-container); font-weight: 600; }
+  .select-opt.is-selected.is-active { background: color-mix(in srgb, var(--c-secondary-container) 85%, var(--c-on-surface)); }
+  .field-input:hover:not(:focus):not(:disabled) { box-shadow: inset 0 0 0 2px var(--c-on-surface-variant); }
   .field-input:focus {
     box-shadow: inset 0 0 0 2px var(--c-primary);
   }
@@ -502,6 +555,7 @@ select option {
 .pop-in { animation: popIn 0.2s var(--spring-default-spatial) backwards; }
 
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
@@ -535,7 +589,23 @@ select option {
   from { opacity: 0; transform: translateY(12px) scale(0.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-.toast-enter { animation: toastIn 0.25s var(--spring-default-spatial) backwards; }
+.toast-enter { animation: toastIn 0.35s var(--ease-emphasized-decel) backwards; }
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(8px) scale(0.97); }
+}
+.toast-exit { animation: toastOut 0.2s var(--ease-emphasized-accel) forwards; }
+
+/* ---------- Chuyển giao diện (sáng/tối, màu chủ đề, font) ---------- */
+::view-transition-old(root), ::view-transition-new(root) {
+  animation-duration: 0.32s;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+html.vt-theme { cursor: progress; }
+html.theme-fade, html.theme-fade *, html.theme-fade *::before, html.theme-fade *::after {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, fill 0.3s ease, stroke 0.3s ease,
+    box-shadow 0.3s ease !important;
+}
 
 /* =====================================================================
    Landing — hiệu ứng xuất hiện khi cuộn & chuyển động nền

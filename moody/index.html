@@ -22,22 +22,41 @@
   <meta name="keywords"
     content="mood tracker, nhật ký tâm trạng, theo dõi cảm xúc, mood journal, daily check-in, sức khỏe tinh thần, mental wellbeing, PWA" />
   <meta name="author" content="minhtrong67" />
-  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="creator" content="minhtrong67" />
+  <meta name="publisher" content="minhtrong67" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <meta name="bingbot" content="index, follow" />
   <meta name="application-name" content="Moody" />
   <meta name="generator" content="Vite + React" />
-  <link rel="canonical" href="https://moody-mood-tracker.vercel.app/" />
-  <link rel="alternate" hreflang="vi" href="https://moody-mood-tracker.vercel.app/" />
-  <link rel="alternate" hreflang="en" href="https://moody-mood-tracker.vercel.app/" />
-  <link rel="alternate" hreflang="x-default" href="https://moody-mood-tracker.vercel.app/" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="language" content="Vietnamese" />
+  <meta name="coverage" content="Worldwide" />
+  <meta name="rating" content="general" />
+  <link rel="canonical" href="https://moody-inky-iota.vercel.app/" />
+  <link rel="alternate" hreflang="vi" href="https://moody-inky-iota.vercel.app/" />
+  <link rel="alternate" hreflang="en" href="https://moody-inky-iota.vercel.app/" />
+  <link rel="alternate" hreflang="x-default" href="https://moody-inky-iota.vercel.app/" />
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+  <!-- ===== PWA / iOS / Windows ===== -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Moody" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="msapplication-TileColor" content="#f4fbf8" />
+  <meta name="msapplication-tap-highlight" content="no" />
 
   <!-- ===== Open Graph (Facebook, Zalo, LinkedIn, Messenger…) ===== -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Moody" />
   <meta property="og:title" content="Moody — Nhật ký tâm trạng hằng ngày" />
   <meta property="og:description"
-    content="Check-in tâm trạng mỗi ngày, theo dõi xu hướng và xuất báo cáo. Daily mood journal with trends, statistics and reports." />
-  <meta property="og:url" content="https://moody-mood-tracker.vercel.app/" />
-  <meta property="og:image" content="https://moody-mood-tracker.vercel.app/og-image.png" />
+    content="Moody là ứng dụng nhật ký tâm trạng: check-in mỗi ngày, theo dõi xu hướng, xem thống kê và xuất báo cáo PDF/PNG. Miễn phí, hỗ trợ cài đặt như app (PWA)." />
+  <meta property="og:url" content="https://moody-inky-iota.vercel.app/" />
+  <meta property="og:image" content="https://moody-inky-iota.vercel.app/og-image.png" />
+  <meta property="og:image:secure_url" content="https://moody-inky-iota.vercel.app/og-image.png" />
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -47,25 +66,54 @@
 
   <!-- ===== Twitter / X Card ===== -->
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://moody-inky-iota.vercel.app/" />
   <meta name="twitter:title" content="Moody — Nhật ký tâm trạng hằng ngày" />
-  <meta name="twitter:description" content="Check-in tâm trạng mỗi ngày, theo dõi xu hướng và xuất báo cáo." />
-  <meta name="twitter:image" content="https://moody-mood-tracker.vercel.app/og-image.png" />
+  <meta name="twitter:description"
+    content="Moody là ứng dụng nhật ký tâm trạng: check-in mỗi ngày, theo dõi xu hướng, xem thống kê và xuất báo cáo PDF/PNG. Miễn phí, hỗ trợ cài đặt như app (PWA)." />
+  <meta name="twitter:image" content="https://moody-inky-iota.vercel.app/og-image.png" />
   <meta name="twitter:image:alt" content="Moody — ứng dụng nhật ký tâm trạng" />
 
+  <!-- ===== Dữ liệu có cấu trúc (JSON-LD) ===== -->
   <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Moody",
-        "alternateName": "Moody — Mood journal",
-        "description": "Mood journal app: daily check-ins, trends, statistics and PDF/PNG reports.",
-        "applicationCategory": "HealthApplication",
-        "operatingSystem": "Any",
-        "inLanguage": ["vi", "en"],
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-        "author": { "@type": "Person", "name": "minhtrong67" }
-      }
-    </script>
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://moody-inky-iota.vercel.app/#website",
+          "url": "https://moody-inky-iota.vercel.app/",
+          "name": "Moody",
+          "description": "Nhật ký tâm trạng hằng ngày — Daily mood journal.",
+          "inLanguage": ["vi", "en"],
+          "publisher": { "@id": "https://moody-inky-iota.vercel.app/#author" }
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://moody-inky-iota.vercel.app/#app",
+          "name": "Moody",
+          "alternateName": "Moody — Mood journal",
+          "url": "https://moody-inky-iota.vercel.app/",
+          "description": "Mood journal app: daily check-ins, trends, statistics and PDF/PNG reports.",
+          "image": "https://moody-inky-iota.vercel.app/og-image.png",
+          "screenshot": "https://moody-inky-iota.vercel.app/og-image.png",
+          "applicationCategory": "HealthApplication",
+          "operatingSystem": "Any",
+          "browserRequirements": "Requires JavaScript",
+          "isAccessibleForFree": true,
+          "inLanguage": ["vi", "en"],
+          "featureList": ["Daily mood check-in", "Calendar and history", "Statistics and charts", "PDF/PNG export", "Dark mode", "Installable PWA"],
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "author": { "@id": "https://moody-inky-iota.vercel.app/#author" }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://moody-inky-iota.vercel.app/#author",
+          "name": "minhtrong67",
+          "url": "https://github.com/minhtrong67"
+        }
+      ]
+    }
+  </script>
 
 </head>
 

@@ -106,7 +106,7 @@ theme.css  ──►  index.css (--c-* roles + components)  ──►  tailwind.
 | Settings → Introduction | Opens the landing page again on demand. |
 | Log out | Returns to the landing page. |
 
-The share tags (Open Graph, Twitter Card, JSON-LD, canonical, hreflang, `robots.txt`, `sitemap.xml`) point at the production URL **https://moody-mood-tracker.vercel.app/**.
+The share tags (Open Graph, Twitter Card, JSON-LD, canonical, hreflang, `robots.txt`, `sitemap.xml`) point at the production URL **https://moody-inky-iota.vercel.app/**.
 
 ## Theme-aware toasts
 

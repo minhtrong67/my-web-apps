@@ -207,6 +207,9 @@ export default {
   'stats.noExpense': 'No expenses yet.',
   'stats.categoryPct': 'Share by category',
   'stats.highest': 'Highest: {name} ({pct}%)',
+  'stats.catSummary': '{n} transactions · {pct}% of total spending',
+  'stats.viewCategory': 'View {name} expenses',
+  'stats.catEmpty': 'No expenses in this period.',
 
   // Settings
   'settings.installTitle': 'Install Expenser on your device',

@@ -1,4 +1,6 @@
 import { PALETTES } from './palettes'
+import { applyFont, getStoredFont } from './fonts'
+import { withThemeTransition } from './transition'
 
 // Quản lý giao diện: chế độ sáng/tối/hệ thống, màu chủ đề (Material 3) và cỡ chữ.
 // Bảng màu Material 3 Expressive (seed teal) nằm trong src/styles/theme.css; chế độ tối bật bằng class `.dark` trên <html>.
@@ -99,8 +101,10 @@ export function applyTheme(theme) {
 
 export function setTheme(theme) {
   write(THEME_KEY, theme)
-  applyTheme(theme)
-  window.dispatchEvent(new CustomEvent('themechange'))
+  withThemeTransition(() => {
+    applyTheme(theme)
+    window.dispatchEvent(new CustomEvent('themechange'))
+  })
 }
 
 // Áp màu chủ đề: ghi đè các token --md-* bằng bảng màu đã sinh sẵn (src/lib/palettes.js).
@@ -121,8 +125,10 @@ export function applyThemeColor(id) {
 
 export function setThemeColor(id) {
   write(COLOR_KEY, id === DEFAULT_THEME_COLOR ? '' : id)
-  applyThemeColor(id)
-  window.dispatchEvent(new CustomEvent('themechange'))
+  withThemeTransition(() => {
+    applyThemeColor(id)
+    window.dispatchEvent(new CustomEvent('themechange'))
+  })
 }
 
 export function applyFontScale(scale) {
@@ -142,6 +148,7 @@ export function initTheme() {
   applyThemeColor(getStoredThemeColor())
   applyTheme(getStoredTheme())
   applyFontScale(getStoredFontScale())
+  applyFont(getStoredFont())
   const mq = window.matchMedia('(prefers-color-scheme: dark)')
   mq.addEventListener('change', () => {
     if (getStoredTheme() === 'system') {

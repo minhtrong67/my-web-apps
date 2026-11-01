@@ -88,8 +88,11 @@ function CheckInForm({ open, request, onClose, t }) {
       if (existing) await updateEntry(existing.id, payload)
       else await addEntry(payload)
       setConfirmSaveOpen(false)
-      showToast(existing ? t('checkin.updated') : t('checkin.saved'))
+      showToast(existing ? t('checkin.updated') : t('checkin.saved'), { type: 'success' })
       onClose()
+    } catch {
+      setConfirmSaveOpen(false)
+      showToast(t('checkin.saveFailed'), { type: 'error' })
     } finally {
       setSaving(false)
     }

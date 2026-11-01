@@ -108,7 +108,7 @@
 | Backend | Firebase Authentication + Cloud Firestore (persistent cache) |
 
 | Biểu đồ | Recharts |
-| Xuất / nhập | jsPDF + autoTable, ExcelJS, PapaParse, html2canvas |
+| Xuất / nhập | jsPDF + autoTable, ExcelJS, PapaParse, Canvas API |
 | PWA | vite-plugin-pwa (Workbox) |
 | Công cụ | oxlint, script kiểm tra i18n |
 

@@ -3,7 +3,7 @@
 import { forwardRef } from 'react'
 import {
   Home as LHome, ListChecks as LListChecks, History as LHistory, BarChart3 as LBarChart3, Settings as LSettings,
-  Plus, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Menu, Sun, Moon, Monitor, X, Check, TriangleAlert as AlertTriangle,
+  Plus, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Menu, Sun, Moon, Monitor, X, Check, TriangleAlert as AlertTriangle, CircleAlert,
   CircleHelp as HelpCircle, Languages, Palette, Calendar, CalendarCheck2, ChevronDown, ChevronLeft, ChevronRight,
   Clock3, Download, Upload, FileDown, Image, Flame, Heart, List, ListPlus, LogOut, NotebookPen, Pencil, RotateCcw,
   Search, Send, Settings2, Bell, BellOff, Info, Sparkles, SlidersHorizontal, Smartphone, Smile, Trash2, TrendingUp, GripVertical
@@ -32,7 +32,7 @@ export {
   Plus, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Menu, Sun, Moon, Monitor, X, Check, AlertTriangle, HelpCircle,
   Languages, Palette, Calendar, CalendarCheck2, ChevronDown, ChevronLeft, ChevronRight, Clock3, Download, Upload,
   FileDown, Image, Flame, Heart, List, ListPlus, LogOut, NotebookPen, Pencil, RotateCcw, Search, Send, Settings2,
-  SlidersHorizontal, Smartphone, Smile, Trash2, TrendingUp, GripVertical, Bell, BellOff, Info, Sparkles
+  SlidersHorizontal, Smartphone, Smile, Trash2, TrendingUp, GripVertical, Bell, BellOff, Info, Sparkles, CircleAlert
 }
 
 // Loading indicator của M3 Expressive: khối biến hình xoay tròn (indeterminate).

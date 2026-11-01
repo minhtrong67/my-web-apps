@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Google Sans Flex Variable"', '"Google Sans Flex"', '"Google Sans"', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['"Google Sans Flex Round"', '"Google Sans Flex Variable"', 'system-ui', 'sans-serif']
+        sans: ['var(--font-sans)'],
+        display: ['var(--font-round)']
       },
       colors: {
         primary: role('primary'),

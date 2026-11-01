@@ -3,11 +3,12 @@ import { useSettings } from '../contexts/SettingsContext';
 
 /** Recharts styling derived from the active theme (follows light/dark + custom colour). */
 export function useChartTheme() {
-  const { colors } = useSettings();
+  const { colors, isDark } = useSettings();
   return useMemo(
     () => ({
-      income: colors.income,
-      expense: colors.expense,
+      // Chart colours are deliberately stronger than the UI roles (which turn pastel in dark mode).
+      income: isDark ? '#22C55E' : '#15803D',
+      expense: isDark ? '#EF4444' : '#DC2626',
       primary: colors.primary,
       grid: colors.outlineVariant,
       tick: { fontSize: 11, fill: colors.onSurfaceVariant },
@@ -25,6 +26,6 @@ export function useChartTheme() {
       },
       cursor: { fill: colors.onSurface, fillOpacity: 0.06 },
     }),
-    [colors],
+    [colors, isDark],
   );
 }

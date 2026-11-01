@@ -1,11 +1,11 @@
 import { useMemo, useRef, useState } from 'react'
+import WavyProgress from '../components/WavyProgress'
 import { useSessionState, reviveDate } from '../hooks/useSessionState'
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts'
 import { ChevronLeft, ChevronRight, FileDown, Image as ImageIcon, Loader2, Smile, CalendarCheck2, Flame, Heart } from '../components/icons'
 import { useMoodEntries } from '../hooks/useMoodEntries'
 import { useActivities } from '../hooks/useActivities'
 import { useThemeColors, useIsDark } from '../hooks/useIsDark'
-import WavyProgress from '../components/WavyProgress'
 import { CATEGORY_COLORS } from '../lib/chartColors'
 import { useMoods } from '../hooks/useMoods'
 import { useI18n } from '../i18n'
@@ -234,10 +234,18 @@ const trackOf = (c) => (typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c) ? `${
 
 function LegendList({ items, color }) {
   const total = items.reduce((a, i) => a + i.count, 0) || 1
+  // Làm tròn theo phần dư lớn nhất để tổng các % hiển thị luôn đúng 100%.
+  const rounded = items.map((i) => Math.floor((i.count / total) * 100))
+  let left = (items.some((i) => i.count > 0) ? 100 : 0) - rounded.reduce((a, b) => a + b, 0)
+  items
+    .map((i, idx) => ({ idx, rem: ((i.count / total) * 100) % 1 }))
+    .filter((x) => items[x.idx].count > 0)
+    .sort((a, b) => b.rem - a.rem)
+    .forEach((x) => { if (left > 0) { rounded[x.idx] += 1; left -= 1 } })
   return (
     <ul className="card-filled mt-3 p-4 space-y-3.5">
-      {items.map((it) => {
-        const pct = (it.count / total) * 100
+      {items.map((it, idx) => {
+        const pct = (it.count / total) * 100 // độ dài thanh: đúng tỉ lệ trên tổng
         const barColor = it.color || color
         return (
           <li key={it.key || it.id} className="min-w-0">
@@ -246,13 +254,13 @@ function LegendList({ items, color }) {
               <span className="text-base leading-none shrink-0">{it.emoji}</span>
               <span className="t-body-medium flex-1 min-w-0 truncate">{it.label}</span>
               <span className="t-body-small text-on-surface-variant shrink-0 tabular-nums">{it.count}</span>
-              <span className="t-label-large shrink-0 w-11 text-right tabular-nums">{Math.round(pct)}%</span>
+              <span className="t-label-large shrink-0 w-11 text-right tabular-nums">{rounded[idx]}%</span>
             </div>
             {/* Linear progress dạng gợn sóng của M3 Expressive: phần đạt là sóng, khe hở 4px, track thẳng có chấm dừng ở cuối */}
             <div
               className="flex items-center gap-1 h-3"
               role="progressbar"
-              aria-valuenow={Math.round(pct)}
+              aria-valuenow={rounded[idx]}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-label={it.label}
@@ -261,11 +269,11 @@ function LegendList({ items, color }) {
                 <WavyProgress
                   color={barColor}
                   className="shrink-0"
-                  style={{ flexBasis: `${pct}%`, minWidth: 36, maxWidth: '100%', transition: 'flex-basis .6s var(--spring-default-spatial)' }}
+                  style={{ flex: `${pct} 1 0%`, minWidth: 12, transition: 'flex-grow .6s var(--spring-default-spatial)' }}
                 />
               )}
               {pct < 100 && (
-                <div className="relative h-full flex-1 min-w-0 rounded-full" style={{ background: trackOf(barColor) }}>
+                <div className="relative h-full min-w-0 rounded-full" style={{ flex: `${100 - pct} 1 0%`, background: trackOf(barColor) }}>
                   <span className="absolute right-[5px] top-1/2 -mt-[2px] w-1 h-1 rounded-full" style={{ background: barColor }} />
                 </div>
               )}

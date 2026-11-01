@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+/* Dark mode dựa trên data-theme của <html> */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* ── Phong cách Blue Archive: màu lấy từ biến CSS, dẫn xuất từ màu chủ đạo (--ac) ── */
+@theme inline {
+  --color-primary: var(--ba-primary);
+  --color-on-primary: var(--ba-on-primary);
+  --color-primary-container: var(--ba-primary-container);
+  --color-on-primary-container: var(--ba-on-primary-container);
+  --color-secondary-container: var(--ba-secondary-container);
+  --color-on-secondary-container: var(--ba-on-secondary-container);
+  --color-hl: var(--ba-hl);
+  --color-on-hl: var(--ba-on-hl);
+  --color-error: var(--ba-error);
+  --color-on-error: var(--ba-on-error);
+  --color-surface: var(--ba-surface);
+  --color-surface-lowest: var(--ba-surface-lowest);
+  --color-surface-low: var(--ba-surface-low);
+  --color-surface-mid: var(--ba-surface-mid);
+  --color-surface-high: var(--ba-surface-high);
+  --color-surface-highest: var(--ba-surface-highest);
+  --color-on-surface: var(--ba-on-surface);
+  --color-on-surface-variant: var(--ba-on-surface-variant);
+  --color-outline: var(--ba-outline);
+  --color-outline-variant: var(--ba-outline-variant);
+  --color-navy: var(--ba-navy);
+  --color-on-navy: var(--ba-on-navy);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-star: var(--star);
+  --font-sans: var(--ff);
+  --ease-out-back: cubic-bezier(0.34, 1.35, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-rise: rise 0.5s var(--ease-smooth) backwards;
+  --animate-pop: pop 0.35s var(--ease-out-back) backwards;
+}
+
+:root {
+  --ac: #128cff; --on-ac: #ffffff;
+  --ff: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --ok: #1f9d5b; --warn: #b87500; --star: #f0a800;
+
+  /* sáng */
+  --ba-surface: color-mix(in srgb, var(--ac) 9%, #f6faff);
+  --ba-surface-lowest: #ffffff;
+  --ba-surface-low: #ffffff;
+  --ba-surface-mid: color-mix(in srgb, var(--ac) 6%, #ffffff);
+  --ba-surface-high: color-mix(in srgb, var(--ac) 12%, #ffffff);
+  --ba-surface-highest: color-mix(in srgb, var(--ac) 19%, #ffffff);
+  --ba-on-surface: #16243a;
+  --ba-on-surface-variant: #587091;
+  --ba-outline: #7f97ba;
+  --ba-outline-variant: #cadbf0;
+  --ba-primary: var(--ac);
+  --ba-on-primary: var(--on-ac);
+  --ba-primary-container: color-mix(in srgb, var(--ac) 16%, #ffffff);
+  --ba-on-primary-container: color-mix(in srgb, var(--ac) 62%, #06101f);
+  --ba-secondary-container: color-mix(in srgb, var(--ac) 14%, #ffffff);
+  --ba-on-secondary-container: color-mix(in srgb, var(--ac) 62%, #06101f);
+  --ba-hl: #ffd23f; --ba-on-hl: #3a2c00;
+  --ba-error: #d93a3f; --ba-on-error: #ffffff;
+  --ba-navy: #12284a; --ba-on-navy: #eaf3ff;
+  --ba-scrim: #04101f;
+}
+[data-theme="dark"] {
+  --ok: #5fd89a; --warn: #ffc247; --star: #ffcb3d;
+  --ba-surface: color-mix(in srgb, var(--ac) 5%, #0a111f);
+  --ba-surface-lowest: #080d18;
+  --ba-surface-low: color-mix(in srgb, var(--ac) 6%, #101a2d);
+  --ba-surface-mid: color-mix(in srgb, var(--ac) 8%, #142039);
+  --ba-surface-high: color-mix(in srgb, var(--ac) 11%, #1a2946);
+  --ba-surface-highest: color-mix(in srgb, var(--ac) 15%, #213357);
+  --ba-on-surface: #e6efff;
+  --ba-on-surface-variant: #97abcd;
+  --ba-outline: #5d7299;
+  --ba-outline-variant: #263a5e;
+  --ba-primary: color-mix(in srgb, var(--ac) 82%, #ffffff);
+  --ba-on-primary: #04162e;
+  --ba-primary-container: color-mix(in srgb, var(--ac) 30%, #0a111f);
+  --ba-on-primary-container: color-mix(in srgb, var(--ac) 30%, #ffffff);
+  --ba-secondary-container: color-mix(in srgb, var(--ac) 26%, #0a111f);
+  --ba-on-secondary-container: #dbe9ff;
+  --ba-hl: #ffd23f; --ba-on-hl: #3a2c00;
+  --ba-error: #ff6b70; --ba-on-error: #2b0507;
+  --ba-navy: #0d1a31; --ba-on-navy: #eaf3ff;
+}
+[data-ff="round"] { --ff: ui-rounded, "Hiragino Maru Gothic ProN", Nunito, "Quicksand", system-ui, sans-serif; }
+[data-ff="serif"] { --ff: ui-serif, Georgia, "Times New Roman", serif; }
+[data-ff="mono"]  { --ff: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+@layer base {
+  html { color-scheme: light; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scrollbar-gutter: stable; }
+  html[data-theme="dark"] { color-scheme: dark; }
+  html[data-motion="off"] { scroll-behavior: auto; }
+  body {
+    margin: 0; min-height: 100dvh; font-family: var(--ff);
+    background-color: var(--ba-surface); color: var(--ba-on-surface);
+    background-image: repeating-linear-gradient(-45deg, transparent 0 14px, color-mix(in srgb, var(--ba-primary) 5%, transparent) 14px 28px);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  }
+  * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--ba-primary) 55%, transparent) transparent; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--ba-primary) 55%, transparent); border: 3px solid transparent; background-clip: padding-box; transform: skewY(-8deg); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ba-primary); background-clip: padding-box; border: 3px solid transparent; }
+  ::selection { background: var(--ba-primary); color: var(--ba-on-primary); }
+  :focus-visible { outline: 3px solid var(--ba-primary); outline-offset: 2px; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  input, select { font: inherit; }
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] > summary .chev { transform: rotate(180deg); }
+}
+html.sheet-open { overflow: hidden; }
+
+/* ── Hình khối đặc trưng Blue Archive: hình bình hành, vát chéo, sọc chéo ── */
+.slant { --s: 10px; clip-path: polygon(var(--s) 0, 100% 0, calc(100% - var(--s)) 100%, 0 100%); }
+.slant-sm { --s: 6px; }
+.slant:focus-visible { outline: none; box-shadow: inset 0 -4px 0 var(--ba-hl); }
+.cut-bl { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), 0 100%); }
+.cut-bl-sm { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), 0 100%); }
+.stripes { background-image: repeating-linear-gradient(-45deg, transparent 0 9px, color-mix(in srgb, var(--ba-primary) 9%, transparent) 9px 18px); }
+.stripes-on-primary { background-image: repeating-linear-gradient(-45deg, transparent 0 9px, rgb(255 255 255 / 0.1) 9px 18px); }
+.halo::before, .halo::after { content: ""; position: absolute; pointer-events: none; border-radius: 50%; }
+.halo::before { width: 46%; aspect-ratio: 1; right: -8%; top: -14%; border: 10px solid color-mix(in srgb, var(--ba-primary) 14%, transparent); }
+.halo::after { width: 34%; aspect-ratio: 1; right: 2%; top: -6%; border: 3px dashed color-mix(in srgb, var(--ba-primary) 22%, transparent); animation: spin-slow 40s linear infinite; }
+
+/* ── Animation ── */
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes pop { from { opacity: 0; transform: scale(0.8); } }
+@keyframes fade { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes shimmer { to { background-position: -200% 0; } }
+@keyframes sheet-up { from { transform: translate3d(0, 100%, 0); } }
+@keyframes sheet-down { to { transform: translate3d(0, 100%, 0); } }
+@keyframes sheet-right { from { transform: translate3d(100%, 0, 0); } }
+@keyframes sheet-left { to { transform: translate3d(100%, 0, 0); } }
+@keyframes toast-in { from { opacity: 0; transform: translate3d(-24px, 0, 0); } }
+@keyframes toast-out { to { opacity: 0; transform: translate3d(-24px, 0, 0); } }
+@keyframes toast-bar { to { transform: scaleX(0); } }
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+
+.skeleton {
+  background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--ba-on-surface) 9%, transparent) 50%, transparent 70%) 0 0 / 200% 100%, var(--ba-surface-high);
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* ── Sheet (<dialog> gốc: bottom sheet trên mobile, side sheet trên desktop) ──
+   Trạng thái data-phase được gán trực tiếp lên DOM trước khi showModal() để không bị "nháy" khung đầu. */
+dialog.sheet { color: var(--ba-on-surface); background: var(--ba-surface-low); will-change: transform; }
+dialog.sheet:focus, dialog.sheet:focus-visible { outline: none; }
+dialog.sheet[open] { display: flex; flex-direction: column; }
+dialog.sheet::backdrop { background: color-mix(in srgb, var(--ba-scrim) 55%, transparent); }
+dialog.sheet[data-phase="open"] { animation: sheet-up 0.42s var(--ease-smooth); }
+dialog.sheet[data-phase="open"]::backdrop { animation: fade 0.3s ease-out; }
+dialog.sheet[data-phase="closing"] { animation: sheet-down 0.24s cubic-bezier(0.4, 0, 1, 1) forwards; }
+dialog.sheet[data-phase="closing"]::backdrop { animation: fade-out 0.24s ease-in forwards; }
+@media (min-width: 768px) {
+  dialog.sheet[data-side="side"][data-phase="open"] { animation-name: sheet-right; }
+  dialog.sheet[data-side="side"][data-phase="closing"] { animation-name: sheet-left; }
+}
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after, html[data-motion="off"] ::backdrop {
+  animation-duration: 0.001ms !important; animation-delay: 0ms !important; transition-duration: 0.001ms !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after, ::backdrop { animation-duration: 0.001ms !important; animation-delay: 0ms !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
+/* Toast nằm trong top-layer (popover) nên luôn hiện phía trên sheet */
+#toasts { position: fixed; inset: auto 0 0 0; width: auto; height: auto; margin: 0; padding: 0 12px max(24px, env(safe-area-inset-bottom)); border: 0; background: none; color: inherit; overflow: visible; pointer-events: none; }
+@media (min-width: 768px) { #toasts { inset: auto auto 0 0; padding: 0 24px max(24px, env(safe-area-inset-bottom)); } }
+@media (max-width: 767px) { #toasts { inset: 0 0 auto 0; padding: max(12px, env(safe-area-inset-top)) 12px 0; } }

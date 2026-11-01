@@ -52,7 +52,13 @@ export function I18nProvider({ children }) {
     document.documentElement.lang = lang
     document.title = dict['meta.title']
     document.querySelector('meta[name="description"]')?.setAttribute('content', dict['meta.description'])
-    document.querySelector('meta[property="og:locale"]')?.setAttribute('content', lang === 'vi' ? 'vi_VN' : 'en_US')
+    const setMeta = (sel, v) => document.querySelector(sel)?.setAttribute('content', v)
+    setMeta('meta[property="og:title"]', dict['meta.title'])
+    setMeta('meta[property="og:description"]', dict['meta.description'])
+    setMeta('meta[name="twitter:title"]', dict['meta.title'])
+    setMeta('meta[name="twitter:description"]', dict['meta.description'])
+    setMeta('meta[property="og:locale"]', lang === 'vi' ? 'vi_VN' : 'en_US')
+    setMeta('meta[property="og:locale:alternate"]', lang === 'vi' ? 'en_US' : 'vi_VN')
   }, [lang])
 
   const setLang = useCallback((next) => {

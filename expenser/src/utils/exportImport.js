@@ -1,8 +1,9 @@
 import Papa from 'papaparse';
 import { formatDate, formatMoney, formatTime } from './format';
 import { renderPieDataUrl, toPieSlices } from './pieChart';
+import { buildImageReport } from './imageReport';
 
-// Heavy libraries (jsPDF, ExcelJS, html2canvas) are imported on demand, so none
+// Heavy libraries (jsPDF, ExcelJS) are imported on demand, so none
 // of this code lands in the main bundle. Every user-facing string goes through
 // the `t` function passed in by the caller, so reports follow the app language.
 
@@ -429,60 +430,6 @@ async function buildPdfReport(r) {
   return doc;
 }
 
-// Renders a compact report card off-screen and captures it as a PNG.
-// Legend rows have a fixed height + line-height and no overflow clipping: html2canvas
-// crops the bottom of text inside `overflow:hidden` boxes, so long names are
-// shortened in JS instead of with CSS ellipsis.
-async function buildImageReport(r) {
-  const { default: html2canvas } = await import('html2canvas');
-  const { title, subtitle, income, expense, count, expenseSlices, expensePie, compareSlices, comparePie, t } = r;
-  const ROW_H = 28;
-  const shorten = (name, max = 24) => (name.length > max ? `${name.slice(0, max - 1)}…` : name);
-  const legend = (slices, showAmount) =>
-    slices
-      .slice(0, 10)
-      .map(
-        (x) =>
-          `<div style="display:flex;align-items:center;gap:8px;height:${ROW_H}px;font-size:13px;line-height:${ROW_H}px">` +
-          `<span style="flex:none;width:10px;height:10px;border-radius:3px;background:${escapeHtml(x.color)}"></span>` +
-          `<span style="flex:1;min-width:0;white-space:nowrap;line-height:${ROW_H}px">${escapeHtml(shorten(x.name))}</span>` +
-          (showAmount ? `<span style="flex:none;color:#525252;line-height:${ROW_H}px">${escapeHtml(formatMoney(x.value))}</span>` : '') +
-          `<b style="flex:none;min-width:40px;text-align:right;line-height:${ROW_H}px">${Math.round(x.pct)}%</b>` +
-          `</div>`,
-      )
-      .join('');
-  const pieBlock = (heading, url, slices, showAmount) =>
-    url
-      ? `<div style="margin-top:22px"><div style="font-weight:700;font-size:15px;line-height:22px;margin-bottom:10px">${escapeHtml(heading)}</div><div style="display:flex;gap:20px;align-items:center"><img src="${url}" style="flex:none;width:190px;height:190px" alt=""/><div style="flex:1;min-width:0">${legend(slices, showAmount)}</div></div></div>`
-      : '';
-  const stat = (label, value, bg, fg) => `<div style="flex:1;background:${bg};color:${fg};border-radius:12px;padding:14px 16px"><div style="font-size:12px;opacity:.8">${escapeHtml(label)}</div><div style="font-size:17px;font-weight:700;margin-top:4px">${escapeHtml(value)}</div></div>`;
-
-  const node = document.createElement('div');
-  node.style.cssText = 'position:fixed;left:-10000px;top:0;width:640px;padding:28px;background:#FFFFFF;color:#0A0A0A;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif';
-  node.innerHTML = `
-    <div style="background:#70FF77;color:#005313;border-radius:28px;padding:20px 22px">
-      <div style="font-size:13px;opacity:.8;font-weight:700">${APP_NAME}</div>
-      <div style="font-size:22px;font-weight:700;margin-top:4px">${escapeHtml(title)}</div>
-      <div style="font-size:12px;opacity:.8;margin-top:4px">${escapeHtml(subtitle)}</div>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:14px">
-      ${stat(t('export.totalIncome'), formatMoney(income), '#C3ECD0', '#2A4E3A')}
-      ${stat(t('export.totalExpense'), formatMoney(expense), '#FFDAD6', '#93000A')}
-      ${stat(t('export.difference'), formatMoney(income - expense), '#F5F5F5', '#0A0A0A')}
-    </div>
-    <div style="font-size:12px;color:#525252;margin-top:10px">${escapeHtml(t('export.totalCount'))}: <b>${count}</b></div>
-    ${pieBlock(t('export.pieExpense'), expensePie, expenseSlices, false)}
-    ${pieBlock(t('stats.compare'), comparePie, compareSlices, true)}
-    <div style="margin-top:22px;font-size:11px;color:#737373;text-align:right">${APP_NAME}</div>`;
-  document.body.appendChild(node);
-  try {
-    const canvas = await html2canvas(node, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
-    return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
-  } finally {
-    document.body.removeChild(node);
-  }
-}
-
 /** Period report as Excel (multi-sheet), PDF or PNG image - all with pie charts. */
 export async function exportRangeReport({ title, start, end, transactions, getCategory, getWallet, format = 'excel', t }) {
   const rangeTx = transactions.filter((x) => x.type !== 'transfer' && x.date >= start && x.date <= end);
@@ -495,8 +442,8 @@ export async function exportRangeReport({ title, start, end, transactions, getCa
   // Income vs expense share (image report): two slices, zero values dropped.
   const compareSlices = toPieSlices(
     [
-      { name: t('export.type.income'), value: income, color: '#006E1C' },
-      { name: t('export.type.expense'), value: expense, color: '#BA1A1A' },
+      { name: t('export.type.income'), value: income, color: '#15803D' },
+      { name: t('export.type.expense'), value: expense, color: '#DC2626' },
     ].filter((x) => x.value > 0),
     t('common.other'),
   );

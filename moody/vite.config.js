@@ -21,6 +21,17 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        // Font tuỳ chọn chỉ tải khi người dùng chọn → không precache, lưu cache lần đầu dùng.
+        globIgnores: ['**/{roboto,roboto-flex,inter,be-vietnam-pro}-*.woff*'],
+        runtimeCaching: [
+          {
+            urlPattern: /\/assets\/(roboto|roboto-flex|inter|be-vietnam-pro)-.*\.woff2?$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'optional-fonts', expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 365 } }
+          }
+        ]
+      },
       includeAssets: ['favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'icons/*.png'],
       manifest: {
         id: '/',
@@ -32,8 +43,8 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         display: 'standalone',
-        theme_color: '#f4fbf8', // M3 surface (sáng) — thanh trạng thái khi cài như app; lúc chạy được đồng bộ theo giao diện
-        background_color: '#f4fbf8', // M3 surface (sáng) — màn hình chờ khi mở app
+        theme_color: '#009688',
+        background_color: '#009688',
         categories: ['health', 'lifestyle', 'productivity'],
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },

@@ -202,6 +202,9 @@ export default {
   'stats.noExpense': 'Chưa có khoản chi nào.',
   'stats.categoryPct': 'Tỷ lệ theo danh mục',
   'stats.highest': 'Cao nhất: {name} ({pct}%)',
+  'stats.catSummary': '{n} giao dịch · {pct}% tổng chi',
+  'stats.viewCategory': 'Xem các khoản chi của {name}',
+  'stats.catEmpty': 'Không có khoản chi nào trong kỳ này.',
 
   // Cài đặt
   'settings.installTitle': 'Cài đặt Expenser lên thiết bị',

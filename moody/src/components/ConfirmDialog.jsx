@@ -12,7 +12,7 @@ export default function ConfirmDialog({
 }) {
   const { t } = useI18n()
   const [submitting, setSubmitting] = useState(false)
-  const { mounted, visible } = useMountTransition(open, 200)
+  const { mounted, visible } = useMountTransition(open, 180)
   useBodyScrollLock(mounted)
   useEscape(open, () => { if (!submitting) onCancel() })
 
@@ -39,14 +39,15 @@ export default function ConfirmDialog({
   return createPortal(
     <div className="fixed inset-0 z-[80] flex items-center justify-center px-6" role="presentation">
       <div
-        className={`absolute inset-0 scrim transition-opacity duration-200 ease-out ${visible ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 scrim transition-opacity ${visible ? 'duration-[250ms] ease-out' : 'duration-[150ms] ease-in'} ${visible ? 'opacity-100' : 'opacity-0'}`}
         onClick={handleCancel}
       />
       <div
         role="alertdialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative w-full max-w-sm bg-popover text-popover-foreground rounded-xl p-6 shadow-elev-3 transition-[opacity,transform] duration-300 ease-spring-fast ${visible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
+        className={`relative w-full max-w-sm bg-popover text-popover-foreground rounded-xl p-6 shadow-elev-3 transition-[opacity,transform] ${visible ? 'duration-[280ms] ease-[var(--ease-emphasized-decel)]' : 'duration-[150ms] ease-[var(--ease-emphasized-accel)]'} ${visible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-2'}`}
+        style={{ willChange: 'transform, opacity' }}
       >
         <Icon size={28} className={`mx-auto mb-4 ${danger ? 'text-error' : 'text-brand'}`} />
         <p className="t-headline-small text-center mb-4">{title}</p>

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://moody-mood-tracker.vercel.app/sitemap.xml
+Sitemap: https://moody-inky-iota.vercel.app/sitemap.xml

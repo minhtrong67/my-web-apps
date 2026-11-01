@@ -113,7 +113,12 @@ body {
 }
 .md-input::placeholder { color: transparent; }
 .md-input:focus-visible { outline: none; }
-select.md-input { appearance: none; cursor: pointer; padding-right: 1.5rem; }
+select.md-input { appearance: none; cursor: pointer; padding-right: 1.5rem; color-scheme: light; }
+html.dark select.md-input { color-scheme: dark; }
+/* The option list is drawn by the browser: give it the theme's own surface + text colours. */
+select.md-input option,
+select.md-input optgroup { background-color: var(--md-surface-container-high); color: var(--md-on-surface); }
+select.md-input option:checked { background-color: var(--md-primary-container); color: var(--md-on-primary-container); }
 textarea.md-input { resize: none; overflow: hidden; display: block; }
 
 .md-label {

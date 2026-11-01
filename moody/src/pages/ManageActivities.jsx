@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Plus, GripVertical, ArrowUp, ArrowDown, Loader2, Search, X, Check } from '../components/icons'
 import { useSessionState } from '../hooks/useSessionState'
 import { useActivities } from '../hooks/useActivities'
-import { useToast } from '../context/ToastContext'
 import SwipeableRow from '../components/SwipeableRow'
 import Dialog, { DialogActions } from '../components/Dialog'
 import TextField from '../components/TextField'
@@ -12,7 +11,6 @@ import { ManageListSkeleton } from '../components/PageSkeleton'
 
 export default function ManageActivities() {
   const { activities, loading, addActivity, updateActivity, removeActivity, reorderActivities } = useActivities()
-  const { showToast } = useToast()
   const { t } = useI18n()
   const [editingId, setEditingId] = useState(null)
   const [formOpen, setFormOpen] = useState(false)
@@ -65,7 +63,6 @@ export default function ManageActivities() {
 
   async function performUpdate() {
     await updateActivity(editingId, { emoji: emoji.trim() || '✨', label: label.trim() })
-    showToast(t('manageActs.updated'))
     setConfirmUpdateOpen(false)
     closeForm()
   }
@@ -79,7 +76,6 @@ export default function ManageActivities() {
     setSaving(true)
     try {
       await addActivity({ emoji: emoji.trim() || '✨', label: label.trim() })
-      showToast(t('manageActs.added'))
       closeForm()
     } finally {
       setSaving(false)
@@ -89,7 +85,6 @@ export default function ManageActivities() {
   async function confirmDelete() {
     if (!pendingDelete) return
     await removeActivity(pendingDelete.id)
-    showToast(t('manageActs.deleted'))
     setPendingDelete(null)
   }
 

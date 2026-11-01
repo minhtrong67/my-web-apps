@@ -42,6 +42,7 @@ import { useAuth } from "../context/AuthContext";
 import { useMoodEntries } from "../hooks/useMoodEntries";
 import { useInstallPrompt } from "../hooks/useInstallPrompt";
 import { useI18n, LANGUAGES } from "../i18n";
+import { FONTS, getStoredFont, setFont } from "../lib/fonts";
 import {
   getStoredTheme,
   getStoredFontScale,
@@ -65,6 +66,7 @@ export default function Settings() {
   const { t, langPref, setLang } = useI18n();
   const [theme, setThemeState] = useState(getStoredTheme());
   const [fontScale, setFontScaleState] = useState(getStoredFontScale());
+  const [fontFamily, setFontFamilyState] = useState(getStoredFont());
   const [startPage, setStartPageState] = useState(getStartPage());
   const [format, setFormat] = useSessionState("settings.format", "csv");
   const [dataOpen, setDataOpen] = useSessionState("settings.dataOpen", false);
@@ -80,6 +82,11 @@ export default function Settings() {
   function handleFontScale(value) {
     setFontScaleState(value);
     setFontScale(value);
+  }
+
+  function handleFontFamily(id) {
+    setFontFamilyState(id);
+    setFont(id);
   }
 
   function handleStartPage(path) {
@@ -179,7 +186,7 @@ export default function Settings() {
         return showToast(t("settings.importErr.write"), { type: "error" });
       }
       if (total.added + total.updated === 0) return showToast(t("settings.importNothing"), { type: "info" });
-      showToast(t("settings.importDone", total), { type: "success" });
+      showToast(t("settings.importDone", total), { type: total.skipped > 0 ? "warning" : "success" });
     } catch (err) {
       const known = ["format", "size", "invalid", "mismatch"].includes(err?.message) ? err.message : "read";
       showToast(t(`settings.importErr.${known}`), { type: "error" });
@@ -271,6 +278,25 @@ export default function Settings() {
         </div>
 
         <div>
+          <SettingGroup title={t("settings.fontFamily")}>
+            <TextField
+              as="select"
+              label={t("settings.fontFamily")}
+              value={fontFamily}
+              onChange={(e) => handleFontFamily(e.target.value)}
+            >
+              {FONTS.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.label}
+                </option>
+              ))}
+            </TextField>
+            <div className="card-filled mt-3 px-4 py-3">
+              <p className="t-title-medium">{t("settings.fontPreview")}</p>
+              <p className="t-body-small text-on-surface-variant mt-0.5">{t("settings.fontFamilyHint")}</p>
+            </div>
+          </SettingGroup>
+
           <SettingGroup title={t("settings.fontSize")}>
             <div className="segmented" role="group">
               {FONT_SIZES.map((f) => (
@@ -422,13 +448,34 @@ export default function Settings() {
             </span>
             <div className="t-body-medium text-on-surface-variant">
               <p className="t-title-small text-on-surface mb-0.5">Moody</p>
-              <p>{t("settings.credit", { author: "minhtrong67" })}</p>
+              <p><Credit text={t("settings.credit", { author: "\u0001author\u0001", ai: "\u0001ai\u0001" })} /></p>
             </div>
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+// Làm nổi bật tên tác giả (link tới GitHub) và AI hỗ trợ trong dòng ghi công.
+const chip = "px-1.5 py-0.5 rounded-md bg-primary-container text-on-primary-container font-semibold whitespace-nowrap";
+function Credit({ text }) {
+  return text.split(/(\u0001author\u0001|\u0001ai\u0001)/).map((part, i) => {
+    if (part === "\u0001author\u0001")
+      return (
+        <a key={i} href="https://github.com/minhtrong67" target="_blank" rel="noopener noreferrer" className={`${chip} state hover:underline`}>
+          minhtrong67
+        </a>
+      );
+    if (part === "\u0001ai\u0001")
+      return (
+        <span key={i} className={chip}>
+          <Sparkles size={13} className="inline -mt-0.5 mr-1" />
+          Claude AI
+        </span>
+      );
+    return part;
+  });
 }
 
 function SettingGroup({ title, children }) {

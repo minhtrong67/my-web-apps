@@ -9,6 +9,8 @@ import { useAuth } from '../context/AuthContext'
 import { ThemeToggle, LangToggle } from '../components/Toggles'
 import { enterGuest, isGuest } from '../lib/session'
 import { MOODS } from '../lib/moodConfig'
+import ScrollToTop from '../components/ScrollToTop'
+import { scrollToId, scrollToTop } from '../lib/scroll'
 
 const FEATURES = [
   { icon: NotebookPen, key: 'f1' },
@@ -45,8 +47,6 @@ function useReveal(rootRef) {
     return () => io.disconnect()
   }, [rootRef])
 }
-
-const scrollToId = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
 function GitHubMark({ size = 18 }) {
   return (
@@ -187,7 +187,7 @@ export default function Landing() {
         style={{ paddingTop: 'var(--safe-top)' }}
       >
         <div className="mx-auto max-w-6xl h-16 px-4 sm:px-6 flex items-center gap-2">
-          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2.5 mr-2" aria-label="Moody">
+          <button onClick={scrollToTop} className="flex items-center gap-2.5 mr-2" aria-label="Moody">
             <img src="/icons/icon-192.png" alt="" width="32" height="32" className="w-8 h-8 rounded-lg" />
             <span className="t-title-large">Moody</span>
           </button>
@@ -272,7 +272,7 @@ export default function Landing() {
         </section>
 
         {/* ===== Tính năng ===== */}
-        <section id="features" className="scroll-mt-20 py-20 sm:py-28">
+        <section id="features" className="py-20 sm:py-28">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="max-w-2xl mx-auto text-center mb-12 sm:mb-16">
               <Eyebrow>{t('landing.features.eyebrow')}</Eyebrow>
@@ -298,7 +298,7 @@ export default function Landing() {
         </section>
 
         {/* ===== Cách dùng ===== */}
-        <section id="how" className="scroll-mt-20 py-20 sm:py-28 bg-surface-container-low">
+        <section id="how" className="py-20 sm:py-28 bg-surface-container-low">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="max-w-2xl mx-auto text-center mb-14">
               <Eyebrow>{t('landing.how.eyebrow')}</Eyebrow>
@@ -359,7 +359,7 @@ export default function Landing() {
         </section>
 
         {/* ===== Hỏi đáp ===== */}
-        <section id="faq" className="scroll-mt-20 pb-20 sm:pb-28">
+        <section id="faq" className="pb-20 sm:pb-28">
           <div className="mx-auto max-w-3xl px-4 sm:px-6">
             <div className="text-center mb-10">
               <Eyebrow>{t('landing.faq.eyebrow')}</Eyebrow>
@@ -424,6 +424,8 @@ export default function Landing() {
           <p className="t-body-small text-on-surface-variant">{t('landing.footer.rights')}</p>
         </div>
       </footer>
+
+      <ScrollToTop />
     </div>
   )
 }

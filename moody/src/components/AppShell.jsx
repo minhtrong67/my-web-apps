@@ -8,6 +8,7 @@ import { ModalDrawer, PermanentDrawer, NavRail } from './Sidebar'
 import { ThemeToggle, LangToggle } from './Toggles'
 import { useI18n } from '../i18n'
 import { useCheckIn } from '../context/CheckInContext'
+import { scrollToTop } from '../lib/scroll'
 
 // Navigation bar (điện thoại): tối đa 5 đích đến; icon đặc khi đang chọn.
 const TABS = [
@@ -16,6 +17,17 @@ const TABS = [
   { to: '/stats', key: 'nav.stats', icon: BarChart3, activeIcon: BarChartFilled },
   { to: '/settings', key: 'nav.settings', icon: Settings, activeIcon: SettingsFilled }
 ]
+
+// Tên trang hiện trên thanh trên cùng theo đường dẫn đang xem.
+const TITLES = [
+  ['/history', 'nav.history'],
+  ['/stats', 'nav.stats'],
+  ['/settings', 'nav.settings'],
+  ['/manage/activities', 'nav.activities'],
+  ['/manage/moods', 'nav.moods'],
+  ['/checkin', 'nav.newCheckin']
+]
+const titleKey = (path) => TITLES.find(([p]) => path === p || path.startsWith(p + '/'))?.[1] || 'nav.today'
 
 export default function AppShell() {
   const { openCheckIn } = useCheckIn()
@@ -65,8 +77,7 @@ export default function AppShell() {
           <button onClick={() => setDrawerOpen(true)} aria-label={t('nav.openMenu')} className="icon-btn state text-on-surface md:hidden">
             <Menu size={24} />
           </button>
-          <span className="t-headline-small flex-1 ml-2 md:ml-4 lg:hidden text-primary">Moody</span>
-          <span className="hidden lg:block flex-1" />
+          <p key={pathname} className="page-enter t-headline-small flex-1 min-w-0 truncate ml-2 md:ml-4 text-primary">{t(titleKey(pathname))}</p>
           <LangToggle />
           <ThemeToggle />
         </header>
@@ -78,7 +89,7 @@ export default function AppShell() {
 
       {/* FAB lên đầu trang */}
       <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        onClick={scrollToTop}
         aria-label={t('common.scrollTop')}
         className={`state fixed right-4 md:right-6 z-20 w-12 h-12 rounded-lg bg-secondary-container text-on-secondary-container shadow-elev-2 flex items-center justify-center transition-[opacity,transform,border-radius] duration-300 ease-spring-fast active:rounded-md md:bottom-6 ${showAddFab ? 'bottom-[calc(var(--safe-bottom)+11.5rem)]' : 'bottom-[calc(var(--safe-bottom)+7rem)]'
           } ${showScrollTop ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'
