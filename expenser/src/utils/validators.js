@@ -64,3 +64,26 @@ export function validateWallet(form, existingNames, t) {
   if (form.balance === '' || form.balance === null || Number.isNaN(Number(form.balance))) errors.balance = t('validation.balanceInvalid');
   return { valid: Object.keys(errors).length === 0, errors };
 }
+
+export function validateCafeShop(form, existingNames, t) {
+  const errors = {};
+  const name = trimValue(form.name);
+  if (!isNonEmpty(name)) errors.name = t('validation.shopNameRequired');
+  else if (!maxLength(name, 60)) errors.name = t('validation.shopNameMax');
+  else if (existingNames.some((n) => n.toLowerCase() === name.toLowerCase())) errors.name = t('validation.shopExists');
+  if (!maxLength(form.address || '', 200)) errors.address = t('validation.addressMax');
+  if (!maxLength(form.description || '', 500)) errors.description = t('validation.descriptionMax');
+  const r = Number(form.rating);
+  if (!Number.isFinite(r) || r < 0 || r > 5) errors.rating = t('validation.ratingInvalid');
+  return { valid: Object.keys(errors).length === 0, errors };
+}
+
+export function validateCafeDrink(form, existingNames, t) {
+  const errors = {};
+  const name = trimValue(form.name);
+  if (!isNonEmpty(name)) errors.name = t('validation.drinkNameRequired');
+  else if (!maxLength(name, 60)) errors.name = t('validation.drinkNameMax');
+  else if (existingNames.some((n) => n.toLowerCase() === name.toLowerCase())) errors.name = t('validation.drinkExists');
+  if (!maxLength(form.description || '', 500)) errors.description = t('validation.descriptionMax');
+  return { valid: Object.keys(errors).length === 0, errors };
+}

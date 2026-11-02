@@ -18,6 +18,9 @@ const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const TransactionsPage = lazy(() => import('./pages/Transactions'));
 const CategoriesPage = lazy(() => import('./pages/Categories'));
+const CafeTransactionsPage = lazy(() => import('./pages/CafeTransactions'));
+const CafeShopsPage = lazy(() => import('./pages/CafeShops'));
+const CafeDrinksPage = lazy(() => import('./pages/CafeDrinks'));
 const WalletsPage = lazy(() => import('./pages/Wallets'));
 const StatisticsPage = lazy(() => import('./pages/Statistics'));
 const SettingsPage = lazy(() => import('./pages/Settings'));
@@ -62,6 +65,9 @@ export default function App() {
                 <Route index element={<Dashboard />} />
                 <Route path="transactions" element={<TransactionsPage />} />
                 <Route path="categories" element={<CategoriesPage />} />
+                <Route path="cafe" element={<CafeTransactionsPage />} />
+                <Route path="cafe-shops" element={<CafeShopsPage />} />
+                <Route path="cafe-drinks" element={<CafeDrinksPage />} />
                 <Route path="wallets" element={<WalletsPage />} />
                 <Route path="statistics" element={<StatisticsPage />} />
                 <Route path="settings" element={<SettingsPage />} />

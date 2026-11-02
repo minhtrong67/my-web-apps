@@ -16,7 +16,8 @@ donut_large download edit edit_note error event event_busy favorite filter_alt_o
 lock lock_reset logout mail mark_email_read menu notifications notifications_active notifications_off open_in_new palette
 pause_circle payments person picture_as_pdf pie_chart play_circle qr_code_2 real_estate_agent receipt_long remove restart_alt
 rocket savings schedule search search_off settings shield show_chart space_dashboard star summarize swap_vert sync_alt table_view
-translate trending_down trending_up tune upload_file visibility visibility_off warning wifi_off`.split(/\s+/);
+translate trending_down trending_up tune upload_file visibility visibility_off warning wifi_off
+local_cafe storefront location_on add_photo_alternate coffee`.split(/\s+/);
 
 // app name -> Material Symbols file name where they differ
 const ALIAS = {
@@ -33,7 +34,7 @@ const ALIAS = {
 const ALL = [...ICONS, ...Object.keys(ALIAS)].sort();
 // Icons that have a filled "selected" form (navigation, state)
 const FILLED = new Set(['space_dashboard', 'receipt_long', 'category', 'account_balance_wallet', 'bar_chart', 'settings', 'savings',
-  'event', 'autorenew', 'check_circle', 'notifications', 'notifications_active', 'person', 'pie_chart', 'calendar_month', 'star', 'favorite']);
+  'local_cafe', 'storefront', 'coffee', 'event', 'autorenew', 'check_circle', 'notifications', 'notifications_active', 'person', 'pie_chart', 'calendar_month', 'star', 'favorite']);
 
 const d = (file) => /<path d="([^"]+)"/.exec(readFileSync(join(dir, file), 'utf8'))[1];
 const lines = ALL.map((name) => {

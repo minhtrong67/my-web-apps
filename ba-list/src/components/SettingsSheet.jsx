@@ -1,16 +1,36 @@
-import { useEffect, useRef, useState } from 'react'
-import { Check, Download, Heart, Languages, Monitor, Moon, Palette, RotateCcw, Settings, Smartphone, Sparkles, Sun, Type, Upload, X } from 'lucide-react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { Check, ChevronDown, Download, Heart, Languages, Monitor, Moon, Palette, RotateCcw, Settings, Smartphone, Sparkles, Sun, Type, Upload, X } from 'lucide-react'
 import { ACCENTS, useSettings, useToast } from '../lib/app-context.jsx'
+import { FONT_LIST, fontStack, getFont, loadFont } from '../lib/fonts.js'
 import { LANGS } from '../lib/i18n.js'
 import { BY_NAME, STUDENTS, cleanForExport } from '../lib/students.js'
 import Sheet from './Sheet.jsx'
-import { IconButton, Segmented, Switch, TitleTab, cx } from './ui.jsx'
+import { IconButton, Segmented, Switch, cx } from './ui.jsx'
 
-function Panel({ icon, title, children }) {
+/* Mục dạng accordion: bấm tiêu đề để đóng/mở (mở/đóng mượt bằng grid-template-rows, nội dung đóng thì inert) */
+function Panel({ icon: Icon, title, hint, defaultOpen = false, onToggle, children }) {
+  const [open, setOpen] = useState(defaultOpen)
+  const id = useId()
+  useEffect(() => { onToggle?.(open) }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
   return (
-    <section className="rounded-md border border-outline-variant bg-surface-mid p-4 pt-3">
-      <TitleTab icon={icon}>{title}</TitleTab>
-      {children}
+    <section className="rounded-md border border-outline-variant bg-surface-mid">
+      <button
+        type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}
+        className="group flex w-full items-center justify-between gap-3 p-4 text-left"
+      >
+        <span className="slant inline-flex h-8 items-center gap-2 bg-primary pl-4 pr-7 text-sm font-bold italic tracking-wide text-on-primary transition-[filter] [--s:9px] group-hover:brightness-110">
+          <Icon size={16} strokeWidth={2.5} />{title}
+        </span>
+        <span className="flex min-w-0 items-center gap-2 text-sm font-semibold italic text-on-surface-variant">
+          {!open && hint && <span className="min-w-0 truncate">{hint}</span>}
+          <ChevronDown size={20} className={cx('shrink-0 text-primary transition-transform duration-300 ease-out-back', open && 'rotate-180')} />
+        </span>
+      </button>
+      <div id={id} inert={!open} className={cx('grid transition-[grid-template-rows] duration-300 ease-smooth', open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
+        <div className="min-h-0 overflow-hidden">
+          <div className={cx('px-4 pb-4 transition-opacity duration-300', open ? 'opacity-100' : 'opacity-0')}>{children}</div>
+        </div>
+      </div>
     </section>
   )
 }
@@ -21,8 +41,6 @@ const download = (name, data) => {
   a.download = name; a.click()
   setTimeout(() => URL.revokeObjectURL(a.href), 1000)
 }
-const FONTS = ['sans', 'round', 'serif', 'mono']
-const FONT_FAMILY = { sans: 'ui-sans-serif, system-ui, sans-serif', round: 'ui-rounded, Nunito, system-ui, sans-serif', serif: 'ui-serif, Georgia, serif', mono: 'ui-monospace, Menlo, monospace' }
 const btn = 'slant inline-flex h-11 items-center justify-center gap-2 bg-surface-high px-6 text-sm font-bold italic transition-all duration-200 ease-out-back hover:bg-primary hover:text-on-primary active:scale-95 disabled:pointer-events-none disabled:opacity-40'
 
 export default function SettingsSheet({ open, onClose, list, favs, onImport }) {
@@ -30,6 +48,8 @@ export default function SettingsSheet({ open, onClose, list, favs, onImport }) {
   const toast = useToast()
   const file = useRef(null)
   const [bip, setBip] = useState(() => window.__bip || null)
+  const [fontOpen, setFontOpen] = useState(false)
+  useEffect(() => { if (fontOpen) FONT_LIST.forEach((f) => loadFont(f.id)) }, [fontOpen])
   useEffect(() => {
     const on = () => setBip(window.__bip || null)
     window.addEventListener('bip', on)
@@ -80,7 +100,7 @@ export default function SettingsSheet({ open, onClose, list, favs, onImport }) {
       {/* Khung cuộn → lưới (các khối KHÔNG bị co lại như flex-col trước đây nên không còn bị cắt) */}
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <div className="grid content-start gap-3 px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 md:pl-10 md:pr-5">
-          <Panel icon={Sun} title={t('set.theme')}>
+          <Panel icon={Sun} title={t('set.theme')} hint={t(`theme.${cfg.theme}`)} defaultOpen>
             <Segmented
               value={cfg.theme} onChange={(v) => update({ theme: v })}
               options={[
@@ -91,33 +111,38 @@ export default function SettingsSheet({ open, onClose, list, favs, onImport }) {
             />
           </Panel>
 
-          <Panel icon={Palette} title={t('set.color')}>
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <Panel icon={Palette} title={t('set.color')} hint={<span className="slant inline-block h-5 w-8 align-middle [--s:5px]" style={{ background: cfg.ac }} />} defaultOpen>
+            <div className="grid grid-cols-7 gap-1.5">
               {ACCENTS.map((c) => (
                 <button
-                  key={c} type="button" aria-label={c} aria-pressed={cfg.ac === c} onClick={() => update({ ac: c })}
+                  key={c} type="button" aria-label={c} title={c} aria-pressed={cfg.ac === c} onClick={() => update({ ac: c })}
                   style={{ background: c }}
-                  className={cx('slant grid h-10 w-9 place-items-center text-white sm:w-12 transition-all duration-200 ease-out-back active:scale-90', cfg.ac === c ? 'shadow-[inset_0_-5px_0_var(--ba-hl)]' : 'hover:scale-105')}
-                >{cfg.ac === c && <Check size={18} strokeWidth={4} className="animate-pop" />}</button>
+                  className={cx('slant grid h-10 place-items-center transition-all duration-200 ease-out-back active:scale-90', cfg.ac === c ? 'text-white shadow-[inset_0_-5px_0_var(--ba-hl)]' : 'hover:scale-105')}
+                >{cfg.ac === c && <Check size={18} strokeWidth={4} className="animate-pop drop-shadow" />}</button>
               ))}
-              <label title={t('set.customColor')} className="slant relative grid h-10 w-9 cursor-pointer sm:w-12 place-items-center bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] transition-transform hover:scale-105">
+              <label title={t('set.customColor')} className="slant relative grid h-10 cursor-pointer place-items-center bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] transition-transform hover:scale-105">
                 <span className="slant h-5 w-6 border-2 border-white [--s:4px]" style={{ background: cfg.ac }} />
-                <input type="color" value={cfg.ac} onChange={(e) => update({ ac: e.target.value })} aria-label={t('set.customColor')} className="absolute inset-0 size-full cursor-pointer opacity-0" />
+                <input type="color" value={cfg.ac} onChange={(e) => update({ ac: e.target.value }, { animate: false })} aria-label={t('set.customColor')} className="absolute inset-0 size-full cursor-pointer opacity-0" />
               </label>
             </div>
           </Panel>
 
-          <Panel icon={Languages} title={t('set.lang')}>
+          <Panel icon={Languages} title={t('set.lang')} hint={LANGS[lang]} defaultOpen>
             <Segmented value={lang} onChange={(v) => update({ lang: v })} options={Object.entries(LANGS).map(([value, label]) => ({ value, label }))} />
           </Panel>
 
-          <Panel icon={Type} title={t('set.font')}>
-            <div className="grid grid-cols-2 gap-2">
-              {FONTS.map((f) => (
+          <Panel icon={Type} title={t('set.font')} hint={getFont(cfg.ff).label} onToggle={setFontOpen}>
+            <div className="grid gap-1.5" role="radiogroup" aria-label={t('set.font')}>
+              {FONT_LIST.map((f) => (
                 <button
-                  key={f} type="button" aria-pressed={cfg.ff === f} onClick={() => update({ ff: f })} style={{ fontFamily: FONT_FAMILY[f] }}
-                  className={cx('slant flex h-12 items-center gap-2.5 px-6 text-sm transition-all duration-200 ease-out-back active:scale-95', cfg.ff === f ? 'bg-primary font-bold text-on-primary' : 'bg-surface-high hover:bg-surface-highest')}
-                ><b className="text-lg">Aa</b>{t(`font.${f}`)}</button>
+                  key={f.id} type="button" role="radio" aria-checked={cfg.ff === f.id} onClick={() => update({ ff: f.id })}
+                  style={{ fontFamily: fontStack(f.id) }}
+                  className={cx('slant flex h-12 items-center gap-3 px-7 text-left transition-all duration-200 ease-out-back active:scale-[0.98]', cfg.ff === f.id ? 'bg-primary text-on-primary' : 'bg-surface-high hover:bg-surface-highest')}
+                >
+                  <b className="w-9 text-xl leading-none">Aa</b>
+                  <span className="flex-1 truncate text-sm font-semibold">{f.label}</span>
+                  {cfg.ff === f.id && <Check size={16} strokeWidth={4} />}
+                </button>
               ))}
             </div>
             <div className="mt-4 flex items-center justify-between text-sm font-bold italic"><span>{t('set.size')}</span><span className="text-primary">{cfg.fs}px</span></div>
@@ -128,11 +153,11 @@ export default function SettingsSheet({ open, onClose, list, favs, onImport }) {
             </div>
           </Panel>
 
-          <Panel icon={Sparkles} title={t('set.anim')}>
+          <Panel icon={Sparkles} title={t('set.anim')} hint={cfg.motion !== 0 ? 'ON' : 'OFF'}>
             <Switch checked={cfg.motion !== 0} onChange={(v) => update({ motion: v ? 1 : 0 })} label={t('set.motion')} hint={t('set.motionHint')} />
           </Panel>
 
-          <Panel icon={Download} title={t('set.data')}>
+          <Panel icon={Download} title={t('set.data')} hint={`${favs.size} ♥`}>
             <div className="grid grid-cols-2 gap-2">
               <button type="button" className={btn} onClick={() => exportData(true)}><Download size={17} />{t('set.exportAll', { n: STUDENTS.length })}</button>
               <button type="button" className={btn} onClick={() => exportData(false)}><Download size={17} />{t('set.exportCur', { n: list.length })}</button>

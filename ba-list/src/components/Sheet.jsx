@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cx } from './ui.jsx'
 
 /**
@@ -9,6 +9,7 @@ import { cx } from './ui.jsx'
  */
 export default function Sheet({ open, onClose, variant = 'side', label, children, className }) {
   const ref = useRef(null), last = useRef(children), skip = useRef(false), timer = useRef(0), closeRef = useRef(onClose)
+  const [mounted, setMounted] = useState(false) // giữ nội dung trong lúc chạy animation đóng; đóng xong thì gỡ khỏi DOM (nhẹ trang hơn)
   closeRef.current = onClose
   if (open) last.current = children
 
@@ -17,6 +18,7 @@ export default function Sheet({ open, onClose, variant = 'side', label, children
     if (!d) return
     clearTimeout(timer.current)
     if (open) {
+      setMounted(true)
       d.style.transition = d.style.transform = ''
       d.dataset.phase = 'open'
       if (!d.open) { window.__sheetAt = performance.now(); document.documentElement.classList.add('sheet-open'); d.showModal() }
@@ -26,11 +28,12 @@ export default function Sheet({ open, onClose, variant = 'side', label, children
     if (skip.current) {
       skip.current = false
       d.close(); d.dataset.phase = 'closed'; d.style.transition = d.style.transform = ''
+      setMounted(false)
       if (!document.querySelector('dialog[open]')) document.documentElement.classList.remove('sheet-open')
       return
     }
     d.dataset.phase = 'closing'
-    timer.current = setTimeout(() => { d.close(); d.dataset.phase = 'closed'; if (!document.querySelector('dialog[open]')) document.documentElement.classList.remove('sheet-open') }, 250)
+    timer.current = setTimeout(() => { d.close(); d.dataset.phase = 'closed'; setMounted(false); if (!document.querySelector('dialog[open]')) document.documentElement.classList.remove('sheet-open') }, 250)
     return () => clearTimeout(timer.current)
   }, [open])
 
@@ -99,7 +102,7 @@ export default function Sheet({ open, onClose, variant = 'side', label, children
       <div data-drag className={cx('relative h-8 shrink-0 cursor-grab touch-none select-none', variant === 'side' && 'md:hidden')}>
         <span className="slant absolute left-1/2 top-3.5 h-1.5 w-14 -translate-x-1/2 bg-primary/60 [--s:4px]" />
       </div>
-      {open ? children : last.current}
+      {open ? children : mounted ? last.current : null}
     </dialog>
   )
 }

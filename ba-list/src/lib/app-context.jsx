@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { CircleAlert, CircleCheck, Info, TriangleAlert } from 'lucide-react'
+import { flushSync } from 'react-dom'
 import { detectLang, makeT } from './i18n.js'
+import { fontStack, loadFont, normalizeFont } from './fonts.js'
 import { applyScheme } from './theme.js'
 
 /* ───────────── localStorage an toàn ───────────── */
@@ -8,16 +10,29 @@ export const readLS = (k, d) => { try { return { ...d, ...JSON.parse(localStorag
 export const writeLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { /* bỏ qua */ } }
 
 /* ───────────── Cài đặt (giao diện, ngôn ngữ) ───────────── */
-export const DEFAULTS = { theme: 'system', fs: 15, ff: 'sans', ac: '#128cff', motion: 1 }
-export const ACCENTS = ['#128cff', '#e8508c', '#16a085', '#8a63f0', '#f0801f', '#d93a3f']
+export const DEFAULTS = { theme: 'system', fs: 15, ff: 'system', ac: '#128cff', motion: 1 }
+export const ACCENTS = [
+  '#128cff', '#00b4d8', '#16a085', '#2fb85a', '#8bc34a', '#f2b705',
+  '#f0801f', '#d93a3f', '#e8508c', '#c2399c', '#8a63f0', '#4c5fd5',
+]
 const SettingsCtx = createContext(null)
 export const useSettings = () => useContext(SettingsCtx)
 
+const initialCfg = () => {
+  let raw = {}
+  try { raw = JSON.parse(localStorage.getItem('ba-cfg') || '{}') } catch { /* bỏ qua */ }
+  const c = { ...DEFAULTS, ...raw }
+  c.ff = normalizeFont(c.ff)
+  c.lang = c.lang === 'vi' || c.lang === 'en' ? c.lang : detectLang()
+  // lần đầu: nếu hệ điều hành bật "giảm chuyển động" thì tắt hiệu ứng (người dùng vẫn bật lại được trong Cài đặt)
+  if (raw.motion === undefined && matchMedia('(prefers-reduced-motion: reduce)').matches) c.motion = 0
+  return c
+}
+
 export function SettingsProvider({ children }) {
-  const [cfg, setCfg] = useState(() => {
-    const c = readLS('ba-cfg', DEFAULTS)
-    return { ...DEFAULTS, ...c, lang: c.lang === 'vi' || c.lang === 'en' ? c.lang : detectLang() }
-  })
+  const [cfg, setCfg] = useState(initialCfg)
+  const cfgRef = useRef(cfg)
+  cfgRef.current = cfg
   const [sysDark, setSysDark] = useState(() => matchMedia('(prefers-color-scheme: dark)').matches)
   useEffect(() => {
     const mq = matchMedia('(prefers-color-scheme: dark)'), on = (e) => setSysDark(e.matches)
@@ -29,16 +44,30 @@ export function SettingsProvider({ children }) {
   useLayoutEffect(() => {
     const r = document.documentElement
     r.dataset.theme = dark ? 'dark' : 'light'
-    r.dataset.ff = cfg.ff
+    r.style.setProperty('--ff', fontStack(cfg.ff))
     r.lang = cfg.lang
     if (cfg.motion === 0) r.dataset.motion = 'off'; else delete r.dataset.motion
     r.style.fontSize = `${(cfg.fs / 15) * 16}px`
     applyScheme(cfg.ac, dark ? 'dark' : 'light')
     writeLS('ba-cfg', cfg)
   }, [cfg, dark])
+  useEffect(() => { loadFont(cfg.ff) }, [cfg.ff])
 
-  const update = useCallback((patch) => setCfg((c) => ({ ...c, ...patch })), [])
-  const reset = useCallback(() => setCfg((c) => ({ ...DEFAULTS, lang: c.lang })), [])
+  /* Đổi theme / màu / font: cross-fade cả trang bằng View Transitions API (1 lớp ảnh chụp → mượt, không tính transition cho hàng nghìn node) */
+  const update = useCallback((patch, { animate = true } = {}) => {
+    const apply = () => setCfg((c) => ({ ...c, ...patch }))
+    const visual = 'theme' in patch || 'ac' in patch || 'ff' in patch
+    const run = () => {
+      if (animate && visual && cfgRef.current.motion !== 0 && document.startViewTransition) {
+        document.startViewTransition(() => { flushSync(apply) })
+      } else apply()
+    }
+    if ('ff' in patch) loadFont(patch.ff).then(run); else run()
+  }, [])
+  const reset = useCallback(() => {
+    const go = () => setCfg((c) => ({ ...DEFAULTS, lang: c.lang }))
+    if (cfgRef.current.motion !== 0 && document.startViewTransition) document.startViewTransition(() => { flushSync(go) }); else go()
+  }, [])
   const t = useMemo(() => makeT(cfg.lang), [cfg.lang])
   const value = useMemo(() => ({ cfg, update, reset, t, dark, lang: cfg.lang }), [cfg, update, reset, t, dark])
   return <SettingsCtx.Provider value={value}>{children}</SettingsCtx.Provider>

@@ -2,7 +2,7 @@
   "name": "BA List",
   "short_name": "BA List",
   "description": "Danh sách và tra cứu học sinh Blue Archive",
-  "start_url": "./",
+  "start_url": "./app/",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
@@ -25,6 +25,19 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "id": "./app/",
+  "shortcuts": [
+    {
+      "name": "Mở BA List",
+      "url": "./app/",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

@@ -111,7 +111,7 @@ export default function App() {
       <header className="sticky top-0 z-20 border-b-[3px] border-primary bg-surface-low">
         <div className="mx-auto flex h-[68px] max-w-[1600px] items-center gap-3 px-4 lg:px-6">
           <a href="./" className="flex shrink-0 items-center gap-2.5" aria-label="BA List">
-            <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width="40" height="40" className="size-10" />
+            <img src="../favicon.svg" alt="" width="40" height="40" className="size-10" />
             <h1 className="hidden text-[1.45rem] font-black italic tracking-tight sm:block">BA <span className="text-primary">List</span></h1>
           </a>
           <label className="slant group mx-auto flex h-11 min-w-0 max-w-2xl flex-1 items-center gap-3 bg-surface-high px-8 transition-shadow duration-200 [--s:14px] focus-within:shadow-[inset_0_-4px_0_var(--ba-primary)]">

@@ -8,6 +8,8 @@ import Textarea from './ui/Textarea';
 import ChoiceSelect from './ui/ChoiceSelect';
 import SegmentedButton from './ui/SegmentedButton';
 import Emoji from './ui/Emoji';
+import Icon from './ui/Icon';
+import ImageUpload from './ui/ImageUpload';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useT, useI18n } from '../i18n';
@@ -15,15 +17,16 @@ import { useRecentEntries } from '../hooks/useRecentEntries';
 import { validateTransaction, trimValue } from '../utils/validators';
 import { toInputDateTimeLocal, formatNumber } from '../utils/format';
 import { getCategoryEmoji } from '../utils/categoryEmoji';
+import { isCafeCategory } from '../utils/cafe';
 
 function emptyForm() {
-  return { type: 'expense', amount: '', categoryId: '', walletId: '', datetime: toInputDateTimeLocal(new Date()), note: '' };
+  return { type: 'expense', amount: '', categoryId: '', walletId: '', datetime: toInputDateTimeLocal(new Date()), note: '', shopId: '', drinkId: '', imageUrl: '' };
 }
 
-export default function TransactionFormModal({ open, onClose, editingTx, initialType = 'expense' }) {
+export default function TransactionFormModal({ open, onClose, editingTx, initialType = 'expense', initialCategoryId = '' }) {
   const t = useT();
   const { locale } = useI18n();
-  const { categories, wallets, getCategory, addTransaction, updateTransaction } = useData();
+  const { categories, wallets, getCategory, addTransaction, updateTransaction, cafeShops, cafeDrinks, cafeLogById } = useData();
   const { user } = useAuth();
   const { forType, remember } = useRecentEntries(user?.uid);
   const [form, setForm] = useState(emptyForm);
@@ -40,9 +43,12 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
         walletId: editingTx.walletId,
         datetime: toInputDateTimeLocal(editingTx.date),
         note: editingTx.note || '',
+        shopId: cafeLogById.get(editingTx.id)?.shopId || '',
+        drinkId: cafeLogById.get(editingTx.id)?.drinkId || '',
+        imageUrl: cafeLogById.get(editingTx.id)?.imageUrl || '',
       });
     } else {
-      setForm({ ...emptyForm(), type: initialType, walletId: wallets[0]?.id || '' });
+      setForm({ ...emptyForm(), type: initialType, walletId: wallets[0]?.id || '', categoryId: initialCategoryId });
     }
     setErrors({});
     // Only re-initialise when the dialog opens / the edited item changes.
@@ -63,13 +69,32 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
     [wallets, locale],
   );
 
+  // Cafe mini-module: picking the cafe category reveals photo / shop / drink fields.
+  const showCafe = form.type === 'expense' && isCafeCategory(getCategory(form.categoryId));
+
+  // Optional dropdowns: once a value is picked, a "none" entry lets the user clear it again.
+  const withNone = (list, value) => (value ? [{ id: '', name: t('cafe.none'), icon: 'remove', color: '#64748B' }, ...list] : list);
+  const shopOptions = useMemo(
+    () => cafeShops.map((s) => ({ id: s.id, name: s.name, icon: 'storefront', color: '#B45309' })).sort((a, b) => a.name.localeCompare(b.name, locale)),
+    [cafeShops, locale],
+  );
+  const drinkOptions = useMemo(
+    () => cafeDrinks.map((d) => ({ id: d.id, name: d.name, icon: 'local_cafe', color: '#92400E' })).sort((a, b) => a.name.localeCompare(b.name, locale)),
+    [cafeDrinks, locale],
+  );
+
   function setType(type) {
     setForm((f) => ({ ...f, type, categoryId: '' }));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const payload = { ...form, note: trimValue(form.note), date: new Date(form.datetime) };
+    const payload = {
+      ...form,
+      note: trimValue(form.note),
+      date: new Date(form.datetime),
+      cafe: showCafe ? { shopId: form.shopId, drinkId: form.drinkId, imageUrl: form.imageUrl } : null,
+    };
     const { valid, errors: errs } = validateTransaction(payload, t);
     setErrors(errs);
     if (!valid) return;
@@ -172,6 +197,30 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
             emptyLabel={t('tx.noWallet')}
           />
         </div>
+
+        {showCafe && (
+          <div className="flex flex-col gap-4 rounded-2xl border border-outline-variant bg-surface-container-low p-4">
+            <p className="flex items-center gap-2 text-label-lg text-on-surface-variant">
+              <Icon name="local_cafe" size={18} />
+              {t('cafe.formSection')}
+            </p>
+            <ChoiceSelect
+              label={t('cafe.shop')}
+              options={withNone(shopOptions, form.shopId)}
+              value={form.shopId}
+              onChange={(v) => setForm((f) => ({ ...f, shopId: v }))}
+              emptyLabel={t('cafe.noShops')}
+            />
+            <ChoiceSelect
+              label={t('cafe.drink')}
+              options={withNone(drinkOptions, form.drinkId)}
+              value={form.drinkId}
+              onChange={(v) => setForm((f) => ({ ...f, drinkId: v }))}
+              emptyLabel={t('cafe.noDrinks')}
+            />
+            <ImageUpload label={t('cafe.photo')} value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} />
+          </div>
+        )}
 
         <TextInput
           type="datetime-local"

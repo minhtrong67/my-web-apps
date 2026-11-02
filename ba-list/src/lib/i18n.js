@@ -37,6 +37,7 @@ const vi = {
 }
 vi['set.import'] = 'Nhập yêu thích'
 vi['set.anim'] = 'Hoạt ảnh'
+vi.loading = 'Đang tải dữ liệu học sinh…'
 vi['set.exportFavs'] = 'Xuất yêu thích ({n})'
 
 const en = {
@@ -66,7 +67,7 @@ const en = {
   'set.color': 'Accent color', 'set.customColor': 'Pick a custom color', 'set.lang': 'Language',
   'set.font': 'Typeface', 'font.sans': 'Default', 'font.round': 'Rounded', 'font.serif': 'Serif', 'font.mono': 'Monospace',
   'set.size': 'Text size', 'set.motion': 'Motion effects', 'set.motionHint': 'Turn off to reduce animations when scrolling and opening sheets',
-  'set.data': 'Data', 'set.exportAll': 'Export all ({n})', 'set.exportCur': 'Current filter ({n})', 'set.import': 'Import favorites', 'set.anim': 'Animation', 'set.exportFavs': 'Export favorites ({n})', 'set.favs': '{n} favorite students',
+  'set.data': 'Data', 'set.exportAll': 'Export all ({n})', 'set.exportCur': 'Current filter ({n})', 'set.import': 'Import favorites', 'set.anim': 'Animation', loading: 'Loading student data…', 'set.exportFavs': 'Export favorites ({n})', 'set.favs': '{n} favorite students',
   'set.install': 'Install app', 'set.reset': 'Reset to defaults', 'set.done': 'Done',
   'set.about': 'Author', 'set.aboutBy': 'Developed by {author}', 'set.aboutAi': 'with AI assistance from {ai}',
   'toast.exported': 'Data exported', 'toast.imported': 'Favorites imported', 'toast.importSub': 'Added {n} students to your favorites',

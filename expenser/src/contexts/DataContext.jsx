@@ -48,6 +48,15 @@ function settle(promise) {
   return promise;
 }
 
+function cafeLogData(c) {
+  return {
+    shopId: c.shopId || '',
+    drinkId: c.drinkId || '',
+    imageUrl: (c.imageUrl || '').trim(),
+    updatedAt: serverTimestamp(),
+  };
+}
+
 export function DataProvider({ children }) {
   const { user } = useAuth();
   const t = useT();
@@ -56,6 +65,11 @@ export function DataProvider({ children }) {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [wallets, setWallets] = useState([]);
+  // Cafe mini-module: shops, drinks and the per-transaction cafe details (doc id = transaction id).
+  const [cafeShops, setCafeShops] = useState([]);
+  const [cafeDrinks, setCafeDrinks] = useState([]);
+  const [cafeLogs, setCafeLogs] = useState([]);
+  const [cafeReady, setCafeReady] = useState({ shops: false, drinks: false, logs: false });
   const [ready, setReady] = useState({ tx: false, cat: false, wal: false });
   const tRef = useRef(t);
   useEffect(() => {
@@ -139,7 +153,28 @@ export function DataProvider({ children }) {
     };
   }, [uid]);
 
+  // Cafe collections are listened to separately so they never delay the main app's loading state.
+  useEffect(() => {
+    if (!uid) return undefined;
+    const mark = (k) => setCafeReady((r) => (r[k] ? r : { ...r, [k]: true }));
+    const listen = (name, setter, key) =>
+      onSnapshot(
+        col(uid, name),
+        (snap) => {
+          setter(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+          mark(key);
+        },
+        () => mark(key),
+      );
+    const unsubs = [listen('cafeShops', setCafeShops, 'shops'), listen('cafeDrinks', setCafeDrinks, 'drinks'), listen('cafeLogs', setCafeLogs, 'logs')];
+    return () => {
+      unsubs.forEach((u) => u());
+      setCafeReady({ shops: false, drinks: false, logs: false });
+    };
+  }, [uid]);
+
   const loading = !!uid && !(ready.tx && ready.cat && ready.wal);
+  const cafeLoading = !!uid && !(cafeReady.shops && cafeReady.drinks && cafeReady.logs);
 
   // ---------- Transactions ----------
   // Each write combines the transaction + wallet balance update into a single
@@ -158,6 +193,7 @@ export function DataProvider({ children }) {
         note: (payload.note || '').trim(),
         createdAt: serverTimestamp(),
       });
+      if (payload.cafe) batch.set(doc(col(uid, 'cafeLogs'), ref.id), cafeLogData(payload.cafe));
       const sign = payload.type === 'income' ? 1 : -1;
       batch.update(doc(db, 'users', uid, 'wallets', payload.walletId), {
         balance: increment(sign * Number(payload.amount)),
@@ -180,6 +216,10 @@ export function DataProvider({ children }) {
         date: Timestamp.fromDate(new Date(payload.date)),
         note: (payload.note || '').trim(),
       });
+      // Cafe details live in their own document; keep it in step with the transaction.
+      const logRef = doc(db, 'users', uid, 'cafeLogs', id);
+      if (payload.cafe) batch.set(logRef, cafeLogData(payload.cafe));
+      else batch.delete(logRef);
       // Net the balance change per wallet so a same-wallet edit is one increment.
       const deltas = {};
       if (previous) {
@@ -201,6 +241,7 @@ export function DataProvider({ children }) {
       if (!uid) return;
       const batch = writeBatch(db);
       batch.delete(doc(db, 'users', uid, 'transactions', tx.id));
+      batch.delete(doc(db, 'users', uid, 'cafeLogs', tx.id));
       batch.update(doc(db, 'users', uid, 'wallets', tx.walletId), {
         balance: increment((tx.type === 'income' ? -1 : 1) * Number(tx.amount)),
       });
@@ -385,6 +426,89 @@ export function DataProvider({ children }) {
     [uid],
   );
 
+  // ---------- Cafe: shops & drinks ----------
+  const addCafeShop = useCallback(
+    async (p) => {
+      if (!uid) return;
+      const ref = doc(col(uid, 'cafeShops'));
+      await settle(
+        setDoc(ref, {
+          name: p.name.trim(),
+          address: (p.address || '').trim(),
+          imageUrl: (p.imageUrl || '').trim(),
+          description: (p.description || '').trim(),
+          rating: Number(p.rating) || 0,
+          createdAt: serverTimestamp(),
+        }),
+      );
+      return ref.id;
+    },
+    [uid],
+  );
+
+  const updateCafeShop = useCallback(
+    async (id, p) => {
+      if (!uid) return;
+      await settle(
+        updateDoc(doc(db, 'users', uid, 'cafeShops', id), {
+          name: p.name.trim(),
+          address: (p.address || '').trim(),
+          imageUrl: (p.imageUrl || '').trim(),
+          description: (p.description || '').trim(),
+          rating: Number(p.rating) || 0,
+        }),
+      );
+    },
+    [uid],
+  );
+
+  const deleteCafeShop = useCallback(
+    async (id) => {
+      if (!uid) return;
+      await settle(deleteDoc(doc(db, 'users', uid, 'cafeShops', id)));
+    },
+    [uid],
+  );
+
+  const addCafeDrink = useCallback(
+    async (p) => {
+      if (!uid) return;
+      const ref = doc(col(uid, 'cafeDrinks'));
+      await settle(
+        setDoc(ref, {
+          name: p.name.trim(),
+          imageUrl: (p.imageUrl || '').trim(),
+          description: (p.description || '').trim(),
+          createdAt: serverTimestamp(),
+        }),
+      );
+      return ref.id;
+    },
+    [uid],
+  );
+
+  const updateCafeDrink = useCallback(
+    async (id, p) => {
+      if (!uid) return;
+      await settle(
+        updateDoc(doc(db, 'users', uid, 'cafeDrinks', id), {
+          name: p.name.trim(),
+          imageUrl: (p.imageUrl || '').trim(),
+          description: (p.description || '').trim(),
+        }),
+      );
+    },
+    [uid],
+  );
+
+  const deleteCafeDrink = useCallback(
+    async (id) => {
+      if (!uid) return;
+      await settle(deleteDoc(doc(db, 'users', uid, 'cafeDrinks', id)));
+    },
+    [uid],
+  );
+
   // ---------- Derived selectors ----------
   const currentMonthKey = monthKey(new Date());
 
@@ -427,12 +551,29 @@ export function DataProvider({ children }) {
   const getCategory = useCallback((id) => categoryById.get(id), [categoryById]);
   const getWallet = useCallback((id) => walletById.get(id), [walletById]);
 
+  const cafeLogById = useMemo(() => new Map(cafeLogs.map((l) => [l.id, l])), [cafeLogs]);
+  const cafeShopById = useMemo(() => new Map(cafeShops.map((x) => [x.id, x])), [cafeShops]);
+  const cafeDrinkById = useMemo(() => new Map(cafeDrinks.map((x) => [x.id, x])), [cafeDrinks]);
+
   const value = useMemo(
     () => ({
       transactions,
       categories,
       wallets,
       loading,
+      cafeShops,
+      cafeDrinks,
+      cafeLogs,
+      cafeLoading,
+      cafeLogById,
+      cafeShopById,
+      cafeDrinkById,
+      addCafeShop,
+      updateCafeShop,
+      deleteCafeShop,
+      addCafeDrink,
+      updateCafeDrink,
+      deleteCafeDrink,
       stats,
       getCategory,
       getWallet,
@@ -451,6 +592,8 @@ export function DataProvider({ children }) {
     }),
     [
       transactions, categories, wallets, loading, stats, getCategory, getWallet,
+      cafeShops, cafeDrinks, cafeLogs, cafeLoading, cafeLogById, cafeShopById, cafeDrinkById,
+      addCafeShop, updateCafeShop, deleteCafeShop, addCafeDrink, updateCafeDrink, deleteCafeDrink,
       addTransaction, updateTransaction, deleteTransaction, importTransactions, importCategories,
       addCategory, updateCategory, deleteCategory, addWallet, updateWallet, deleteWallet, transferBetweenWallets,
     ],

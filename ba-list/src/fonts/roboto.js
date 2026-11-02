@@ -1,0 +1,10 @@
+// Roboto tĩnh: 400 / 500 / 700 × (latin, latin-ext, vietnamese)
+import '@fontsource/roboto/latin-400.css'
+import '@fontsource/roboto/latin-500.css'
+import '@fontsource/roboto/latin-700.css'
+import '@fontsource/roboto/latin-ext-400.css'
+import '@fontsource/roboto/latin-ext-500.css'
+import '@fontsource/roboto/latin-ext-700.css'
+import '@fontsource/roboto/vietnamese-400.css'
+import '@fontsource/roboto/vietnamese-500.css'
+import '@fontsource/roboto/vietnamese-700.css'

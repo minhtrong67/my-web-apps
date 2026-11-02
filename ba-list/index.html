@@ -1,56 +1,353 @@
 <!doctype html>
-<html lang="vi" data-theme="light">
+<html lang="vi" data-theme="light" prefix="og: https://ogp.me/ns#">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" id="tc" content="#eaf3ff">
-<script>/* Áp theme TRƯỚC khi React chạy để không bị nháy sáng/tối khi reload */
-(function(){try{var c=JSON.parse(localStorage.getItem('ba-cfg')||'{}'),r=document.documentElement,
-d=c.theme==='dark'||((c.theme||'system')==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);
-r.dataset.theme=d?'dark':'light';r.dataset.ff=c.ff||'sans';if(c.motion===0)r.dataset.motion='off';
-r.style.background=d?'#0a111f':'#eaf3ff';document.getElementById('tc').content=d?'#0a111f':'#eaf3ff'}catch(e){}})();</script>
-<title>BA List – Danh sách học sinh Blue Archive, tìm kiếm &amp; lọc nhanh</title>
-<meta name="description" content="Tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, lọc theo trường, vai trò, vũ khí, địa hình, sắp xếp và xem chi tiết. Hoạt động offline, không cần đăng nhập.">
-<meta name="keywords" content="Blue Archive, ブルーアーカイブ, danh sách học sinh, nhân vật, student list, wiki, SRT, Abydos, Gehenna, Trinity">
-<meta name="author" content="minhtrong67">
+<title>BA List – Tra cứu học sinh Blue Archive nhanh, đẹp, offline</title>
+<meta name="description" content="BA List là web tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, lọc theo trường, vai trò, vũ khí, địa hình, xem chi tiết và lưu yêu thích. Miễn phí, chạy offline.">
+<meta name="keywords" content="Blue Archive, ブルーアーカイブ, BA List, danh sách học sinh Blue Archive, tra cứu nhân vật Blue Archive, student list, Abydos, Gehenna, Trinity, Millennium, SRT, wiki Blue Archive">
 <meta name="application-name" content="BA List">
-<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="googlebot" content="index,follow">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="format-detection" content="telephone=no">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" id="tc" content="#eaf3ff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" id="tc-dark" content="#0a111f" media="(prefers-color-scheme: dark)">
 <link rel="canonical" href="https://minhtrong67.github.io/blue-archive-list/">
 <link rel="alternate" hreflang="vi" href="https://minhtrong67.github.io/blue-archive-list/">
 <link rel="alternate" hreflang="x-default" href="https://minhtrong67.github.io/blue-archive-list/">
-<!-- Open Graph (Facebook, Zalo, Messenger, Discord, Telegram, LinkedIn…) -->
+<!-- Open Graph: Facebook, Zalo, Messenger, Discord, Telegram, LinkedIn… -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://minhtrong67.github.io/blue-archive-list/">
 <meta property="og:site_name" content="BA List">
-<meta property="og:title" content="BA List – Danh sách học sinh Blue Archive">
-<meta property="og:description" content="Tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, bộ lọc, xem chi tiết. Nhanh, đẹp, chạy offline, không cần đăng nhập.">
+<meta property="og:title" content="BA List – Tra cứu học sinh Blue Archive">
+<meta property="og:description" content="Tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, bộ lọc đa tiêu chí, hồ sơ chi tiết, lưu yêu thích. Miễn phí, chạy offline, không cần đăng nhập.">
 <meta property="og:image" content="https://minhtrong67.github.io/blue-archive-list/og-image.png">
 <meta property="og:image:secure_url" content="https://minhtrong67.github.io/blue-archive-list/og-image.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="BA List – logo halo trên nền xanh dương">
+<meta property="og:image:alt" content="BA List – logo halo trên nền xanh dương, danh sách học sinh Blue Archive">
 <meta property="og:locale" content="vi_VN">
+<meta property="og:locale:alternate" content="en_US">
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="BA List – Danh sách học sinh Blue Archive">
-<meta name="twitter:description" content="Tìm kiếm, lọc và xem chi tiết toàn bộ học sinh Blue Archive. Nhanh, đẹp, chạy offline.">
+<meta name="twitter:title" content="BA List – Tra cứu học sinh Blue Archive">
+<meta name="twitter:description" content="Tìm kiếm, lọc và xem chi tiết 278 học sinh Blue Archive. Nhanh, đẹp, chạy offline, không cần đăng nhập.">
 <meta name="twitter:image" content="https://minhtrong67.github.io/blue-archive-list/og-image.png">
-<meta name="twitter:image:alt" content="BA List – logo halo trên nền xanh dương">
+<meta name="twitter:image:alt" content="BA List – logo halo trên nền xanh dương, danh sách học sinh Blue Archive">
+<!-- PWA / iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="BA List">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="preconnect" href="https://static.wikitide.net" crossorigin>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"BA List","url":"https://minhtrong67.github.io/blue-archive-list/","image":"https://minhtrong67.github.io/blue-archive-list/og-image.png","description":"Danh sách và tra cứu học sinh Blue Archive: tìm kiếm thông minh, bộ lọc, xem chi tiết, hoạt động offline.","applicationCategory":"GameApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","inLanguage":"vi","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","author":{"@type":"Person","name":"minhtrong67","url":"https://github.com/minhtrong67"}}</script>
+<link rel="sitemap" type="application/xml" href="sitemap.xml">
+<link rel="preload" as="image" href="landing/shot-desktop.webp" type="image/webp" fetchpriority="high">
+<script>/* Áp theme + màu chủ đạo TRƯỚC khi vẽ trang để không bị nháy sáng/tối */
+(function(){try{var c=JSON.parse(localStorage.getItem('ba-cfg')||'{}'),r=document.documentElement,
+d=c.theme==='dark'||((c.theme||'system')==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);
+r.classList.add('js');r.dataset.theme=d?'dark':'light';if(c.ac)r.style.setProperty('--ac',c.ac);
+r.style.background=d?'#0a111f':'#eaf3ff'}catch(e){}})();</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"BA List","alternateName":"Blue Archive List","url":"https://minhtrong67.github.io/blue-archive-list/","inLanguage":["vi","en"],"description":"BA List là web tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, lọc theo trường, vai trò, vũ khí, địa hình, xem chi tiết và lưu yêu thích. Miễn phí, chạy offline."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"BA List","url":"https://minhtrong67.github.io/blue-archive-list/app/","image":"https://minhtrong67.github.io/blue-archive-list/og-image.png","description":"BA List là web tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, lọc theo trường, vai trò, vũ khí, địa hình, xem chi tiết và lưu yêu thích. Miễn phí, chạy offline.","applicationCategory":"ReferenceApplication","operatingSystem":"Any (Web, PWA)","browserRequirements":"Requires JavaScript","inLanguage":["vi","en"],"offers":{"@type":"Offer","price":"0","priceCurrency":"VND"},"isAccessibleForFree":true,"featureList":["Smart search","Multi-criteria filters","Student detail","Favorites","Offline PWA","Dark mode","Vietnamese and English"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"BA List có miễn phí và cần đăng nhập không?","acceptedAnswer":{"@type":"Answer","text":"Hoàn toàn miễn phí, không quảng cáo và không cần tạo tài khoản. Bạn chỉ cần mở web và dùng ngay."}},{"@type":"Question","name":"Dữ liệu học sinh lấy từ đâu và có đầy đủ không?","acceptedAnswer":{"@type":"Answer","text":"Dữ liệu 278 học sinh (kèm các phiên bản trang phục) được tổng hợp từ bluearchive.wiki: trường, vai trò, vị trí, loại tấn công/giáp, vũ khí, địa hình, ngày ra mắt JP/Global, seiyuu và họa sĩ."}},{"@type":"Question","name":"Tôi có dùng được khi không có mạng không?","acceptedAnswer":{"@type":"Answer","text":"Có. BA List là một PWA: sau lần mở đầu tiên, mã nguồn, dữ liệu và những ảnh bạn đã xem được lưu lại để dùng offline."}},{"@type":"Question","name":"Làm sao để cài BA List như một ứng dụng?","acceptedAnswer":{"@type":"Answer","text":"Trên Chrome/Edge, bấm biểu tượng cài đặt ở thanh địa chỉ hoặc vào Cài đặt → Cài đặt ứng dụng. Trên iPhone, mở bằng Safari rồi chọn Chia sẻ → Thêm vào Màn hình chính."}},{"@type":"Question","name":"Danh sách yêu thích của tôi được lưu ở đâu?","acceptedAnswer":{"@type":"Answer","text":"Chỉ lưu trên trình duyệt của bạn (localStorage), không gửi lên máy chủ nào. Bạn có thể xuất/nhập file JSON trong Cài đặt để chuyển sang thiết bị khác."}},{"@type":"Question","name":"BA List có phải sản phẩm chính thức của NEXON hay Yostar không?","acceptedAnswer":{"@type":"Answer","text":"Không. Đây là dự án phi thương mại của người hâm mộ. Blue Archive và hình ảnh nhân vật thuộc về chủ sở hữu tương ứng."}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"BA List","item":"https://minhtrong67.github.io/blue-archive-list/"},{"@type":"ListItem","position":2,"name":"Ứng dụng","item":"https://minhtrong67.github.io/blue-archive-list/app/"}]}</script>
 </head>
-<body>
-<div id="root"></div>
-<noscript><p style="padding:20px">Trang cần bật JavaScript để hiển thị danh sách học sinh Blue Archive.</p></noscript>
-<script type="module" src="/src/main.jsx"></script>
+<body class="antialiased">
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" /></symbol><symbol id="i-sliders-horizontal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5H3" />
+  <path d="M12 19H3" />
+  <path d="M14 3v4" />
+  <path d="M16 17v4" />
+  <path d="M21 12h-9" />
+  <path d="M21 19h-5" />
+  <path d="M21 5h-7" />
+  <path d="M8 10v4" />
+  <path d="M8 12H3" /></symbol><symbol id="i-user-round" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5" />
+  <path d="M20 21a8 8 0 0 0-16 0" /></symbol><symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" /></symbol><symbol id="i-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z" />
+  <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+  <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+  <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+  <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" /></symbol><symbol id="i-wifi-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01" />
+  <path d="M8.5 16.429a5 5 0 0 1 7 0" />
+  <path d="M5 12.859a10 10 0 0 1 5.17-2.69" />
+  <path d="M19 12.859a10 10 0 0 0-2.007-1.523" />
+  <path d="M2 8.82a15 15 0 0 1 4.177-2.643" />
+  <path d="M22 8.82a15 15 0 0 0-11.288-3.764" />
+  <path d="m2 2 20 20" /></symbol><symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" /></symbol><symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7" />
+  <path d="M12 19V5" /></symbol><symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" /></symbol><symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" />
+  <path d="m6 6 12 12" /></symbol><symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" /></symbol><symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" /></symbol><symbol id="i-languages" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" /></symbol><symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></symbol><symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" />
+  <path d="M20 2v4" />
+  <path d="M22 4h-4" />
+  <circle cx="4" cy="20" r="2" /></symbol><symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3" />
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+  <path d="m7 10 5 5 5-5" /></symbol><symbol id="i-layout-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="14" rx="1" />
+  <rect width="7" height="7" x="3" y="14" rx="1" /></symbol><symbol id="i-shield-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" /></symbol><symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" /></symbol><symbol id="i-code-xml" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4" />
+  <path d="m6 8-4 4 4 4" />
+  <path d="m14.5 4-5 16" /></symbol><symbol id="i-external-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6" />
+  <path d="M10 14 21 3" />
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></symbol><symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></symbol><symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" /></symbol><symbol id="i-smartphone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+  <path d="M12 18h.01" /></symbol><symbol id="i-swords" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 19 6-6" />
+  <path d="M14.5 17.5 3.586 6.586A2 2 0 013 5.172V3h2.172a2 2 0 011.414.586L17.5 14.5" />
+  <path d="m14.828 6.172 2.586-2.586A2 2 0 0118.828 3H21v2.172a2 2 0 01-.586 1.414l-2.586 2.586" />
+  <path d="m16 16 4 4" />
+  <path d="m19 21 2-2" />
+  <path d="m5 14 4 4" />
+  <path d="m5 21-2-2" />
+  <path d="M7.5 16.5 4 20" /></symbol><symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" /></symbol><symbol id="i-scan-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2" />
+  <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+  <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+  <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+  <circle cx="12" cy="12" r="3" />
+  <path d="m16 16-1.9-1.9" /></symbol><symbol id="i-mouse-pointer-click" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4.1 12 6" />
+  <path d="m5.1 8-2.9-.8" />
+  <path d="m6 12-1.9 2" />
+  <path d="M7.2 2.2 8 5.1" />
+  <path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z" /></symbol><symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" /></symbol></defs></svg>
+<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:bg-hl focus:px-4 focus:py-2 focus:font-bold focus:text-on-hl" data-i18n="skip">Bỏ qua điều hướng</a>
+
+<!-- ───────── Header ───────── -->
+<header id="top" class="sticky top-0 z-40 border-b-[3px] border-primary bg-surface-low/95 backdrop-blur">
+  <div class="mx-auto flex h-[68px] max-w-6xl items-center gap-3 px-4">
+    <a href="#home" data-nav class="flex shrink-0 items-center gap-2.5" aria-label="BA List">
+      <img src="favicon.svg" alt="" width="40" height="40" class="size-10">
+      <span class="text-[1.45rem] font-black italic tracking-tight">BA <span class="text-primary">List</span></span>
+    </a>
+    <nav class="ml-6 hidden items-center gap-1 md:flex" aria-label="Điều hướng chính">
+      <a data-nav href="#features" class="nav-link slant px-6 py-2 text-sm font-bold italic" data-i18n="nav.features">Tính năng</a>
+      <a data-nav href="#search" class="nav-link slant px-6 py-2 text-sm font-bold italic" data-i18n="nav.search">Tìm kiếm</a>
+      <a data-nav href="#showcase" class="nav-link slant px-6 py-2 text-sm font-bold italic" data-i18n="nav.showcase">Giao diện</a>
+      <a data-nav href="#faq" class="nav-link slant px-6 py-2 text-sm font-bold italic" data-i18n="nav.faq">Hỏi đáp</a>
+    </nav>
+    <div class="ml-auto flex items-center gap-1.5">
+      <button id="lang" type="button" class="slant slant-sm inline-flex h-10 items-center gap-1.5 bg-surface-high px-5 text-sm font-bold italic transition-colors hover:bg-primary hover:text-on-primary" aria-label="Language"><svg class="size-4 shrink-0" aria-hidden="true"><use href="#i-languages"/></svg><span id="lang-label">VI</span></button>
+      <button id="theme" type="button" class="slant slant-sm grid size-10 place-items-center bg-surface-high transition-colors hover:bg-primary hover:text-on-primary" aria-label="Theme" title="Theme"><svg class="size-5 dark:hidden" aria-hidden="true"><use href="#i-sun"/></svg><svg class="hidden size-5 dark:block" aria-hidden="true"><use href="#i-moon"/></svg></button>
+      <a href="app/" class="slant hidden h-10 items-center gap-2 bg-hl px-7 text-sm font-extrabold italic text-on-hl transition-all duration-200 ease-out-back hover:brightness-105 active:scale-95 sm:inline-flex"><span data-i18n="cta.open">Mở ứng dụng</span><svg class="size-4 shrink-0" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+      <button id="menu" type="button" class="slant slant-sm grid size-10 place-items-center bg-primary text-on-primary md:hidden" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu"><svg class="size-5" aria-hidden="true"><use id="menu-ic" href="#i-menu"/></svg></button>
+    </div>
+  </div>
+  <div id="mobile-nav" class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-smooth md:hidden" inert>
+    <div class="min-h-0 overflow-hidden"><nav class="mx-auto flex max-w-6xl flex-col gap-1 px-4 pb-4 pt-1" aria-label="Menu">
+      <a data-nav href="#features" class="nav-link slant px-7 py-3 text-base font-bold italic" data-i18n="nav.features">Tính năng</a>
+      <a data-nav href="#search" class="nav-link slant px-7 py-3 text-base font-bold italic" data-i18n="nav.search">Tìm kiếm</a>
+      <a data-nav href="#showcase" class="nav-link slant px-7 py-3 text-base font-bold italic" data-i18n="nav.showcase">Giao diện</a>
+      <a data-nav href="#faq" class="nav-link slant px-7 py-3 text-base font-bold italic" data-i18n="nav.faq">Hỏi đáp</a>
+      <a href="app/" class="slant mt-1 inline-flex h-12 items-center justify-center gap-2 bg-hl text-base font-extrabold italic text-on-hl"><span data-i18n="cta.open">Mở ứng dụng</span><svg class="size-4 shrink-0" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+    </nav></div>
+  </div>
+  <i id="progress" class="absolute -bottom-[3px] left-0 h-[3px] w-full origin-left scale-x-0 bg-hl"></i>
+</header>
+
+<main id="main">
+<!-- ───────── Hero ───────── -->
+<section id="home" class="relative overflow-hidden">
+  <div class="halo pointer-events-none absolute inset-x-0 top-0 h-[520px]"></div>
+  <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-12 md:pb-24 md:pt-20 lg:grid-cols-[1.05fr_1fr]">
+    <div>
+      <span class="slant reveal inline-flex items-center gap-2 bg-primary-container py-1 pl-5 pr-8 text-xs font-extrabold uppercase italic tracking-widest text-on-primary-container [--s:9px]"><svg class="size-3.5 shrink-0" aria-hidden="true"><use href="#i-sparkles"/></svg><span data-i18n="hero.badge">Fan-made · 278 học sinh</span></span>
+      <h1 class="reveal mt-5 text-[2.4rem] font-black italic leading-[1.06] tracking-tight sm:text-5xl lg:text-[3.4rem]" style="--d:60ms" data-i18n-html="hero.title">Tra cứu học sinh <span class="relative whitespace-nowrap text-primary">Blue Archive<i class="slant absolute -bottom-1 left-0 -z-10 h-3 w-full bg-hl/80 [--s:8px]"></i></span> nhanh, gọn, đẹp</h1>
+      <p class="reveal mt-6 max-w-xl text-lg leading-relaxed text-on-surface-variant" style="--d:120ms" data-i18n="hero.sub">BA List gom toàn bộ học sinh vào một nơi: tìm kiếm thông minh, bộ lọc đa tiêu chí, hồ sơ chi tiết và lưu yêu thích. Miễn phí, không cần đăng nhập, dùng được cả khi offline.</p>
+      <div class="reveal mt-8 flex flex-wrap items-center gap-3" style="--d:180ms">
+        <a href="app/" class="slant inline-flex h-14 items-center gap-3 bg-hl px-10 text-base font-extrabold italic text-on-hl shadow-lg transition-all duration-200 ease-out-back hover:brightness-105 active:scale-95 [--s:14px]"><span data-i18n="cta.open">Mở ứng dụng</span><svg class="size-5 shrink-0" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+        <a data-nav href="#features" class="slant inline-flex h-14 items-center gap-2 bg-primary px-9 text-base font-bold italic text-on-primary transition-all duration-200 ease-out-back hover:brightness-110 active:scale-95 [--s:14px]"><span data-i18n="cta.explore">Khám phá tính năng</span><svg class="size-5 shrink-0" aria-hidden="true"><use href="#i-mouse-pointer-click"/></svg></a>
+      </div>
+      <ul class="reveal mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-on-surface-variant" style="--d:240ms">
+        <li class="flex items-center gap-1.5"><svg class="size-4 text-primary shrink-0" aria-hidden="true"><use href="#i-shield-check"/></svg><span data-i18n="trust.1">Không quảng cáo · không theo dõi</span></li>
+        <li class="flex items-center gap-1.5"><svg class="size-4 text-primary shrink-0" aria-hidden="true"><use href="#i-zap"/></svg><span data-i18n="trust.2">Nhanh, chạy ngay trên trình duyệt</span></li>
+        <li class="flex items-center gap-1.5"><svg class="size-4 text-primary shrink-0" aria-hidden="true"><use href="#i-wifi-off"/></svg><span data-i18n="trust.3">Dùng được offline</span></li>
+      </ul>
+    </div>
+    <div class="reveal relative mx-auto w-full max-w-xl lg:max-w-none" style="--d:140ms">
+      <div class="relative overflow-hidden rounded-md border border-outline-variant bg-surface-low shadow-[0_30px_60px_-24px_rgb(0_0_0/0.5)]">
+        <div class="flex items-center gap-1.5 bg-surface-high px-3 py-2"><i class="size-2.5 rounded-full bg-[#ff5f57]"></i><i class="size-2.5 rounded-full bg-[#febc2e]"></i><i class="size-2.5 rounded-full bg-[#28c840]"></i><span class="slant ml-3 hidden h-5 flex-1 bg-surface-highest sm:block [--s:6px]"></span></div>
+        <img src="landing/shot-desktop.webp" width="1366" height="860" alt="Giao diện BA List trên máy tính: lưới học sinh, bộ lọc bên trái" class="block h-auto w-full" fetchpriority="high" decoding="async">
+      </div>
+      <div class="absolute -bottom-8 -right-1 w-[30%] min-w-[110px] overflow-hidden rounded-[18px] border-[5px] border-navy bg-navy shadow-[0_24px_40px_-14px_rgb(0_0_0/0.6)] sm:-right-4">
+        <img src="landing/shot-mobile.webp" width="390" height="844" alt="Giao diện BA List trên điện thoại" class="block h-auto w-full" loading="eager" decoding="async">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── Stats ───────── -->
+<section aria-label="Số liệu" class="border-y-[3px] border-primary bg-surface-low">
+  <div class="stripes mx-auto grid max-w-6xl grid-cols-2 divide-x divide-dashed divide-outline-variant md:grid-cols-4"><div class="reveal px-4 py-5 text-center" style="--d:0ms"><b class="block text-4xl font-black italic text-primary md:text-5xl"><span data-count="278">278</span></b><span class="mt-1 block text-sm font-semibold uppercase tracking-wider text-on-surface-variant" data-i18n="stat.0">Học sinh</span></div><div class="reveal px-4 py-5 text-center" style="--d:60ms"><b class="block text-4xl font-black italic text-primary md:text-5xl"><span data-count="15">15</span></b><span class="mt-1 block text-sm font-semibold uppercase tracking-wider text-on-surface-variant" data-i18n="stat.1">Nhóm bộ lọc</span></div><div class="reveal px-4 py-5 text-center" style="--d:120ms"><b class="block text-4xl font-black italic text-primary md:text-5xl"><span data-count="12">12</span></b><span class="mt-1 block text-sm font-semibold uppercase tracking-wider text-on-surface-variant" data-i18n="stat.2">Kiểu sắp xếp</span></div><div class="reveal px-4 py-5 text-center" style="--d:180ms"><b class="block text-4xl font-black italic text-primary md:text-5xl"><span data-count="7">7</span></b><span class="mt-1 block text-sm font-semibold uppercase tracking-wider text-on-surface-variant" data-i18n="stat.3">Font chữ</span></div></div>
+</section>
+
+<!-- ───────── Features ───────── -->
+<section id="features" class="scroll-mt-24 py-20 md:py-28">
+  <div class="mx-auto max-w-6xl px-4">
+    <div class="reveal max-w-2xl">
+      <span class="slant inline-block bg-primary py-1 pl-5 pr-8 text-xs font-extrabold uppercase italic tracking-widest text-on-primary [--s:9px]" data-i18n="feat.eyebrow">Tính năng</span>
+      <h2 class="mt-4 text-3xl font-black italic leading-tight tracking-tight md:text-5xl" data-i18n="feat.title">Mọi thứ bạn cần để tìm đúng học sinh</h2>
+      <p class="mt-4 text-lg leading-relaxed text-on-surface-variant" data-i18n="feat.sub">Từ tìm nhanh một cái tên đến lọc ra đội hình phù hợp, BA List giữ mọi thao tác ngắn gọn.</p>
+    </div>
+    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"><article class="reveal group relative overflow-hidden rounded-md border border-outline-variant border-t-4 border-t-primary bg-surface-low p-6 shadow-[0_2px_0_var(--ba-outline-variant)] transition-[transform,box-shadow] duration-300 ease-smooth hover:-translate-y-1 hover:shadow-[0_3px_0_var(--ba-primary),0_18px_34px_-18px_rgb(0_0_0/0.4)]" style="--d:0ms">
+  <span class="slant mb-4 grid size-12 place-items-center bg-primary text-on-primary [--s:9px]"><svg class="size-6 shrink-0" aria-hidden="true"><use href="#i-scan-search"/></svg></span>
+  <h3 class="text-lg font-extrabold italic" data-i18n="feat.t0">Tìm kiếm thông minh</h3>
+  <p class="mt-2 leading-relaxed text-on-surface-variant" data-i18n="feat.d0">Bỏ dấu tiếng Việt, chịu lỗi gõ sai, xếp theo độ liên quan và hỗ trợ cú pháp nâng cao như school:abydos hay age>16.</p>
+</article><article class="reveal group relative overflow-hidden rounded-md border border-outline-variant border-t-4 border-t-primary bg-surface-low p-6 shadow-[0_2px_0_var(--ba-outline-variant)] transition-[transform,box-shadow] duration-300 ease-smooth hover:-translate-y-1 hover:shadow-[0_3px_0_var(--ba-primary),0_18px_34px_-18px_rgb(0_0_0/0.4)]" style="--d:70ms">
+  <span class="slant mb-4 grid size-12 place-items-center bg-primary text-on-primary [--s:9px]"><svg class="size-6 shrink-0" aria-hidden="true"><use href="#i-sliders-horizontal"/></svg></span>
+  <h3 class="text-lg font-extrabold italic" data-i18n="feat.t1">Bộ lọc đa tiêu chí</h3>
+  <p class="mt-2 leading-relaxed text-on-surface-variant" data-i18n="feat.d1">15 nhóm: trường, vai trò, vị trí, loại tấn công, giáp, vũ khí, độ hiếm, địa hình, tháng sinh… chọn nhiều giá trị cùng lúc.</p>
+</article><article class="reveal group relative overflow-hidden rounded-md border border-outline-variant border-t-4 border-t-primary bg-surface-low p-6 shadow-[0_2px_0_var(--ba-outline-variant)] transition-[transform,box-shadow] duration-300 ease-smooth hover:-translate-y-1 hover:shadow-[0_3px_0_var(--ba-primary),0_18px_34px_-18px_rgb(0_0_0/0.4)]" style="--d:140ms">
+  <span class="slant mb-4 grid size-12 place-items-center bg-primary text-on-primary [--s:9px]"><svg class="size-6 shrink-0" aria-hidden="true"><use href="#i-user-round"/></svg></span>
+  <h3 class="text-lg font-extrabold italic" data-i18n="feat.t2">Hồ sơ chi tiết</h3>
+  <p class="mt-2 leading-relaxed text-on-surface-variant" data-i18n="feat.d2">Chỉ số chiến đấu, địa hình S–D, thông tin cá nhân, seiyuu, họa sĩ, ngày ra mắt JP/Global và các phiên bản khác của cùng nhân vật.</p>
+</article><article class="reveal group relative overflow-hidden rounded-md border border-outline-variant border-t-4 border-t-primary bg-surface-low p-6 shadow-[0_2px_0_var(--ba-outline-variant)] transition-[transform,box-shadow] duration-300 ease-smooth hover:-translate-y-1 hover:shadow-[0_3px_0_var(--ba-primary),0_18px_34px_-18px_rgb(0_0_0/0.4)]" style="--d:210ms">
+  <span class="slant mb-4 grid size-12 place-items-center bg-primary text-on-primary [--s:9px]"><svg class="size-6 shrink-0" aria-hidden="true"><use href="#i-heart"/></svg></span>
+  <h3 class="text-lg font-extrabold italic" data-i18n="feat.t3">Yêu thích & dữ liệu</h3>
+  <p class="mt-2 leading-relaxed text-on-surface-variant" data-i18n="feat.d3">Lưu học sinh yêu thích ngay trên thiết bị, xuất/nhập JSON để chuyển máy. Dữ liệu của bạn không rời khỏi trình duyệt.</p>
+</article><article class="reveal group relative overflow-hidden rounded-md border border-outline-variant border-t-4 border-t-primary bg-surface-low p-6 shadow-[0_2px_0_var(--ba-outline-variant)] transition-[transform,box-shadow] duration-300 ease-smooth hover:-translate-y-1 hover:shadow-[0_3px_0_var(--ba-primary),0_18px_34px_-18px_rgb(0_0_0/0.4)]" style="--d:280ms">
+  <span class="slant mb-4 grid size-12 place-items-center bg-primary text-on-primary [--s:9px]"><svg class="size-6 shrink-0" aria-hidden="true"><use href="#i-palette"/></svg></span>
+  <h3 class="text-lg font-extrabold italic" data-i18n="feat.t4">Tùy biến theo ý bạn</h3>
+  <p class="mt-2 leading-relaxed text-on-surface-variant" data-i18n="feat.d4">Sáng/tối, 12 màu chủ đề + chọn màu tùy ý, 7 font chữ, đổi cỡ chữ, tiếng Việt hoặc English.</p>
+</article><article class="reveal group relative overflow-hidden rounded-md border border-outline-variant border-t-4 border-t-primary bg-surface-low p-6 shadow-[0_2px_0_var(--ba-outline-variant)] transition-[transform,box-shadow] duration-300 ease-smooth hover:-translate-y-1 hover:shadow-[0_3px_0_var(--ba-primary),0_18px_34px_-18px_rgb(0_0_0/0.4)]" style="--d:350ms">
+  <span class="slant mb-4 grid size-12 place-items-center bg-primary text-on-primary [--s:9px]"><svg class="size-6 shrink-0" aria-hidden="true"><use href="#i-wifi-off"/></svg></span>
+  <h3 class="text-lg font-extrabold italic" data-i18n="feat.t5">Offline & cài như app</h3>
+  <p class="mt-2 leading-relaxed text-on-surface-variant" data-i18n="feat.d5">Cài lên màn hình chính như một ứng dụng thật (PWA). Dữ liệu và ảnh đã xem được lưu lại để dùng cả khi mất mạng.</p>
+</article></div>
+  </div>
+</section>
+
+<!-- ───────── Search ───────── -->
+<section id="search" class="relative scroll-mt-24 overflow-hidden bg-navy py-20 text-on-navy md:py-28">
+  <div class="stripes-on-primary pointer-events-none absolute inset-0"></div>
+  <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-4 lg:grid-cols-2">
+    <div class="reveal">
+      <span class="slant inline-block bg-hl py-1 pl-5 pr-8 text-xs font-extrabold uppercase italic tracking-widest text-on-hl [--s:9px]" data-i18n="sr.eyebrow">Tìm kiếm</span>
+      <h2 class="mt-4 text-3xl font-black italic leading-tight tracking-tight md:text-5xl" data-i18n="sr.title">Gõ ít, ra đúng người cần tìm</h2>
+      <p class="mt-4 text-lg leading-relaxed text-on-navy/80" data-i18n="sr.sub">Ô tìm kiếm hiểu tiếng Việt không dấu, chịu được gõ sai và cho phép thêm điều kiện ngay trong câu lệnh.</p>
+      <ul class="mt-6 space-y-3 font-semibold">
+        <li class="flex items-start gap-3"><svg class="mt-0.5 size-5 text-hl shrink-0" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="sr.b1">Không phân biệt dấu và chữ hoa/thường</span></li>
+        <li class="flex items-start gap-3"><svg class="mt-0.5 size-5 text-hl shrink-0" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="sr.b2">Sai chính tả vẫn tìm ra, kèm gợi ý "Có phải ý bạn là…"</span></li>
+        <li class="flex items-start gap-3"><svg class="mt-0.5 size-5 text-hl shrink-0" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="sr.b3">Kết hợp từ khóa với điều kiện, nhấn / để focus ô tìm kiếm</span></li>
+      </ul>
+    </div>
+    <div class="reveal relative overflow-hidden rounded-md border border-white/15 bg-black/25 p-5 shadow-2xl" style="--d:120ms">
+      <div class="slant mb-4 flex h-11 items-center gap-3 bg-white/10 px-7 [--s:12px]"><svg class="size-5 text-primary shrink-0" aria-hidden="true"><use href="#i-search"/></svg><span class="font-mono text-sm text-on-navy/70"><span id="typed">school:abydos</span><span class="caret ml-0.5 inline-block h-4 w-0.5 translate-y-0.5 bg-hl"></span></span></div>
+      <ul><li class="flex flex-wrap items-baseline gap-x-3 border-b border-dashed border-white/15 py-3 last:border-0"><code class="slant bg-primary px-4 py-0.5 font-mono text-sm font-bold text-on-primary [--s:6px]">school:abydos</code><span class="text-sm text-on-navy/80" data-i18n="sr.0">học sinh trường Abydos</span></li><li class="flex flex-wrap items-baseline gap-x-3 border-b border-dashed border-white/15 py-3 last:border-0"><code class="slant bg-primary px-4 py-0.5 font-mono text-sm font-bold text-on-primary [--s:6px]">role:healer weapon:smg</code><span class="text-sm text-on-navy/80" data-i18n="sr.1">healer dùng súng SMG</span></li><li class="flex flex-wrap items-baseline gap-x-3 border-b border-dashed border-white/15 py-3 last:border-0"><code class="slant bg-primary px-4 py-0.5 font-mono text-sm font-bold text-on-primary [--s:6px]">age&gt;16 height&lt;=155</code><span class="text-sm text-on-navy/80" data-i18n="sr.2">so sánh số: tuổi, chiều cao</span></li><li class="flex flex-wrap items-baseline gap-x-3 border-b border-dashed border-white/15 py-3 last:border-0"><code class="slant bg-primary px-4 py-0.5 font-mono text-sm font-bold text-on-primary [--s:6px]">akanne</code><span class="text-sm text-on-navy/80" data-i18n="sr.3">gõ sai vẫn ra Akane</span></li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── Showcase ───────── -->
+<section id="showcase" class="scroll-mt-24 py-20 md:py-28">
+  <div class="mx-auto max-w-6xl px-4">
+    <div class="reveal max-w-2xl">
+      <span class="slant inline-block bg-primary py-1 pl-5 pr-8 text-xs font-extrabold uppercase italic tracking-widest text-on-primary [--s:9px]" data-i18n="sc.eyebrow">Giao diện</span>
+      <h2 class="mt-4 text-3xl font-black italic leading-tight tracking-tight md:text-5xl" data-i18n="sc.title">Phong cách Blue Archive, đổi màu theo ý bạn</h2>
+      <p class="mt-4 text-lg leading-relaxed text-on-surface-variant" data-i18n="sc.sub">Hình khối vát chéo, sọc chéo và chữ in nghiêng. Chọn màu chủ đề, sáng hoặc tối, font chữ riêng. Thiết lập được dùng chung với ứng dụng.</p>
+    </div>
+    <div class="reveal mt-8 rounded-md border border-outline-variant bg-surface-low p-5" style="--d:80ms">
+      <p class="mb-3 text-sm font-bold italic text-on-surface-variant" data-i18n="sc.try">Thử đổi màu chủ đề ngay tại đây</p>
+      <div class="grid grid-cols-6 gap-1.5 sm:grid-cols-12"><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#128cff" data-ac="#128cff" aria-label="#128cff" title="#128cff"></button><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#00b4d8" data-ac="#00b4d8" aria-label="#00b4d8" title="#00b4d8"></button><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#16a085" data-ac="#16a085" aria-label="#16a085" title="#16a085"></button><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#2fb85a" data-ac="#2fb85a" aria-label="#2fb85a" title="#2fb85a"></button><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#8bc34a" data-ac="#8bc34a" aria-label="#8bc34a" title="#8bc34a"></button><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#f2b705" data-ac="#f2b705" aria-label="#f2b705" title="#f2b705"></button><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#f0801f" data-ac="#f0801f" aria-label="#f0801f" title="#f0801f"></button><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#d93a3f" data-ac="#d93a3f" aria-label="#d93a3f" title="#d93a3f"></button><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#e8508c" data-ac="#e8508c" aria-label="#e8508c" title="#e8508c"></button><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#c2399c" data-ac="#c2399c" aria-label="#c2399c" title="#c2399c"></button><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#8a63f0" data-ac="#8a63f0" aria-label="#8a63f0" title="#8a63f0"></button><button type="button" class="slant swatch h-10 w-full transition-transform duration-200 ease-out-back hover:scale-105 active:scale-90" style="background:#4c5fd5" data-ac="#4c5fd5" aria-label="#4c5fd5" title="#4c5fd5"></button></div>
+    </div>
+    <div class="mt-10 grid items-start gap-6 md:grid-cols-[1.6fr_1fr]">
+      <figure class="reveal overflow-hidden rounded-md border border-outline-variant bg-surface-low shadow-xl"><img src="landing/shot-dark.webp" width="1366" height="860" loading="lazy" decoding="async" alt="BA List chế độ tối với màu tím: sheet chi tiết học sinh bên phải" class="block h-auto w-full"><figcaption class="slant m-3 inline-block bg-primary-container px-6 py-1 text-xs font-bold italic text-on-primary-container [--s:7px]" data-i18n="sc.cap1">Chế độ tối · sheet chi tiết</figcaption></figure>
+      <div class="grid grid-cols-2 gap-6">
+        <figure class="reveal overflow-hidden rounded-md border border-outline-variant bg-surface-low shadow-xl" style="--d:80ms"><img src="landing/shot-mobile.webp" width="390" height="844" loading="lazy" decoding="async" alt="BA List trên điện thoại: danh sách học sinh dạng thẻ" class="block h-auto w-full"></figure>
+        <figure class="reveal overflow-hidden rounded-md border border-outline-variant bg-surface-low shadow-xl" style="--d:160ms"><img src="landing/shot-filter.webp" width="390" height="844" loading="lazy" decoding="async" alt="BA List trên điện thoại: bộ lọc dạng bottom sheet" class="block h-auto w-full"></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── FAQ ───────── -->
+<section id="faq" class="scroll-mt-24 border-t-[3px] border-primary bg-surface-low py-20 md:py-28">
+  <div class="mx-auto grid max-w-6xl gap-12 px-4 lg:grid-cols-[0.8fr_1.2fr]">
+    <div class="reveal">
+      <span class="slant inline-block bg-primary py-1 pl-5 pr-8 text-xs font-extrabold uppercase italic tracking-widest text-on-primary [--s:9px]" data-i18n="faq.eyebrow">Hỏi đáp</span>
+      <h2 class="mt-4 text-3xl font-black italic leading-tight tracking-tight md:text-5xl" data-i18n="faq.title">Câu hỏi thường gặp</h2>
+      <p class="mt-4 text-lg leading-relaxed text-on-surface-variant" data-i18n="faq.sub">Chưa thấy câu trả lời? Mở ứng dụng và thử ngay, mọi thứ đều chạy ngay trên trình duyệt của bạn.</p>
+    </div>
+    <div class="reveal" style="--d:100ms"><details class="faq group border-b border-dashed border-outline-variant" open>
+  <summary class="flex cursor-pointer select-none items-center justify-between gap-4 py-4 text-left text-base font-bold italic transition-colors hover:text-primary md:text-lg"><span data-i18n="faq.q0">BA List có miễn phí và cần đăng nhập không?</span><svg class="chev size-5 shrink-0 text-primary transition-transform duration-300 group-open:rotate-180" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary>
+  <div class="faq-body overflow-hidden"><p class="pb-5 pr-8 leading-relaxed text-on-surface-variant" data-i18n="faq.a0">Hoàn toàn miễn phí, không quảng cáo và không cần tạo tài khoản. Bạn chỉ cần mở web và dùng ngay.</p></div>
+</details><details class="faq group border-b border-dashed border-outline-variant" >
+  <summary class="flex cursor-pointer select-none items-center justify-between gap-4 py-4 text-left text-base font-bold italic transition-colors hover:text-primary md:text-lg"><span data-i18n="faq.q1">Dữ liệu học sinh lấy từ đâu và có đầy đủ không?</span><svg class="chev size-5 shrink-0 text-primary transition-transform duration-300 group-open:rotate-180" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary>
+  <div class="faq-body overflow-hidden"><p class="pb-5 pr-8 leading-relaxed text-on-surface-variant" data-i18n="faq.a1">Dữ liệu 278 học sinh (kèm các phiên bản trang phục) được tổng hợp từ bluearchive.wiki: trường, vai trò, vị trí, loại tấn công/giáp, vũ khí, địa hình, ngày ra mắt JP/Global, seiyuu và họa sĩ.</p></div>
+</details><details class="faq group border-b border-dashed border-outline-variant" >
+  <summary class="flex cursor-pointer select-none items-center justify-between gap-4 py-4 text-left text-base font-bold italic transition-colors hover:text-primary md:text-lg"><span data-i18n="faq.q2">Tôi có dùng được khi không có mạng không?</span><svg class="chev size-5 shrink-0 text-primary transition-transform duration-300 group-open:rotate-180" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary>
+  <div class="faq-body overflow-hidden"><p class="pb-5 pr-8 leading-relaxed text-on-surface-variant" data-i18n="faq.a2">Có. BA List là một PWA: sau lần mở đầu tiên, mã nguồn, dữ liệu và những ảnh bạn đã xem được lưu lại để dùng offline.</p></div>
+</details><details class="faq group border-b border-dashed border-outline-variant" >
+  <summary class="flex cursor-pointer select-none items-center justify-between gap-4 py-4 text-left text-base font-bold italic transition-colors hover:text-primary md:text-lg"><span data-i18n="faq.q3">Làm sao để cài BA List như một ứng dụng?</span><svg class="chev size-5 shrink-0 text-primary transition-transform duration-300 group-open:rotate-180" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary>
+  <div class="faq-body overflow-hidden"><p class="pb-5 pr-8 leading-relaxed text-on-surface-variant" data-i18n="faq.a3">Trên Chrome/Edge, bấm biểu tượng cài đặt ở thanh địa chỉ hoặc vào Cài đặt → Cài đặt ứng dụng. Trên iPhone, mở bằng Safari rồi chọn Chia sẻ → Thêm vào Màn hình chính.</p></div>
+</details><details class="faq group border-b border-dashed border-outline-variant" >
+  <summary class="flex cursor-pointer select-none items-center justify-between gap-4 py-4 text-left text-base font-bold italic transition-colors hover:text-primary md:text-lg"><span data-i18n="faq.q4">Danh sách yêu thích của tôi được lưu ở đâu?</span><svg class="chev size-5 shrink-0 text-primary transition-transform duration-300 group-open:rotate-180" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary>
+  <div class="faq-body overflow-hidden"><p class="pb-5 pr-8 leading-relaxed text-on-surface-variant" data-i18n="faq.a4">Chỉ lưu trên trình duyệt của bạn (localStorage), không gửi lên máy chủ nào. Bạn có thể xuất/nhập file JSON trong Cài đặt để chuyển sang thiết bị khác.</p></div>
+</details><details class="faq group border-b border-dashed border-outline-variant" >
+  <summary class="flex cursor-pointer select-none items-center justify-between gap-4 py-4 text-left text-base font-bold italic transition-colors hover:text-primary md:text-lg"><span data-i18n="faq.q5">BA List có phải sản phẩm chính thức của NEXON hay Yostar không?</span><svg class="chev size-5 shrink-0 text-primary transition-transform duration-300 group-open:rotate-180" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary>
+  <div class="faq-body overflow-hidden"><p class="pb-5 pr-8 leading-relaxed text-on-surface-variant" data-i18n="faq.a5">Không. Đây là dự án phi thương mại của người hâm mộ. Blue Archive và hình ảnh nhân vật thuộc về chủ sở hữu tương ứng.</p></div>
+</details></div>
+  </div>
+</section>
+
+<!-- ───────── CTA ───────── -->
+<section class="relative overflow-hidden bg-primary py-16 text-on-primary md:py-20">
+  <div class="stripes-on-primary pointer-events-none absolute inset-0"></div>
+  <div class="relative mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-4 md:flex-row md:items-center">
+    <div><h2 class="text-3xl font-black italic leading-tight md:text-4xl" data-i18n="cta.title">Sẵn sàng tra cứu?</h2><p class="mt-2 max-w-xl text-lg opacity-90" data-i18n="cta.sub">Mở BA List và tìm học sinh bạn cần trong vài giây.</p></div>
+    <a href="app/" class="slant inline-flex h-14 shrink-0 items-center gap-3 bg-hl px-10 text-base font-extrabold italic text-on-hl shadow-xl transition-all duration-200 ease-out-back hover:brightness-105 active:scale-95 [--s:14px]"><span data-i18n="cta.open">Mở ứng dụng</span><svg class="size-5 shrink-0" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+  </div>
+</section>
+</main>
+
+<!-- ───────── Footer ───────── -->
+<footer class="bg-navy text-on-navy">
+  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-[1.4fr_1fr_1fr]">
+    <div>
+      <a href="#home" data-nav class="flex items-center gap-2.5" aria-label="BA List"><img src="favicon.svg" alt="" width="36" height="36" class="size-9"><span class="text-xl font-black italic">BA <span class="text-hl">List</span></span></a>
+      <p class="mt-4 max-w-sm text-sm leading-relaxed text-on-navy/70" data-i18n="ft.disc">BA List là dự án phi thương mại của người hâm mộ, không liên kết với NEXON Games hay Yostar. Blue Archive và hình ảnh nhân vật thuộc về chủ sở hữu tương ứng. Dữ liệu tham khảo từ bluearchive.wiki.</p>
+    </div>
+    <nav aria-label="Liên kết"><b class="text-sm font-extrabold uppercase italic tracking-widest text-hl" data-i18n="ft.links">Liên kết</b>
+      <ul class="mt-3 space-y-2 text-sm font-semibold">
+        <li><a data-nav href="#features" class="hover:text-hl" data-i18n="nav.features">Tính năng</a></li>
+        <li><a data-nav href="#search" class="hover:text-hl" data-i18n="nav.search">Tìm kiếm</a></li>
+        <li><a data-nav href="#showcase" class="hover:text-hl" data-i18n="nav.showcase">Giao diện</a></li>
+        <li><a data-nav href="#faq" class="hover:text-hl" data-i18n="nav.faq">Hỏi đáp</a></li>
+      </ul></nav>
+    <nav aria-label="Dự án"><b class="text-sm font-extrabold uppercase italic tracking-widest text-hl" data-i18n="ft.project">Dự án</b>
+      <ul class="mt-3 space-y-2 text-sm font-semibold">
+        <li><a href="app/" class="inline-flex items-center gap-1.5 hover:text-hl"><span data-i18n="cta.open">Mở ứng dụng</span><svg class="size-3.5 shrink-0" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></li>
+        <li><a href="https://github.com/minhtrong67/blue-archive-list" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 hover:text-hl"><svg class="size-4 shrink-0" aria-hidden="true"><use href="#i-code-xml"/></svg><span data-i18n="ft.src">Mã nguồn</span><svg class="size-3.5 shrink-0" aria-hidden="true"><use href="#i-external-link"/></svg></a></li>
+        <li><a href="https://bluearchive.wiki" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 hover:text-hl"><svg class="size-4 shrink-0" aria-hidden="true"><use href="#i-globe"/></svg>bluearchive.wiki<svg class="size-3.5 shrink-0" aria-hidden="true"><use href="#i-external-link"/></svg></a></li>
+      </ul></nav>
+  </div>
+  <div class="border-t border-white/10"><p class="mx-auto max-w-6xl px-4 py-4 text-xs text-on-navy/60">© 2026 BA List · <span data-i18n="ft.rights">Phi thương mại</span></p></div>
+</footer>
+
+<button id="to-top" type="button" class="slant fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-5 z-30 grid size-14 translate-y-6 place-items-center bg-hl text-on-hl opacity-0 pointer-events-none transition-all duration-300 ease-out-back hover:brightness-105 active:scale-90 [--s:12px]" aria-label="Lên đầu trang" title="Lên đầu trang"><svg class="size-6 shrink-0" aria-hidden="true"><use href="#i-arrow-up"/></svg></button>
+<script type="module" src="/src/landing.js"></script>
 </body>
 </html>

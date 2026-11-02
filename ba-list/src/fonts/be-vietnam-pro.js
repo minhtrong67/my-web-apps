@@ -1,0 +1,10 @@
+// Be Vietnam Pro tĩnh: 400 / 500 / 700 × (latin, latin-ext, vietnamese)
+import '@fontsource/be-vietnam-pro/latin-400.css'
+import '@fontsource/be-vietnam-pro/latin-500.css'
+import '@fontsource/be-vietnam-pro/latin-700.css'
+import '@fontsource/be-vietnam-pro/latin-ext-400.css'
+import '@fontsource/be-vietnam-pro/latin-ext-500.css'
+import '@fontsource/be-vietnam-pro/latin-ext-700.css'
+import '@fontsource/be-vietnam-pro/vietnamese-400.css'
+import '@fontsource/be-vietnam-pro/vietnamese-500.css'
+import '@fontsource/be-vietnam-pro/vietnamese-700.css'

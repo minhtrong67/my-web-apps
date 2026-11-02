@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" id="tc" content="#eaf3ff">
+<script>/* Áp theme + màu chủ đạo TRƯỚC khi React chạy để không bị nháy sáng/tối khi reload */
+(function(){try{var c=JSON.parse(localStorage.getItem('ba-cfg')||'{}'),r=document.documentElement,
+d=c.theme==='dark'||((c.theme||'system')==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);
+r.dataset.theme=d?'dark':'light';if(c.ac)r.style.setProperty('--ac',c.ac);if(c.motion===0)r.dataset.motion='off';
+r.style.background=d?'#0a111f':'#eaf3ff';document.getElementById('tc').content=d?'#0a111f':'#eaf3ff'}catch(e){}})();</script>
+<title>BA List – Ứng dụng tra cứu học sinh Blue Archive</title>
+<meta name="description" content="Tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, lọc theo trường, vai trò, vũ khí, địa hình, sắp xếp và xem chi tiết. Hoạt động offline, không cần đăng nhập.">
+<meta name="keywords" content="Blue Archive, ブルーアーカイブ, danh sách học sinh, nhân vật, student list, wiki, SRT, Abydos, Gehenna, Trinity">
+<meta name="application-name" content="BA List">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="format-detection" content="telephone=no">
+<link rel="canonical" href="https://minhtrong67.github.io/blue-archive-list/app/">
+<link rel="alternate" hreflang="vi" href="https://minhtrong67.github.io/blue-archive-list/app/">
+<link rel="alternate" hreflang="x-default" href="https://minhtrong67.github.io/blue-archive-list/app/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://minhtrong67.github.io/blue-archive-list/app/">
+<meta property="og:site_name" content="BA List">
+<meta property="og:title" content="BA List – Ứng dụng tra cứu học sinh Blue Archive">
+<meta property="og:description" content="Tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, bộ lọc, xem chi tiết. Nhanh, đẹp, chạy offline, không cần đăng nhập.">
+<meta property="og:image" content="https://minhtrong67.github.io/blue-archive-list/og-image.png">
+<meta property="og:image:secure_url" content="https://minhtrong67.github.io/blue-archive-list/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BA List – logo halo trên nền xanh dương">
+<meta property="og:locale" content="vi_VN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BA List – Ứng dụng tra cứu học sinh Blue Archive">
+<meta name="twitter:description" content="Tìm kiếm, lọc và xem chi tiết toàn bộ học sinh Blue Archive. Nhanh, đẹp, chạy offline.">
+<meta name="twitter:image" content="https://minhtrong67.github.io/blue-archive-list/og-image.png">
+<meta name="twitter:image:alt" content="BA List – logo halo trên nền xanh dương">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BA List">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="preconnect" href="https://static.wikitide.net" crossorigin>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"BA List","url":"https://minhtrong67.github.io/blue-archive-list/app/","image":"https://minhtrong67.github.io/blue-archive-list/og-image.png","description":"Tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, lọc theo trường, vai trò, vũ khí, địa hình, sắp xếp và xem chi tiết. Hoạt động offline, không cần đăng nhập.","applicationCategory":"ReferenceApplication","operatingSystem":"Any (Web, PWA)","inLanguage":["vi","en"],"offers":{"@type":"Offer","price":"0","priceCurrency":"VND"},"isAccessibleForFree":true}</script>
+</head>
+<body>
+<div id="root">
+  <!-- Splash tức thì (hiện trước khi JS tải xong): vòng halo kiểu Blue Archive -->
+  <div class="grid min-h-dvh place-items-center" aria-busy="true">
+    <div class="flex flex-col items-center gap-3">
+      <svg viewBox="0 0 64 64" width="84" height="84" class="halo-spinner text-primary" role="progressbar" aria-label="Loading">
+        <circle class="halo-out" cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 7" opacity=".5"/>
+        <circle class="halo-in" cx="32" cy="32" r="19" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-dasharray="62 58"/>
+        <path class="halo-slash" d="M9 24 L55 15 M9 40 L55 49" stroke="var(--ba-hl)" stroke-width="3.2" stroke-linecap="round"/>
+      </svg>
+      <b class="text-xl font-black italic tracking-tight">BA <span class="text-primary">List</span></b>
+      <div class="slant h-1.5 w-40 overflow-hidden bg-surface-high [--s:4px]"><i class="load-bar block h-full w-2/5 bg-primary"></i></div>
+    </div>
+  </div>
+</div>
+<noscript><p style="padding:20px">Trang cần bật JavaScript để hiển thị danh sách học sinh Blue Archive.</p></noscript>
+<script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

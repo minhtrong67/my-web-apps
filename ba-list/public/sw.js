@@ -1,5 +1,5 @@
 /* BA List – service worker: cache shell + runtime cache (cùng origin) + cache ảnh wiki */
-const V = 'ba-list-v5', IMG = 'ba-img', SHELL = ['./', 'index.html', 'favicon.svg', 'manifest.webmanifest']
+const V = 'ba-list-v6', IMG = 'ba-img', SHELL = ['./', 'index.html', 'app/', 'app/index.html', 'favicon.svg', 'manifest.webmanifest']
 self.addEventListener('install', (e) => e.waitUntil(caches.open(V).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())))
 self.addEventListener('activate', (e) => e.waitUntil(
   caches.keys().then((k) => Promise.all(k.filter((x) => x !== V && x !== IMG).map((x) => caches.delete(x)))).then(() => self.clients.claim()),

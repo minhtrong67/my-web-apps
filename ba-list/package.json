@@ -1,15 +1,21 @@
 {
   "name": "ba-list",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
   "description": "BA List – tra cứu học sinh Blue Archive (React + Vite + Tailwind CSS)",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "gen:fonts": "python3 scripts/gen-fonts.py"
   },
   "dependencies": {
+    "@fontsource-variable/google-sans-flex": "^5.3.2",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/roboto-flex": "^5.3.0",
+    "@fontsource/be-vietnam-pro": "^5.3.0",
+    "@fontsource/roboto": "^5.3.0",
     "lucide-react": "^1.65.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
