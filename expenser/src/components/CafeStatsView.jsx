@@ -154,9 +154,9 @@ export default function CafeStatsView({ items, loading }) {
   return (
     <div className="space-y-4 sm:space-y-5">
       <div className="space-y-3">
-        <div className="flex gap-2" role="group" aria-label={t('stats.rangeLabel')}>
+        <div className="grid grid-cols-3 gap-2 text-center" role="group" aria-label={t('stats.rangeLabel')}>
           {RANGES.map((id) => (
-            <Chip key={id} selected={range === id} onClick={() => setRange(id)}>
+            <Chip className='text-center flex items-center justify-center' key={id} selected={range === id} onClick={() => setRange(id)}>
               {t(`cafe.range.${id}`)}
             </Chip>
           ))}

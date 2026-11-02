@@ -6,15 +6,13 @@ import TextInput from './ui/TextInput';
 import SelectField from './ui/SelectField';
 import ConfirmDialog from './ui/ConfirmDialog';
 import EmptyState from './ui/EmptyState';
-import SwipeableItem, { ItemActions } from './ui/SwipeableItem';
-import { TableSkeleton } from './ui/Skeleton';
-import CafeThumb from './CafeThumb';
+import IconButton from './ui/IconButton';
 import CafeImageViewer from './CafeImageViewer';
 import TransactionFormModal from './TransactionFormModal';
 import { useData } from '../contexts/DataContext';
 import { useI18n } from '../i18n';
 import { useSessionState } from '../hooks/useSessionState';
-import { formatMoney, formatDayHeader, formatTime, dayKey, parseLocalDate, parseLocalDateEnd } from '../utils/format';
+import { formatMoney, formatDate, formatTime, parseLocalDate, parseLocalDateEnd } from '../utils/format';
 import { normalizeText, getSession, SESSIONS, SESSION_COLORS } from '../utils/cafe';
 
 function Badge({ icon, color, children, muted }) {
@@ -29,7 +27,7 @@ function Badge({ icon, color, children, muted }) {
   );
 }
 
-const PAGE = 40;
+const PAGE = 24;
 
 const defaultFilters = () => ({ search: '', shopId: 'all', drinkId: 'all', session: 'all', dateFrom: '', dateTo: '', sort: 'desc' });
 
@@ -85,18 +83,6 @@ export default function CafeTransactionList({ items, loading, cafeCategoryId, on
     io.observe(el);
     return () => io.disconnect();
   }, [hasMore, visible.length]);
-
-  const groups = useMemo(() => {
-    const map = new Map();
-    visible.forEach((it) => {
-      const key = dayKey(it.tx.date);
-      if (!map.has(key)) map.set(key, { key, date: it.tx.date, items: [], sum: 0 });
-      const g = map.get(key);
-      g.items.push(it);
-      g.sum += it.tx.amount;
-    });
-    return Array.from(map.values());
-  }, [visible]);
 
   const shopOptions = useMemo(
     () => cafeShops.map((s) => ({ value: s.id, label: s.name })),
@@ -196,7 +182,17 @@ export default function CafeTransactionList({ items, loading, cafeCategoryId, on
       </section>
 
       {loading ? (
-        <TableSkeleton />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="overflow-hidden rounded-2xl bg-surface-container-low">
+              <div className="skeleton aspect-video w-full" />
+              <div className="space-y-2 p-4">
+                <div className="skeleton h-4 w-2/3 rounded-md" />
+                <div className="skeleton h-3 w-1/2 rounded-md" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl bg-surface-container-low">
           {items.length > 0 ? (
@@ -206,47 +202,48 @@ export default function CafeTransactionList({ items, loading, cafeCategoryId, on
           )}
         </div>
       ) : (
-        <div className="space-y-4 sm:space-y-5">
+        <div className="space-y-4">
           <p className="px-1 text-body-sm text-on-surface-variant">
-            {t('tx.resultCount', { n: filtered.length })} · {formatMoney(total)} · {t('common.swipeHint')}
+            {t('cafe.momentCount', { n: filtered.length })} · {formatMoney(total)}
           </p>
-          {groups.map((group) => (
-            <section key={group.key}>
-              <div className="mb-2 flex items-center justify-between gap-2 px-1">
-                <h3 className="text-label-lg uppercase tracking-wide text-on-surface-variant">{formatDayHeader(group.date)}</h3>
-                <span className="text-label-lg font-bold tabular-nums text-expense">-{formatMoney(group.sum)}</span>
-              </div>
-              <div className="space-y-2">
-                {group.items.map(({ tx, shop, drink, log, wallet }) => (
-                  <SwipeableItem key={tx.id} rounded="rounded-2xl" className="cv-auto" onEdit={() => setEditingTx(tx)} onDelete={() => setDeleteTarget(tx)}>
-                    <div className="flex items-center gap-3 rounded-2xl bg-surface-container-low p-3">
-                      {log?.imageUrl ? (
-                        <button type="button" onClick={() => setViewer({ src: log.imageUrl, title: drink?.name || shop?.name || t('cafe.photo') })} aria-label={t('cafe.viewPhoto')} className="state-layer shrink-0 rounded-2xl">
-                          <CafeThumb src={log.imageUrl} size={56} />
-                        </button>
-                      ) : (
-                        <CafeThumb src={drink?.imageUrl || shop?.imageUrl} icon="local_cafe" size={56} />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <p className="wrap-any text-title-sm text-on-surface">{drink?.name || t('cafe.unspecifiedDrink')}</p>
-                        <div className="mt-1.5 flex flex-wrap gap-1.5">
-                          {shop ? <Badge icon="storefront" color="#B45309">{shop.name}</Badge> : <Badge icon="storefront" muted>{t('cafe.unspecifiedShop')}</Badge>}
-                          <Badge icon="schedule" color={SESSION_COLORS[getSession(tx.date)]}>
-                            {formatTime(tx.date)} · {t(`cafe.session.${getSession(tx.date)}`)}
-                          </Badge>
-                          {wallet && <Badge icon="account_balance_wallet" color="#64748B">{wallet.name}</Badge>}
-                          {shop?.rating > 0 && <Badge icon="star" color="#F59E0B">{shop.rating}/5</Badge>}
-                        </div>
-                        {tx.note && <p className="wrap-any mt-1 text-body-sm text-on-surface-variant">{tx.note}</p>}
-                      </div>
-                      <span className="shrink-0 text-title-sm font-bold tabular-nums text-expense">-{formatMoney(tx.amount)}</span>
-                      <ItemActions onEdit={() => setEditingTx(tx)} onDelete={() => setDeleteTarget(tx)} />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {visible.map(({ tx, shop, drink, log, wallet }, idx) => {
+              const photo = log?.imageUrl || drink?.imageUrl || shop?.imageUrl;
+              const session = getSession(tx.date);
+              return (
+                <article key={tx.id} className="animate-slide-up overflow-hidden rounded-2xl bg-surface-container-low" style={{ animationDelay: `${Math.min(idx * 30, 240)}ms` }}>
+                  {photo ? (
+                    <button type="button" onClick={() => setViewer({ src: photo, title: drink?.name || shop?.name || t('cafe.photo') })} aria-label={t('cafe.viewPhoto')} className="group relative block aspect-video w-full cursor-zoom-in overflow-hidden bg-surface-container">
+                      <img src={photo} alt={drink?.name || ''} loading="lazy" referrerPolicy="no-referrer" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
+                    </button>
+                  ) : (
+                    <div className="flex aspect-video w-full items-center justify-center bg-secondary-container text-on-secondary-container">
+                      <Icon name="local_cafe" size={44} />
                     </div>
-                  </SwipeableItem>
-                ))}
-              </div>
-            </section>
-          ))}
+                  )}
+                  <div className="space-y-2.5 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="wrap-any text-title-md text-on-surface">{drink?.name || t('cafe.unspecifiedDrink')}</h3>
+                      <span className="shrink-0 text-title-md font-bold tabular-nums text-expense">{formatMoney(tx.amount)}</span>
+                    </div>
+                    <p className="wrap-any flex items-center gap-1.5 text-body-md text-on-surface-variant">
+                      <Icon name="storefront" size={16} />
+                      {shop?.name || t('cafe.unspecifiedShop')}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body-sm text-on-surface-variant">
+                      <Icon name="schedule" size={16} />
+                      <span>
+                        {formatDate(tx.date)} · {formatTime(tx.date)}
+                        {wallet ? ` · ${wallet.name}` : ''}
+                      </span>
+                      <Badge icon="schedule" color={SESSION_COLORS[session]}>{t(`cafe.session.${session}`)}</Badge>
+                    </div>
+                    {tx.note && <p className="wrap-any text-body-md text-on-surface">{tx.note}</p>}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
           {hasMore && (
             <div ref={sentinelRef} className="flex justify-center py-4">
               <Button variant="tonal" size="sm" onClick={() => setLimit((l) => l + PAGE)}>

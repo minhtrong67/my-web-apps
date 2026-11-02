@@ -7,8 +7,7 @@ import EmptyState from '../components/ui/EmptyState';
 import SwipeableItem, { ItemActions } from '../components/ui/SwipeableItem';
 import { TableSkeleton } from '../components/ui/Skeleton';
 import CafeThumb from '../components/CafeThumb';
-import CafeReorderList from '../components/CafeReorderList';
-import Button from '../components/ui/Button';
+import IconButton from '../components/ui/IconButton';
 import CafeDrinkFormModal from '../components/CafeDrinkFormModal';
 import { useData } from '../contexts/DataContext';
 import { useI18n } from '../i18n';
@@ -19,7 +18,7 @@ export default function CafeDrinksPage() {
   const { t } = useI18n();
   const { cafeDrinks, reorderCafeDrinks, cafeLogs, deleteCafeDrink, cafeLoading } = useData();
   const [search, setSearch] = useSessionState('cafeDrinks.search', '');
-  const [sorting, setSorting] = useState(false);
+  const [moving, setMoving] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -35,6 +34,24 @@ export default function CafeDrinksPage() {
     cafeLogs.forEach((l) => l.drinkId && m.set(l.drinkId, (m.get(l.drinkId) || 0) + 1));
     return m;
   }, [cafeLogs]);
+
+  const canMove = !search.trim(); // order only makes sense on the full list
+
+  async function move(id, dir) {
+    const ids = cafeDrinks.map((x) => x.id);
+    const from = ids.indexOf(id);
+    const to = from + dir;
+    if (from < 0 || to < 0 || to >= ids.length || moving) return;
+    [ids[from], ids[to]] = [ids[to], ids[from]];
+    setMoving(true);
+    try {
+      await reorderCafeDrinks(ids);
+    } catch {
+      notify.error(t('cafe.reorderError'));
+    } finally {
+      setMoving(false);
+    }
+  }
 
   function openForm(drink = null) {
     setEditing(drink);
@@ -61,20 +78,9 @@ export default function CafeDrinksPage() {
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      {!sorting && (
-        <div className="flex items-start gap-2">
-          <TextInput className="min-w-0 flex-1" icon="search" label={t('cafe.drinkSearch')} value={search} onChange={(e) => setSearch(e.target.value)} />
-          {cafeDrinks.length > 1 && (
-            <Button variant="tonal" icon="swap_vert" onClick={() => setSorting(true)} className="mt-1 shrink-0">
-              {t('cafe.reorder')}
-            </Button>
-          )}
-        </div>
-      )}
+      <TextInput icon="search" label={t('cafe.drinkSearch')} value={search} onChange={(e) => setSearch(e.target.value)} />
 
-      {sorting ? (
-        <CafeReorderList items={cafeDrinks} icon="local_cafe" onSave={reorderCafeDrinks} onCancel={() => setSorting(false)} />
-      ) : cafeLoading ? (
+      {cafeLoading ? (
         <TableSkeleton />
       ) : list.length === 0 ? (
         <div className="rounded-2xl bg-surface-container-low">
@@ -97,6 +103,14 @@ export default function CafeDrinksPage() {
                     {d.description && <p className="wrap-any line-clamp-2 text-body-sm text-on-surface-variant">{d.description}</p>}
                     <p className="mt-1 text-label-md text-on-surface-variant">{t('cafe.drinkUsage', { n: usage.get(d.id) || 0 })}</p>
                   </div>
+                  <div className="flex shrink-0 flex-col">
+                    {canMove && list.length > 1 && (
+                      <>
+                        <IconButton icon="expand_less" label={t('cafe.moveUp')} size={22} disabled={moving || idx === 0} onClick={() => move(d.id, -1)} className="!h-8 !w-8" />
+                        <IconButton icon="expand_more" label={t('cafe.moveDown')} size={22} disabled={moving || idx === list.length - 1} onClick={() => move(d.id, 1)} className="!h-8 !w-8" />
+                      </>
+                    )}
+                  </div>
                   <ItemActions onEdit={() => openForm(d)} onDelete={() => setDeleteTarget(d)} />
                 </div>
               </SwipeableItem>
@@ -105,7 +119,7 @@ export default function CafeDrinksPage() {
         </>
       )}
 
-      {!sorting && <Fab label={t('cafe.drinkAdd')} onClick={() => openForm()} />}
+      <Fab label={t('cafe.drinkAdd')} onClick={() => openForm()} />
 
       <CafeDrinkFormModal
         open={formOpen}
