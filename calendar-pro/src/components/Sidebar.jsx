@@ -25,7 +25,7 @@ export default function Sidebar({ onNavigate, onOpenSearch, className = '' }) {
   return (
     <aside className={className}>
       <div className="mb-6 flex items-center gap-3 px-3 pt-2">
-        <img src="/icons/icon-192.png" alt="" className="h-12 w-12 shrink-0" />
+        <img src="/icons/icon-192.png" alt="" width="48" height="48" className="h-12 w-12 shrink-0" />
         <div className="min-w-0">
           <p className="text-title-lg leading-tight text-on-surface">{t('app.name')}</p>
           <p className="truncate text-body-sm text-on-surface-variant">{t('app.tagline')}</p>
@@ -69,8 +69,6 @@ export default function Sidebar({ onNavigate, onOpenSearch, className = '' }) {
           )
         })}
       </nav>
-
-      <p className="mt-auto px-4 pt-6 text-label-sm text-on-surface-variant/70">{t('app.credit')}</p>
     </aside>
   )
 }

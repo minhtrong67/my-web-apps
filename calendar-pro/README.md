@@ -5,6 +5,7 @@
 # Calendar Pro
 
 **Lịch âm dương · Lịch vạn niên · Đếm ngược ngày lễ Việt Nam**<br/>
+🌐 **Dùng thử:** <https://calendar-pro-rouge.vercel.app/><br/>
 Thiết kế theo chuẩn **Material 3 Expressive (2026)** với màu chủ đạo **Rose** — chạy nhanh, dùng được offline.
 
 [![React](https://img.shields.io/badge/React-18-149ECA?logo=react&logoColor=white)](https://react.dev)
@@ -20,10 +21,10 @@ Thiết kế theo chuẩn **Material 3 Expressive (2026)** với màu chủ đ�
 
 <img src="screenshots/01-home.png" alt="Trang chủ — ngày âm lịch dạng số cuộn, sự kiện sắp tới" width="49%" />
 <img src="screenshots/02-calendar.png" alt="Lịch tháng (chế độ tối) — ngày chọn dạng cookie, chi tiết ngày bên phải" width="49%" />
-<img src="screenshots/03-countdown.png" alt="Đếm ngược sự kiện — thanh tiến trình dạng sóng, số cuộn" width="49%" />
+<img src="screenshots/03-countdown.png" alt="Đếm ngược — thanh tiến trình dạng sóng, số cuộn" width="49%" />
 <img src="screenshots/04-settings.png" alt="Cài đặt — accordion màu/phông chữ, cỡ chữ 3 mức, khối tác giả và Claude AI" width="49%" />
 
-<sub>Trang chủ · Lịch tháng (chế độ tối) · Đếm ngược sự kiện · Cài đặt</sub>
+<sub>Trang chủ · Lịch tháng (chế độ tối) · Đếm ngược · Cài đặt</sub>
 
 </div>
 
@@ -57,7 +58,7 @@ Thiết kế theo chuẩn **Material 3 Expressive (2026)** với màu chủ đ�
 |---|---|
 | 📅 **Lịch âm dương** | Lịch tháng hiển thị đồng thời ngày dương và âm; đánh dấu mùng một, rằm, ngày chay, ngày lễ, Chủ nhật. Vuốt ngang (di động) hoặc dùng nút để đổi tháng; trên màn hình rộng, chi tiết ngày nằm cố định bên phải. |
 | 📖 **Lịch vạn niên** | Tra cứu một ngày bất kỳ: Can Chi ngày / tháng / năm, con giáp, giờ hoàng đạo; **quy đổi hai chiều** dương lịch ↔ âm lịch (có xử lý tháng nhuận). |
-| ⏳ **Đếm ngược sự kiện** | Hơn chục ngày lễ, kỷ niệm lớn của Việt Nam (Tết Nguyên Đán, Giỗ Tổ Hùng Vương, Quốc khánh, Trung Thu…) với đồng hồ thời gian thực, thanh tiến trình dạng sóng, lọc theo danh mục. |
+| ⏳ **Đếm ngược** | Gần 30 ngày lễ, kỷ niệm (Tết Nguyên Đán, Giáng Sinh, Halloween, Giỗ Tổ Hùng Vương, Quốc khánh, Trung Thu…) với đồng hồ thời gian thực, thanh tiến trình dạng sóng, lọc theo danh mục. Ngày đặc biệt có thẻ giao diện riêng theo chủ đề; chạm vào để xem sheet toàn màn hình với ý nghĩa, phong tục và điều thú vị. |
 | 🌿 **Ngày chay & rằm** | Tự động đánh dấu hai ngày ăn chay theo *Nhị trai* (Mùng Một và Rằm) trên lịch, trang chủ và chi tiết ngày. |
 | 🏠 **Trang chủ** | Tổng quan hôm nay: dải 7 ngày trong tuần, ngày âm lịch cỡ lớn, Can Chi, giờ hoàng đạo, các sự kiện sắp tới. |
 | 🔎 **Tìm kiếm nhanh** | `Ctrl/Cmd + K` mở bảng lệnh để nhảy tới bất kỳ trang nào. |

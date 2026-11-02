@@ -31,6 +31,3 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </SettingsProvider>
   </React.StrictMode>
 )
-
-// React đã thay màn hình chờ trong #root bằng giao diện thật; CSS của app đã nắm nền → gỡ CSS khởi động
-requestAnimationFrame(() => document.getElementById('boot-style')?.remove())

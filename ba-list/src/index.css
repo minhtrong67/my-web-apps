@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Font tự host: chỉ là khai báo @font-face (vài KB), file .woff2 chỉ tải khi font đó được dùng */
+@import "./fonts/google-sans-flex.css";
+@import "./fonts/roboto-flex.css";
+@import "./fonts/roboto.css";
+@import "./fonts/inter.css";
+@import "./fonts/be-vietnam-pro.css";
+
 /* Dark mode dựa trên data-theme của <html> */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 

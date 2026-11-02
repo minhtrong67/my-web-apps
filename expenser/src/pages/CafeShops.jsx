@@ -9,6 +9,8 @@ import SwipeableItem, { ItemActions } from '../components/ui/SwipeableItem';
 import { Stars } from '../components/ui/RatingInput';
 import { TableSkeleton } from '../components/ui/Skeleton';
 import CafeThumb from '../components/CafeThumb';
+import CafeReorderList from '../components/CafeReorderList';
+import Button from '../components/ui/Button';
 import CafeShopFormModal from '../components/CafeShopFormModal';
 import { useData } from '../contexts/DataContext';
 import { useI18n } from '../i18n';
@@ -16,9 +18,10 @@ import { useSessionState } from '../hooks/useSessionState';
 import { normalizeText } from '../utils/cafe';
 
 export default function CafeShopsPage() {
-  const { t, locale } = useI18n();
-  const { cafeShops, cafeLogs, deleteCafeShop, cafeLoading } = useData();
+  const { t } = useI18n();
+  const { cafeShops, reorderCafeShops, cafeLogs, deleteCafeShop, cafeLoading } = useData();
   const [search, setSearch] = useSessionState('cafeShops.search', '');
+  const [sorting, setSorting] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -28,8 +31,8 @@ export default function CafeShopsPage() {
     const q = normalizeText(search);
     return cafeShops
       .filter((s) => !q || normalizeText(`${s.name} ${s.address || ''}`).includes(q))
-      .sort((a, b) => a.name.localeCompare(b.name, locale));
-  }, [cafeShops, search, locale]);
+      ;
+  }, [cafeShops, search]);
 
   const usage = useMemo(() => {
     const m = new Map();
@@ -62,9 +65,20 @@ export default function CafeShopsPage() {
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      <TextInput icon="search" label={t('cafe.shopSearch')} value={search} onChange={(e) => setSearch(e.target.value)} />
+      {!sorting && (
+        <div className="flex items-start gap-2">
+          <TextInput className="min-w-0 flex-1" icon="search" label={t('cafe.shopSearch')} value={search} onChange={(e) => setSearch(e.target.value)} />
+          {cafeShops.length > 1 && (
+            <Button variant="tonal" icon="swap_vert" onClick={() => setSorting(true)} className="mt-1 shrink-0">
+              {t('cafe.reorder')}
+            </Button>
+          )}
+        </div>
+      )}
 
-      {cafeLoading ? (
+      {sorting ? (
+        <CafeReorderList items={cafeShops} icon="storefront" onSave={reorderCafeShops} onCancel={() => setSorting(false)} />
+      ) : cafeLoading ? (
         <TableSkeleton />
       ) : list.length === 0 ? (
         <div className="rounded-2xl bg-surface-container-low">
@@ -102,7 +116,7 @@ export default function CafeShopsPage() {
         </>
       )}
 
-      <Fab label={t('cafe.shopAdd')} onClick={() => openForm()} />
+      {!sorting && <Fab label={t('cafe.shopAdd')} onClick={() => openForm()} />}
 
       <CafeShopFormModal
         open={formOpen}

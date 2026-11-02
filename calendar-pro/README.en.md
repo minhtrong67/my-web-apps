@@ -5,6 +5,7 @@
 # Calendar Pro
 
 **Lunar & solar calendar · Perpetual almanac · Vietnamese holiday countdown**<br/>
+🌐 **Live:** <https://calendar-pro-rouge.vercel.app/><br/>
 Designed to **Material 3 Expressive (2026)** with a **Rose** primary color — fast, installable, works offline.
 
 [![React](https://img.shields.io/badge/React-18-149ECA?logo=react&logoColor=white)](https://react.dev)

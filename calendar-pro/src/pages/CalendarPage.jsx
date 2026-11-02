@@ -105,8 +105,8 @@ export default function CalendarPage() {
         <div className="mt-4 flex flex-wrap items-center gap-2 px-1 pt-2 text-label-md text-on-surface-variant">
           <LegendDot color="bg-primary" label={t('calendar.legendToday')} />
           <span className="rounded-full bg-surface-high px-3 py-1.5 font-bold text-on-surface">{t('calendar.legendLunarMark')}</span>
-          <LegendDot color="bg-chay" label={t('calendar.legendVegetarian')} />
-          <LegendDot color="bg-holiday" label={t('calendar.legendHoliday')} />
+          <LegendDot color="bg-chay-container shadow-[inset_0_0_0_1.5px_var(--chay)]" label={t('calendar.legendVegetarian')} />
+          <LegendDot color="bg-holiday-container shadow-[inset_0_0_0_1.5px_var(--holiday)]" label={t('calendar.legendHoliday')} />
           <span className="rounded-full bg-surface-high px-3 py-1.5 text-error">{t('calendar.legendSunday')}</span>
         </div>
       </section>
@@ -138,7 +138,7 @@ export default function CalendarPage() {
 function LegendDot({ color, label }) {
   return (
     <span className="flex items-center gap-2 rounded-full bg-surface-high px-3 py-1.5">
-      <span className={`h-2.5 w-2.5 rounded-full ${color}`} />
+      <span className={`h-3.5 w-3.5 rounded-full ${color}`} />
       {label}
     </span>
   )

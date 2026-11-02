@@ -75,12 +75,12 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
   // Optional dropdowns: once a value is picked, a "none" entry lets the user clear it again.
   const withNone = (list, value) => (value ? [{ id: '', name: t('cafe.none'), icon: 'remove', color: '#64748B' }, ...list] : list);
   const shopOptions = useMemo(
-    () => cafeShops.map((s) => ({ id: s.id, name: s.name, icon: 'storefront', color: '#B45309' })).sort((a, b) => a.name.localeCompare(b.name, locale)),
-    [cafeShops, locale],
+    () => cafeShops.map((s) => ({ id: s.id, name: s.name, icon: 'storefront', color: '#B45309' })),
+    [cafeShops],
   );
   const drinkOptions = useMemo(
-    () => cafeDrinks.map((d) => ({ id: d.id, name: d.name, icon: 'local_cafe', color: '#92400E' })).sort((a, b) => a.name.localeCompare(b.name, locale)),
-    [cafeDrinks, locale],
+    () => cafeDrinks.map((d) => ({ id: d.id, name: d.name, icon: 'local_cafe', color: '#92400E' })),
+    [cafeDrinks],
   );
 
   function setType(type) {

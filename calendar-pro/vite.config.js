@@ -49,6 +49,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,ico}'],
         cleanupOutdatedCaches: true,
+        // Để trình duyệt/bot mở thẳng robots.txt và sitemap.xml thay vì bị trả về index.html của service worker
+        navigateFallbackDenylist: [/^\/robots\.txt$/, /^\/sitemap\.xml$/],
         runtimeCaching: [
           {
             // Font chữ tự host (Google Sans Flex, Roboto Flex, Inter...): chỉ tải khi người dùng chọn, rồi cache lâu dài để dùng offline

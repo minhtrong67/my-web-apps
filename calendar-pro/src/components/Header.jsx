@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import Icon from './Icon'
 import { useSettings } from '../contexts/SettingsContext'
 import { useTranslation } from '../i18n/useTranslation'
@@ -22,13 +22,14 @@ export function usePageTitle() {
 }
 
 /**
- * Top app bar (chỉ hiện trên di động, sm:hidden): nút menu tonal, TÊN TRANG đang xem, đổi sáng/tối và ngôn ngữ.
+ * Top app bar (chỉ hiện trên di động, sm:hidden): nút menu tonal, TÊN TRANG đang xem, đổi sáng/tối và lối tắt vào Cài đặt (đổi ngôn ngữ nằm trong Cài đặt).
  * Tên trang đổi bằng hiệu ứng trượt-nảy mỗi lần điều hướng. Đổi sáng/tối dùng View Transition lan tròn từ điểm bấm.
  */
 export default function Header({ onMenuClick }) {
   const { isDark, update } = useSettings()
-  const { t, lang, toggleLang } = useTranslation()
+  const { t } = useTranslation()
   const title = usePageTitle()
+  const { pathname } = useLocation()
 
   return (
     <header
@@ -54,14 +55,13 @@ export default function Header({ onMenuClick }) {
         >
           <Icon name={isDark ? 'light_mode' : 'dark_mode'} size={24} />
         </button>
-        <button
-          onClick={toggleLang}
-          className="state morph focus-ring flex h-12 items-center gap-1.5 rounded-full bg-secondary-container px-4 text-on-secondary-container"
-          aria-label={t('header.toggleLanguage')}
+        <Link
+          to="/cai-dat"
+          className="state morph focus-ring flex h-12 w-12 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container"
+          aria-label={t('nav.settings')}
         >
-          <Icon name="translate" size={20} />
-          <span className="text-label-lg uppercase">{lang}</span>
-        </button>
+          <Icon name="settings" size={24} filled={pathname.startsWith('/cai-dat')} />
+        </Link>
       </div>
     </header>
   )

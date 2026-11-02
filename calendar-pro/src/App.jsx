@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
@@ -25,6 +25,13 @@ if (typeof window !== 'undefined') {
 }
 
 export default function App() {
+  // Gỡ CSS màn hình chờ CHỈ SAU KHI React đã vẽ xong lần đầu (useEffect chạy sau commit).
+  // Trước đây gỡ ngay sau root.render() — lúc đó React chưa thay màn hình chờ nên logo SVG mất kích thước và phóng to toàn màn hình.
+  useEffect(() => {
+    const id = requestAnimationFrame(() => document.getElementById('boot-style')?.remove())
+    return () => cancelAnimationFrame(id)
+  }, [])
+
   return (
     <Routes>
       <Route element={<Layout />}>

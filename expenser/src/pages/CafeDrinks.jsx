@@ -7,6 +7,8 @@ import EmptyState from '../components/ui/EmptyState';
 import SwipeableItem, { ItemActions } from '../components/ui/SwipeableItem';
 import { TableSkeleton } from '../components/ui/Skeleton';
 import CafeThumb from '../components/CafeThumb';
+import CafeReorderList from '../components/CafeReorderList';
+import Button from '../components/ui/Button';
 import CafeDrinkFormModal from '../components/CafeDrinkFormModal';
 import { useData } from '../contexts/DataContext';
 import { useI18n } from '../i18n';
@@ -14,9 +16,10 @@ import { useSessionState } from '../hooks/useSessionState';
 import { normalizeText } from '../utils/cafe';
 
 export default function CafeDrinksPage() {
-  const { t, locale } = useI18n();
-  const { cafeDrinks, cafeLogs, deleteCafeDrink, cafeLoading } = useData();
+  const { t } = useI18n();
+  const { cafeDrinks, reorderCafeDrinks, cafeLogs, deleteCafeDrink, cafeLoading } = useData();
   const [search, setSearch] = useSessionState('cafeDrinks.search', '');
+  const [sorting, setSorting] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -24,8 +27,8 @@ export default function CafeDrinksPage() {
 
   const list = useMemo(() => {
     const q = normalizeText(search);
-    return cafeDrinks.filter((d) => !q || normalizeText(d.name).includes(q)).sort((a, b) => a.name.localeCompare(b.name, locale));
-  }, [cafeDrinks, search, locale]);
+    return cafeDrinks.filter((d) => !q || normalizeText(d.name).includes(q));
+  }, [cafeDrinks, search]);
 
   const usage = useMemo(() => {
     const m = new Map();
@@ -58,9 +61,20 @@ export default function CafeDrinksPage() {
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      <TextInput icon="search" label={t('cafe.drinkSearch')} value={search} onChange={(e) => setSearch(e.target.value)} />
+      {!sorting && (
+        <div className="flex items-start gap-2">
+          <TextInput className="min-w-0 flex-1" icon="search" label={t('cafe.drinkSearch')} value={search} onChange={(e) => setSearch(e.target.value)} />
+          {cafeDrinks.length > 1 && (
+            <Button variant="tonal" icon="swap_vert" onClick={() => setSorting(true)} className="mt-1 shrink-0">
+              {t('cafe.reorder')}
+            </Button>
+          )}
+        </div>
+      )}
 
-      {cafeLoading ? (
+      {sorting ? (
+        <CafeReorderList items={cafeDrinks} icon="local_cafe" onSave={reorderCafeDrinks} onCancel={() => setSorting(false)} />
+      ) : cafeLoading ? (
         <TableSkeleton />
       ) : list.length === 0 ? (
         <div className="rounded-2xl bg-surface-container-low">
@@ -91,7 +105,7 @@ export default function CafeDrinksPage() {
         </>
       )}
 
-      <Fab label={t('cafe.drinkAdd')} onClick={() => openForm()} />
+      {!sorting && <Fab label={t('cafe.drinkAdd')} onClick={() => openForm()} />}
 
       <CafeDrinkFormModal
         open={formOpen}

@@ -16,7 +16,7 @@ export function HaloSpinner({ size = 64, className }) {
 export function SkeletonCard({ index = 0 }) {
   return (
     <div style={{ animationDelay: `${index * 60}ms` }} className="flex animate-rise flex-col overflow-hidden rounded-md border border-outline-variant bg-surface-low">
-      <div className="skeleton skeleton-ring cut-bl aspect-[4/4.4]" />
+      <div className="skeleton cut-bl aspect-[4/4.4]" />
       <div className="flex flex-col gap-2 px-3 pb-3 pt-3">
         <div className="skeleton slant h-5 w-3/4 [--s:6px]" />
         <div className="skeleton slant h-4 w-1/2 [--s:6px]" />
@@ -31,7 +31,8 @@ export function SkeletonCard({ index = 0 }) {
   )
 }
 
-/* Màn hình chờ khi tải mã + dữ liệu học sinh: khung giao diện bằng skeleton + vòng halo ở giữa */
+/* Màn hình chờ khi tải mã + dữ liệu học sinh: CHỈ là khung giao diện bằng skeleton (không có lớp nào đè lên).
+   Vòng halo nhỏ nằm ở dòng trạng thái ngay dưới thanh công cụ. */
 export function BootScreen() {
   const { t } = useSettings()
   return (
@@ -47,16 +48,12 @@ export function BootScreen() {
         <div className="skeleton hidden h-[70vh] rounded-md lg:block" />
         <div>
           <div className="flex gap-2"><div className="skeleton slant h-10 w-48 [--s:10px]" /><div className="skeleton slant h-10 w-12 [--s:10px]" /><div className="skeleton slant ml-auto h-10 w-24 [--s:10px]" /></div>
-          <div className="mt-6 grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3 sm:grid-cols-[repeat(auto-fill,minmax(184px,1fr))] sm:gap-4">
+          <p className="mt-3 flex h-6 items-center gap-2 text-sm font-semibold italic text-on-surface-variant" role="status">
+            <HaloSpinner size={22} />{t('loading')}
+          </p>
+          <div className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3 sm:grid-cols-[repeat(auto-fill,minmax(184px,1fr))] sm:gap-4">
             {Array.from({ length: 10 }, (_, i) => <SkeletonCard key={i} index={i} />)}
           </div>
-        </div>
-      </div>
-      <div className="pointer-events-none fixed inset-0 grid place-items-center">
-        <div className="cut-bl-sm flex animate-pop flex-col items-center gap-3 border border-outline-variant bg-surface-low/95 px-12 pb-7 pt-6 shadow-[0_20px_50px_-12px_rgb(0_0_0/0.45)]">
-          <HaloSpinner size={76} />
-          <p className="text-sm font-bold italic">{t('loading')}</p>
-          <div className="slant h-1.5 w-40 overflow-hidden bg-surface-high [--s:4px]"><i className="load-bar block h-full w-2/5 bg-primary" /></div>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import BottomNav from './BottomNav'
 import NavRail from './NavRail'
 import Header, { usePageTitle } from './Header'
 import CommandPalette from './CommandPalette'
+import ScrollToTop from './ScrollToTop'
 import Icon from './Icon'
 import { useTranslation } from '../i18n/useTranslation'
 import { useExitTransition } from '../hooks/useExitTransition'
@@ -63,6 +64,7 @@ export default function Layout() {
       </div>
 
       <BottomNav />
+      <ScrollToTop />
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
 
       {drawerMounted &&

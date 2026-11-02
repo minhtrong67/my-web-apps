@@ -44,11 +44,12 @@ r.style.background=d?'#0a111f':'#eaf3ff';document.getElementById('tc').content=d
 <link rel="manifest" href="../manifest.webmanifest">
 <link rel="preconnect" href="https://static.wikitide.net" crossorigin>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"BA List","url":"https://minhtrong67.github.io/blue-archive-list/app/","image":"https://minhtrong67.github.io/blue-archive-list/og-image.png","description":"Tra cứu 278 học sinh Blue Archive: tìm kiếm thông minh, lọc theo trường, vai trò, vũ khí, địa hình, sắp xếp và xem chi tiết. Hoạt động offline, không cần đăng nhập.","applicationCategory":"ReferenceApplication","operatingSystem":"Any (Web, PWA)","inLanguage":["vi","en"],"offers":{"@type":"Offer","price":"0","priceCurrency":"VND"},"isAccessibleForFree":true}</script>
+<link rel="stylesheet" href="/src/index.css">
 </head>
 <body>
 <div id="root">
   <!-- Splash tức thì (hiện trước khi JS tải xong): vòng halo kiểu Blue Archive -->
-  <div class="grid min-h-dvh place-items-center" aria-busy="true">
+  <div class="fixed inset-0 z-50 grid place-items-center bg-surface" aria-busy="true">
     <div class="flex flex-col items-center gap-3">
       <svg viewBox="0 0 64 64" width="84" height="84" class="halo-spinner text-primary" role="progressbar" aria-label="Loading">
         <circle class="halo-out" cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 7" opacity=".5"/>

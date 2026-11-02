@@ -1,11 +1,12 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
 import { BootScreen } from './components/Loading.jsx'
+import { loadFont, normalizeFont } from './lib/fonts.js'
 import { SettingsProvider, ToastProvider } from './lib/app-context.jsx'
 
 /* App + dữ liệu học sinh nằm ở chunk riêng → hiện BootScreen (vòng halo + skeleton) trong lúc tải */
-const App = lazy(() => import('./App.jsx'))
+const savedFont = () => { try { return normalizeFont(JSON.parse(localStorage.getItem('ba-cfg') || '{}').ff) } catch { return 'system' } }
+const App = lazy(() => Promise.all([import('./App.jsx'), loadFont(savedFont())]).then(([m]) => m))
 
 /* Giữ lại sự kiện cài đặt PWA để nút "Cài đặt ứng dụng" trong Cài đặt dùng */
 addEventListener('beforeinstallprompt', (e) => {

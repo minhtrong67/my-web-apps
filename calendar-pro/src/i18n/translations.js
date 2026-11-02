@@ -5,7 +5,7 @@
  */
 export const translations = {
   vi: {
-    app: { name: 'Calendar Pro', tagline: 'Âm dương & vạn niên', tip: 'Mẹo nhanh', tipText: 'Chạm vào một ngày bất kỳ trong Lịch để xem chi tiết âm lịch, can chi và giờ hoàng đạo.', credit: 'Thiết kế bởi minhtrong67 · Phát triển cùng Claude AI' },
+    app: { name: 'Calendar Pro', tagline: 'Âm dương & vạn niên', tip: 'Mẹo nhanh', tipText: 'Chạm vào một ngày bất kỳ trong Lịch để xem chi tiết âm lịch, can chi và giờ hoàng đạo.' },
     nav: {
       home: 'Trang chủ',
       calendar: 'Lịch',
@@ -13,7 +13,7 @@ export const translations = {
       vanNien: 'Vạn Niên',
       vanNienFull: 'Lịch vạn niên',
       countdown: 'Đếm ngược',
-      countdownFull: 'Đếm ngược sự kiện',
+      countdownFull: 'Đếm ngược',
       settings: 'Cài đặt',
       menu: 'Điều hướng chính',
       openMenu: 'Mở menu điều hướng',
@@ -27,6 +27,7 @@ export const translations = {
     common: {
       loading: 'Đang tải...',
       close: 'Đóng',
+      scrollTop: 'Lên đầu trang',
       cancel: 'Huỷ',
       confirm: 'Xác nhận',
       today: 'Hôm nay',
@@ -82,7 +83,7 @@ export const translations = {
       convertedToSolar: 'Đã quy đổi sang dương lịch thành công.'
     },
     countdown: {
-      title: 'Đếm ngược sự kiện',
+      title: 'Đếm ngược',
       subtitle: 'Ngày lễ nổi bật Việt Nam',
       desc: 'Theo dõi thời gian còn lại đến các ngày lễ, kỷ niệm nổi bật. Chạm vào một thẻ để xem chi tiết.',
       filterAll: 'Tất cả',
@@ -97,6 +98,9 @@ export const translations = {
       bySolar: 'Theo dương lịch',
       byLunar: 'Theo âm lịch',
       meaning: 'Ý nghĩa',
+      customs: 'Phong tục & hoạt động',
+      fact: 'Có thể bạn chưa biết',
+      daysLeft: 'Còn lại',
     },
     vanNienDetail: {
       solar: 'Dương lịch',
@@ -186,7 +190,7 @@ export const translations = {
   },
 
   en: {
-    app: { name: 'Calendar Pro', tagline: 'Lunar & solar calendar', tip: 'Quick tip', tipText: 'Tap any date on the Calendar to see lunar details, can-chi and auspicious hours.', credit: 'Designed by minhtrong67 · Built with Claude AI' },
+    app: { name: 'Calendar Pro', tagline: 'Lunar & solar calendar', tip: 'Quick tip', tipText: 'Tap any date on the Calendar to see lunar details, can-chi and auspicious hours.' },
     nav: {
       home: 'Home',
       calendar: 'Calendar',
@@ -194,7 +198,7 @@ export const translations = {
       vanNien: 'Almanac',
       vanNienFull: 'Perpetual Almanac',
       countdown: 'Countdown',
-      countdownFull: 'Event Countdown',
+      countdownFull: 'Countdown',
       settings: 'Settings',
       menu: 'Main navigation',
       openMenu: 'Open navigation menu',
@@ -208,6 +212,7 @@ export const translations = {
     common: {
       loading: 'Loading...',
       close: 'Close',
+      scrollTop: 'Back to top',
       cancel: 'Cancel',
       confirm: 'Confirm',
       today: 'Today',
@@ -263,7 +268,7 @@ export const translations = {
       convertedToSolar: 'Converted to solar calendar successfully.'
     },
     countdown: {
-      title: 'Event Countdown',
+      title: 'Countdown',
       subtitle: "Vietnam's notable holidays",
       desc: 'Track the time remaining until notable holidays and anniversaries. Tap a card to view details.',
       filterAll: 'All',
@@ -278,6 +283,9 @@ export const translations = {
       bySolar: 'By solar calendar',
       byLunar: 'By lunar calendar',
       meaning: 'Meaning',
+      customs: 'Customs & activities',
+      fact: 'Did you know?',
+      daysLeft: 'Time left',
     },
     vanNienDetail: {
       solar: 'Solar date',

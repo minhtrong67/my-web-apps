@@ -21,6 +21,7 @@ import { useAuth } from './AuthContext';
 import { useT } from '../i18n';
 import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_WALLETS } from '../utils/defaults';
 import { monthKey, dayKey } from '../utils/format';
+import { sortByOrder } from '../utils/cafe';
 
 const DataContext = createContext(null);
 
@@ -46,6 +47,10 @@ function settle(promise) {
     return Promise.resolve();
   }
   return promise;
+}
+
+function nextOrder(list) {
+  return list.reduce((m, x) => (Number.isFinite(x.order) ? Math.max(m, x.order) : m), -1) + 1;
 }
 
 function cafeLogData(c) {
@@ -166,7 +171,7 @@ export function DataProvider({ children }) {
         },
         () => mark(key),
       );
-    const unsubs = [listen('cafeShops', setCafeShops, 'shops'), listen('cafeDrinks', setCafeDrinks, 'drinks'), listen('cafeLogs', setCafeLogs, 'logs')];
+    const unsubs = [listen('cafeShops', (l) => setCafeShops(sortByOrder(l)), 'shops'), listen('cafeDrinks', (l) => setCafeDrinks(sortByOrder(l)), 'drinks'), listen('cafeLogs', setCafeLogs, 'logs')];
     return () => {
       unsubs.forEach((u) => u());
       setCafeReady({ shops: false, drinks: false, logs: false });
@@ -438,12 +443,13 @@ export function DataProvider({ children }) {
           imageUrl: (p.imageUrl || '').trim(),
           description: (p.description || '').trim(),
           rating: Number(p.rating) || 0,
+          order: nextOrder(cafeShops),
           createdAt: serverTimestamp(),
         }),
       );
       return ref.id;
     },
-    [uid],
+    [uid, cafeShops],
   );
 
   const updateCafeShop = useCallback(
@@ -479,12 +485,13 @@ export function DataProvider({ children }) {
           name: p.name.trim(),
           imageUrl: (p.imageUrl || '').trim(),
           description: (p.description || '').trim(),
+          order: nextOrder(cafeDrinks),
           createdAt: serverTimestamp(),
         }),
       );
       return ref.id;
     },
-    [uid],
+    [uid, cafeDrinks],
   );
 
   const updateCafeDrink = useCallback(
@@ -508,6 +515,19 @@ export function DataProvider({ children }) {
     },
     [uid],
   );
+
+  // Persist a manual order: item i of `ids` gets order i (one batch).
+  const reorderCafe = useCallback(
+    async (name, ids) => {
+      if (!uid) return;
+      const batch = writeBatch(db);
+      ids.forEach((id, i) => batch.update(doc(db, 'users', uid, name, id), { order: i }));
+      await settle(batch.commit());
+    },
+    [uid],
+  );
+  const reorderCafeShops = useCallback((ids) => reorderCafe('cafeShops', ids), [reorderCafe]);
+  const reorderCafeDrinks = useCallback((ids) => reorderCafe('cafeDrinks', ids), [reorderCafe]);
 
   // ---------- Derived selectors ----------
   const currentMonthKey = monthKey(new Date());
@@ -568,6 +588,8 @@ export function DataProvider({ children }) {
       cafeLogById,
       cafeShopById,
       cafeDrinkById,
+      reorderCafeShops,
+      reorderCafeDrinks,
       addCafeShop,
       updateCafeShop,
       deleteCafeShop,
@@ -594,6 +616,7 @@ export function DataProvider({ children }) {
       transactions, categories, wallets, loading, stats, getCategory, getWallet,
       cafeShops, cafeDrinks, cafeLogs, cafeLoading, cafeLogById, cafeShopById, cafeDrinkById,
       addCafeShop, updateCafeShop, deleteCafeShop, addCafeDrink, updateCafeDrink, deleteCafeDrink,
+      reorderCafeShops, reorderCafeDrinks,
       addTransaction, updateTransaction, deleteTransaction, importTransactions, importCategories,
       addCategory, updateCategory, deleteCategory, addWallet, updateWallet, deleteWallet, transferBetweenWallets,
     ],

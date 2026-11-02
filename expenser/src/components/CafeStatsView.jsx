@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ResponsiveContainer, Tooltip, Legend, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { ResponsiveContainer, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import Icon from './ui/Icon';
 import IconButton from './ui/IconButton';
 import Chip from './ui/Chip';
@@ -8,7 +8,7 @@ import { ChartSkeleton } from './ui/Skeleton';
 import { useI18n } from '../i18n';
 import { useSessionState } from '../hooks/useSessionState';
 import { useChartTheme } from '../hooks/useChartTheme';
-import { formatMoney, formatCompactMoney, formatDateShort, formatMonthYear, formatDate } from '../utils/format';
+import { formatMoney, formatDateShort, formatMonthYear } from '../utils/format';
 import { getPeriod, shiftAnchor, getSession, SESSIONS, SESSION_COLORS, CHART_PALETTE } from '../utils/cafe';
 
 const RANGES = ['week', 'month', 'year'];
@@ -25,35 +25,58 @@ function ChartCard({ title, subtitle, children }) {
   );
 }
 
-function StatCard({ icon, label, value, hint }) {
+function StatCard({ icon, label, value, hint, tone }) {
   return (
-    <div className="min-w-0 rounded-xl bg-surface-container p-3 text-on-surface sm:p-4">
-      <p className="flex items-center gap-1 text-label-md text-on-surface-variant">
+    <div className={`min-w-0 rounded-xl p-3 sm:p-4 ${tone}`}>
+      <p className="flex items-center gap-1 text-label-md opacity-80">
         <Icon name={icon} size={13} /> {label}
       </p>
       <p className="mt-1.5 wrap-any text-title-md font-bold tabular-nums leading-tight sm:text-title-lg">{value}</p>
-      {hint && <p className="wrap-any mt-0.5 text-body-sm text-on-surface-variant">{hint}</p>}
+      {hint && <p className="wrap-any mt-0.5 text-body-sm opacity-80">{hint}</p>}
     </div>
   );
 }
 
-/** Donut of "how often" (visits) with spend in the tooltip. rows: [{ name, visits, amount, color }] */
-function VisitsPie({ rows, chart, t }) {
-  if (rows.length === 0) return <EmptyState icon="donut_large" text={t('common.noData')} />;
-  const total = rows.reduce((s, r) => s + r.visits, 0);
-  const data = rows.map((r) => ({ ...r, pct: Math.round((r.visits / total) * 100) }));
+/**
+ * Donut + progress bars. `valueKey`: 'visits' (how often) or 'amount' (how much money).
+ * rows: [{ name, visits, amount, color }]
+ */
+function PieWithBars({ rows, valueKey, chart, t }) {
+  const total = rows.reduce((s, r) => s + r[valueKey], 0);
+  if (rows.length === 0 || total === 0) return <EmptyState icon="donut_large" text={t('common.noData')} />;
+  const data = rows.map((r) => ({ ...r, pct: Math.round((r[valueKey] / total) * 100) }));
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <PieChart>
-        <Pie data={data} dataKey="visits" nameKey="name" innerRadius={55} outerRadius={92} paddingAngle={2} stroke="none" isAnimationActive={false} label={({ pct }) => (pct >= 5 ? `${pct}%` : '')} labelLine={false} style={{ fontSize: 11, fontWeight: 600 }}>
-          {data.map((d, i) => (
-            <Cell key={i} fill={d.color} />
-          ))}
-        </Pie>
-        <Tooltip {...chart.tooltip} formatter={(v, n, { payload }) => [`${t('cafe.visits', { n: v })} · ${formatMoney(payload.amount)} (${payload.pct}%)`, payload.name]} />
-        <Legend wrapperStyle={{ fontSize: 11 }} />
-      </PieChart>
-    </ResponsiveContainer>
+    <>
+      <ResponsiveContainer width="100%" height={260}>
+        <PieChart>
+          <Pie data={data} dataKey={valueKey} nameKey="name" innerRadius={55} outerRadius={92} paddingAngle={2} stroke="none" isAnimationActive={false} label={({ pct }) => (pct >= 5 ? `${pct}%` : '')} labelLine={false} style={{ fontSize: 11, fontWeight: 600 }}>
+            {data.map((d, i) => (
+              <Cell key={i} fill={d.color} />
+            ))}
+          </Pie>
+          <Tooltip {...chart.tooltip} formatter={(v, n, { payload }) => [`${t('cafe.visits', { n: payload.visits })} · ${formatMoney(payload.amount)} (${payload.pct}%)`, payload.name]} />
+          <Legend wrapperStyle={{ fontSize: 11 }} />
+        </PieChart>
+      </ResponsiveContainer>
+      <ul className="mt-3 space-y-3 border-t border-outline-variant pt-4">
+        {data.map((d) => (
+          <li key={d.key}>
+            <div className="mb-1 flex items-center justify-between gap-2 text-body-sm">
+              <span className="flex min-w-0 items-center gap-2 text-on-surface">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: d.color }} />
+                <span className="wrap-any">{d.name}</span>
+              </span>
+              <span className="shrink-0 tabular-nums text-on-surface-variant">
+                {valueKey === 'amount' ? formatMoney(d.amount) : t('cafe.visits', { n: d.visits })} · {d.pct}%
+              </span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-highest" role="progressbar" aria-label={d.name} aria-valuemin={0} aria-valuemax={100} aria-valuenow={d.pct}>
+              <div className="h-full rounded-full transition-[width] duration-500 ease-emphasized" style={{ width: `${d.pct}%`, backgroundColor: d.color }} />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 
@@ -102,33 +125,6 @@ export default function CafeStatsView({ items, loading }) {
     return { total, count: inPeriod.length, avg: inPeriod.length ? Math.round(total / inPeriod.length) : 0, days };
   }, [inPeriod]);
 
-  // Spend per day (week / month) or per month (year).
-  const series = useMemo(() => {
-    if (range === 'year') {
-      const buckets = Array.from({ length: 12 }, (_, m) => ({ label: String(m + 1), full: formatMonthYear(new Date(start.getFullYear(), m, 1)), amount: 0, visits: 0 }));
-      inPeriod.forEach((it) => {
-        const b = buckets[new Date(it.tx.date).getMonth()];
-        b.amount += it.tx.amount;
-        b.visits += 1;
-      });
-      return buckets;
-    }
-    const n = Math.round((end - start) / 86400000);
-    const buckets = Array.from({ length: n }, (_, i) => {
-      const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-      return { label: range === 'week' ? formatDateShort(d) : String(d.getDate()), full: formatDate(d), amount: 0, visits: 0 };
-    });
-    inPeriod.forEach((it) => {
-      const d = new Date(it.tx.date);
-      const idx = Math.floor((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - start) / 86400000);
-      if (buckets[idx]) {
-        buckets[idx].amount += it.tx.amount;
-        buckets[idx].visits += 1;
-      }
-    });
-    return buckets;
-  }, [inPeriod, range, start, end]);
-
   const sessionRows = useMemo(
     () => aggregate(inPeriod, (it) => getSession(it.tx.date), (k) => t(`cafe.session.${k}`), (k) => SESSION_COLORS[k], t('common.other')).sort((a, b) => SESSIONS.indexOf(a.key) - SESSIONS.indexOf(b.key)),
     [inPeriod, t],
@@ -137,6 +133,7 @@ export default function CafeStatsView({ items, loading }) {
     () => aggregate(inPeriod, (it) => it.log?.drinkId || '', (k, it) => it.drink?.name || t('cafe.unspecified'), (k, i) => (k ? CHART_PALETTE[i % CHART_PALETTE.length] : OTHER_COLOR), t('common.other')),
     [inPeriod, t],
   );
+  const drinkSpendRows = useMemo(() => [...drinkRows].sort((a, b) => b.amount - a.amount), [drinkRows]);
   const shopRows = useMemo(
     () => aggregate(inPeriod, (it) => it.log?.shopId || '', (k, it) => it.shop?.name || t('cafe.unspecified'), (k, i) => (k ? CHART_PALETTE[i % CHART_PALETTE.length] : OTHER_COLOR), t('common.other')),
     [inPeriod, t],
@@ -175,10 +172,10 @@ export default function CafeStatsView({ items, loading }) {
       </div>
 
       <section className="animate-fade-in grid grid-cols-2 gap-2 rounded-2xl bg-surface-container-low p-3 sm:gap-3 sm:p-4 lg:grid-cols-4">
-        <StatCard icon="payments" label={t('cafe.statTotal')} value={formatMoney(summary.total)} />
-        <StatCard icon="local_cafe" label={t('cafe.statCount')} value={summary.count} hint={t('cafe.statDays', { n: summary.days })} />
-        <StatCard icon="trending_up" label={t('cafe.statAvg')} value={formatMoney(summary.avg)} />
-        <StatCard icon="storefront" label={t('cafe.statTopShop')} value={topShop?.name || '—'} hint={topShop ? t('cafe.visits', { n: topShop.visits }) : undefined} />
+        <StatCard tone="bg-expense-container text-on-expense-container" icon="payments" label={t('cafe.statTotal')} value={formatMoney(summary.total)} />
+        <StatCard tone="bg-primary-container text-on-primary-container" icon="local_cafe" label={t('cafe.statCount')} value={summary.count} hint={t('cafe.statDays', { n: summary.days })} />
+        <StatCard tone="bg-tertiary-container text-on-tertiary-container" icon="trending_up" label={t('cafe.statAvg')} value={formatMoney(summary.avg)} />
+        <StatCard tone="bg-secondary-container text-on-secondary-container" icon="storefront" label={t('cafe.statTopShop')} value={topShop?.name || '—'} hint={topShop ? t('cafe.visits', { n: topShop.visits }) : undefined} />
       </section>
 
       {inPeriod.length === 0 ? (
@@ -187,27 +184,18 @@ export default function CafeStatsView({ items, loading }) {
         </div>
       ) : (
         <>
-          <ChartCard title={t('cafe.chartSpend')} subtitle={range === 'year' ? t('cafe.chartByMonth') : t('cafe.chartByDay')}>
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={series} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
-                <CartesianGrid stroke={chart.grid} strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="label" tick={chart.tick} axisLine={false} tickLine={false} interval={range === 'month' ? 'preserveStartEnd' : 0} />
-                <YAxis tick={chart.tick} axisLine={false} tickLine={false} tickFormatter={formatCompactMoney} width={52} />
-                <Tooltip {...chart.tooltip} cursor={chart.cursor} labelFormatter={(_, p) => p?.[0]?.payload?.full} formatter={(v, n, { payload }) => [`${formatMoney(v)} · ${t('cafe.visits', { n: payload.visits })}`, t('cafe.statTotal')]} />
-                <Bar dataKey="amount" fill={chart.primary} radius={[6, 6, 0, 0]} isAnimationActive={false} />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
             <ChartCard title={t('cafe.chartSessions')} subtitle={t('cafe.chartSessionsHint')}>
-              <VisitsPie rows={sessionRows} chart={chart} t={t} />
+              <PieWithBars rows={sessionRows} valueKey="visits" chart={chart} t={t} />
+            </ChartCard>
+            <ChartCard title={t('cafe.chartDrinkSpend')} subtitle={t('cafe.chartDrinkSpendHint', { total: formatMoney(summary.total) })}>
+              <PieWithBars rows={drinkSpendRows} valueKey="amount" chart={chart} t={t} />
             </ChartCard>
             <ChartCard title={t('cafe.chartDrinks')} subtitle={topDrink ? t('cafe.topDrink', { name: topDrink.name }) : undefined}>
-              <VisitsPie rows={drinkRows} chart={chart} t={t} />
+              <PieWithBars rows={drinkRows} valueKey="visits" chart={chart} t={t} />
             </ChartCard>
             <ChartCard title={t('cafe.chartShops')} subtitle={topShop ? t('cafe.topShop', { name: topShop.name }) : undefined}>
-              <VisitsPie rows={shopRows} chart={chart} t={t} />
+              <PieWithBars rows={shopRows} valueKey="visits" chart={chart} t={t} />
             </ChartCard>
           </div>
         </>

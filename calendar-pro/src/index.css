@@ -47,10 +47,26 @@ body {
 * { border-color: var(--outline-variant); }
 ::selection { background-color: var(--primary); color: var(--on-primary); }
 
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background-color: color-mix(in srgb, var(--outline) 45%, transparent); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
-::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--outline) 70%, transparent); background-clip: padding-box; }
+/* Thanh cuộn tuỳ biến cho web (máy tính có chuột). Trên cảm ứng giữ thanh cuộn nổi mỏng của hệ điều hành.
+   Màu theo màu chủ đạo của app và tự đổi theo sáng/tối: thân thanh bo tròn, đậm dần khi rê chuột / kéo. */
+@media (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar { width: 14px; height: 14px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--primary) 34%, var(--surface-high));
+    border-radius: 999px;
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    min-height: 48px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--primary) 60%, var(--surface-high)); background-clip: padding-box; }
+  ::-webkit-scrollbar-thumb:active { background-color: var(--primary); background-clip: padding-box; }
+  ::-webkit-scrollbar-corner { background: transparent; }
+  /* Firefox không hỗ trợ ::-webkit-scrollbar → dùng thuộc tính chuẩn (Chrome mới sẽ bỏ qua khối này để giữ kiểu bo tròn ở trên) */
+  @supports not selector(::-webkit-scrollbar) {
+    * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--primary) 45%, var(--surface-high)) transparent; }
+  }
+}
 
 /* Viền focus rõ cho bàn phím (3px, bo theo hình) */
 :focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
@@ -179,6 +195,9 @@ body {
 .animate-drawer-down { animation: drawer-down 0.24s var(--ease-emphasized-accel) forwards; }
 @keyframes drawer-up { 0% { transform: translateY(100%); } 100% { transform: translateY(0); } }
 @keyframes drawer-down { 0% { transform: translateY(var(--drag-y, 0px)); } 100% { transform: translateY(100%); } }
+/* Sheet toàn màn hình: luôn trượt lên/xuống (không đổi sang kiểu hộp thoại ở màn hình rộng) */
+.animate-full-in { animation: drawer-up var(--dur-spatial-slow) var(--ease-spatial-slow) backwards; }
+.animate-full-out { animation: drawer-down 0.24s var(--ease-emphasized-accel) forwards; }
 /* Menu trượt (di động) */
 .animate-drawer-left { animation: drawer-left var(--dur-spatial-slow) var(--ease-spatial-slow) both; }
 .animate-drawer-left-out { animation: drawer-left-out 0.24s var(--ease-emphasized-accel) forwards; }
@@ -266,4 +285,15 @@ html:not(.icons-ready) .material-symbols-outlined { opacity: 0; }
     scroll-behavior: auto !important;
   }
   .loader-shape { animation: none; }
+}
+
+/* ==== Trang trí thẻ ngày đặc biệt (Giáng sinh, Halloween, Tết...) ==== */
+.holiday-emoji {
+  opacity: 0.4;
+  filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.25));
+  animation: holiday-float 5.5s ease-in-out infinite;
+}
+@keyframes holiday-float {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-7px) rotate(5deg); }
 }

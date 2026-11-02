@@ -66,4 +66,15 @@ export function shiftAnchor(range, anchor, dir) {
   return new Date(a.getFullYear(), a.getMonth() + dir, 1).getTime();
 }
 
+/** Manual order first (`order` ascending); anything without one goes last, oldest first. */
+export function sortByOrder(list) {
+  const ts = (x) => (x.createdAt?.toMillis ? x.createdAt.toMillis() : Number.MAX_SAFE_INTEGER);
+  return [...list].sort((a, b) => {
+    const ao = Number.isFinite(a.order) ? a.order : Infinity;
+    const bo = Number.isFinite(b.order) ? b.order : Infinity;
+    if (ao !== bo) return ao === Infinity ? 1 : bo === Infinity ? -1 : ao - bo;
+    return ts(a) - ts(b) || String(a.name).localeCompare(String(b.name));
+  });
+}
+
 export { startOfDay };

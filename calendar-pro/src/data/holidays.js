@@ -21,6 +21,7 @@ export const HOLIDAYS = [
   { id: 'phu-nu-vietnam', name: 'Ngày Phụ nữ Việt Nam', type: 'solar', day: 20, month: 10, category: 'ky-niem', icon: 'Flower2', desc: 'Tôn vinh phụ nữ Việt Nam.' },
   { id: 'nha-giao', name: 'Ngày Nhà giáo Việt Nam', type: 'solar', day: 20, month: 11, category: 'ky-niem', icon: 'GraduationCap', desc: 'Tôn vinh các thầy cô giáo Việt Nam.' },
   { id: 'qdnd', name: 'Thành lập Quân đội Nhân dân Việt Nam', type: 'solar', day: 22, month: 12, category: 'ky-niem', icon: 'Shield', desc: 'Kỷ niệm ngày thành lập Quân đội Nhân dân Việt Nam.' },
+  { id: 'halloween', name: 'Lễ hội Halloween', type: 'solar', day: 31, month: 10, category: 'quoc-te', icon: 'Ghost', desc: 'Đêm hội hóa trang rùng rợn với đèn bí ngô, kẹo ngọt và những câu chuyện ma.' },
   { id: 'giang-sinh', name: 'Lễ Giáng Sinh', type: 'solar', day: 25, month: 12, category: 'quoc-te', icon: 'TreePine', desc: 'Lễ hội mừng Chúa Giáng Sinh, phổ biến khắp Việt Nam.' },
 
   // ==== Âm lịch ====

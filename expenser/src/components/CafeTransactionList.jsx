@@ -15,7 +15,19 @@ import { useData } from '../contexts/DataContext';
 import { useI18n } from '../i18n';
 import { useSessionState } from '../hooks/useSessionState';
 import { formatMoney, formatDayHeader, formatTime, dayKey, parseLocalDate, parseLocalDateEnd } from '../utils/format';
-import { normalizeText, getSession, SESSIONS } from '../utils/cafe';
+import { normalizeText, getSession, SESSIONS, SESSION_COLORS } from '../utils/cafe';
+
+function Badge({ icon, color, children, muted }) {
+  return (
+    <span
+      className={`inline-flex max-w-full items-center gap-1 rounded-full px-2 py-0.5 text-label-sm font-medium ${muted ? 'border border-dashed border-outline-variant text-on-surface-variant' : ''}`}
+      style={muted ? undefined : { backgroundColor: `${color}26`, color }}
+    >
+      <Icon name={icon} size={13} />
+      <span className="wrap-any">{children}</span>
+    </span>
+  );
+}
 
 const PAGE = 40;
 
@@ -23,7 +35,7 @@ const defaultFilters = () => ({ search: '', shopId: 'all', drinkId: 'all', sessi
 
 /** "Giao dịch" tab of the cafe page: filterable, searchable list of cafe transactions grouped by day. */
 export default function CafeTransactionList({ items, loading, cafeCategoryId, onAdd }) {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const { cafeShops, cafeDrinks, deleteTransaction } = useData();
   const [filters, setFiltersRaw] = useSessionState('cafe.filters', defaultFilters);
   const [filtersOpen, setFiltersOpen] = useSessionState('cafe.filtersOpen', false);
@@ -87,12 +99,12 @@ export default function CafeTransactionList({ items, loading, cafeCategoryId, on
   }, [visible]);
 
   const shopOptions = useMemo(
-    () => [...cafeShops].sort((a, b) => a.name.localeCompare(b.name, locale)).map((s) => ({ value: s.id, label: s.name })),
-    [cafeShops, locale],
+    () => cafeShops.map((s) => ({ value: s.id, label: s.name })),
+    [cafeShops],
   );
   const drinkOptions = useMemo(
-    () => [...cafeDrinks].sort((a, b) => a.name.localeCompare(b.name, locale)).map((d) => ({ value: d.id, label: d.name })),
-    [cafeDrinks, locale],
+    () => cafeDrinks.map((d) => ({ value: d.id, label: d.name })),
+    [cafeDrinks],
   );
 
   async function handleDelete() {
@@ -217,14 +229,15 @@ export default function CafeTransactionList({ items, loading, cafeCategoryId, on
                       )}
                       <div className="min-w-0 flex-1">
                         <p className="wrap-any text-title-sm text-on-surface">{drink?.name || t('cafe.unspecifiedDrink')}</p>
-                        <p className="wrap-any flex items-center gap-1 text-body-sm text-on-surface-variant">
-                          <Icon name="storefront" size={14} />
-                          {shop?.name || t('cafe.unspecifiedShop')}
-                        </p>
-                        <p className="wrap-any text-body-sm text-on-surface-variant">
-                          {formatTime(tx.date)} · {t(`cafe.session.${getSession(tx.date)}`)} · {wallet?.name || ''}
-                        </p>
-                        {tx.note && <p className="wrap-any text-body-sm text-on-surface-variant">{tx.note}</p>}
+                        <div className="mt-1.5 flex flex-wrap gap-1.5">
+                          {shop ? <Badge icon="storefront" color="#B45309">{shop.name}</Badge> : <Badge icon="storefront" muted>{t('cafe.unspecifiedShop')}</Badge>}
+                          <Badge icon="schedule" color={SESSION_COLORS[getSession(tx.date)]}>
+                            {formatTime(tx.date)} · {t(`cafe.session.${getSession(tx.date)}`)}
+                          </Badge>
+                          {wallet && <Badge icon="account_balance_wallet" color="#64748B">{wallet.name}</Badge>}
+                          {shop?.rating > 0 && <Badge icon="star" color="#F59E0B">{shop.rating}/5</Badge>}
+                        </div>
+                        {tx.note && <p className="wrap-any mt-1 text-body-sm text-on-surface-variant">{tx.note}</p>}
                       </div>
                       <span className="shrink-0 text-title-sm font-bold tabular-nums text-expense">-{formatMoney(tx.amount)}</span>
                       <ItemActions onEdit={() => setEditingTx(tx)} onDelete={() => setDeleteTarget(tx)} />

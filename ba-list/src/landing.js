@@ -1,4 +1,3 @@
-import './index.css'
 import { fontStack, loadFont, normalizeFont } from './lib/fonts.js'
 import { motionOn, scrollToTop, smoothScrollTo } from './lib/scroll.js'
 import { applyScheme } from './lib/theme.js'
@@ -62,7 +61,6 @@ function applyTheme() {
   root.dataset.theme = d ? 'dark' : 'light'
   applyScheme(cfg.ac || '#128cff', d ? 'dark' : 'light')
   $$('.swatch').forEach((b) => b.setAttribute('aria-pressed', String((cfg.ac || '#128cff').toLowerCase() === b.dataset.ac)))
-  root.style.setProperty('--ff', fontStack(normalizeFont(cfg.ff)))
   if (cfg.fs) root.style.fontSize = `${(cfg.fs / 15) * 16}px`
 }
 
@@ -85,8 +83,9 @@ function applyLang() {
 }
 
 applyTheme()
-loadFont(normalizeFont(cfg.ff))
 applyLang()
+/* Giữ font hệ thống cho tới khi font đã chọn tải xong → không bị "nháy" đổi chữ */
+{ const id = normalizeFont(cfg.ff); loadFont(id).then(() => root.style.setProperty('--ff', fontStack(id))) }
 
 /* ───────── Nút đổi ngôn ngữ / theme / màu chủ đề ───────── */
 $('#lang').addEventListener('click', () => { lang = lang === 'vi' ? 'en' : 'vi'; saveCfg({ lang }); withTransition(applyLang) })

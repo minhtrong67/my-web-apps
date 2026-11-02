@@ -139,7 +139,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <Sheet open={!!selected} onClose={closeHoliday} title={t('countdown.eventDetail')}>
+      <Sheet fullScreen open={!!selected} onClose={closeHoliday} title={t('countdown.eventDetail')}>
         {selected && <HolidayDetail holiday={selected.holiday} nextDate={selected.next} />}
       </Sheet>
     </Page>

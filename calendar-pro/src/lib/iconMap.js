@@ -10,6 +10,7 @@ export const HOLIDAY_ICON_MAP = {
   Flame: 'local_fire_department',
   Flower: 'local_florist',
   Flower2: 'local_florist',
+  Ghost: 'skull',
   GraduationCap: 'school',
   HardHat: 'engineering',
   Heart: 'favorite',

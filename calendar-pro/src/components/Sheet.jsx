@@ -9,8 +9,9 @@ import { useModal } from "../hooks/useModal";
  * Bottom sheet Expressive: nền tonal, bo góc trên 28px, tay cầm 32×4; vào bằng spring nảy nhẹ.
  * Có animation vào/ra, vuốt xuống ở phần tay cầm để đóng (cảm ứng), Esc/scrim để đóng,
  * giữ focus trong sheet và trả focus về nút đã mở nó.
+ * fullScreen: phủ kín màn hình ở mọi cỡ (trượt lên từ dưới); nội dung căn giữa, rộng tối đa 42rem.
  */
-export default function Sheet({ open, onClose, title, children }) {
+export default function Sheet({ open, onClose, title, children, fullScreen = false }) {
   const { t } = useTranslation();
   const { mounted, closing } = useExitTransition(open, 220);
   const panelRef = useRef(null);
@@ -58,7 +59,7 @@ export default function Sheet({ open, onClose, title, children }) {
   // có transform/animation (transform tạo "containing block" mới cho position:fixed).
   return createPortal(
     <div
-      className="fixed inset-0 z-[70] flex items-end justify-center md:items-center md:p-6"
+      className={`fixed inset-0 z-[70] flex justify-center ${fullScreen ? 'items-stretch' : 'items-end md:items-center md:p-6'}`}
       role="dialog"
       aria-modal="true"
       aria-label={title}
@@ -70,7 +71,11 @@ export default function Sheet({ open, onClose, title, children }) {
       <div
         ref={panelRef}
         tabIndex={-1}
-        className={`${closing ? "animate-drawer-down" : "animate-drawer-up"} relative z-10 flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-[28px] bg-surface-low shadow-elevated outline-none md:max-h-[85dvh] md:max-w-lg md:rounded-[28px]`}
+        className={`${
+          fullScreen
+            ? `${closing ? "animate-full-out" : "animate-full-in"} h-dvh bg-surface`
+            : `${closing ? "animate-drawer-down" : "animate-drawer-up"} max-h-[90dvh] rounded-t-[28px] bg-surface-low shadow-elevated md:max-h-[85dvh] md:max-w-lg md:rounded-[28px]`
+        } relative z-10 flex w-full flex-col overflow-hidden outline-none`}
       >
         <div
           className="shrink-0 touch-none"
@@ -79,8 +84,11 @@ export default function Sheet({ open, onClose, title, children }) {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <div className="mx-auto mt-3 h-1 w-8 rounded-full bg-outline/50 md:hidden" aria-hidden="true" />
-          <div className="flex items-center justify-between pb-1 pl-5 pr-2 pt-3 md:pt-4">
+          <div
+            className={`mx-auto h-1 w-8 rounded-full bg-outline/50 md:hidden ${fullScreen ? "mt-[calc(env(safe-area-inset-top)+0.5rem)]" : "mt-3"}`}
+            aria-hidden="true"
+          />
+          <div className={`flex items-center justify-between pb-1 pl-5 pr-2 ${fullScreen ? "pt-2 md:pt-[calc(env(safe-area-inset-top)+1rem)]" : "pt-3 md:pt-4"} ${fullScreen ? "mx-auto w-full max-w-2xl" : ""}`}>
             <h2 className="text-title-lg text-on-surface">{title}</h2>
             <button
               onClick={onClose}
@@ -91,8 +99,8 @@ export default function Sheet({ open, onClose, title, children }) {
             </button>
           </div>
         </div>
-        <div className="overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-2 sm:px-5">
-          {children}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-2 sm:px-5">
+          <div className={fullScreen ? "mx-auto w-full max-w-2xl" : ""}>{children}</div>
         </div>
       </div>
     </div>,

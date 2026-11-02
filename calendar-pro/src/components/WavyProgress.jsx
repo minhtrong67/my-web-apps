@@ -11,7 +11,7 @@ const wave = (() => {
   return d
 })()
 
-export default function WavyProgress({ value = 0, className = '', label }) {
+export default function WavyProgress({ value = 0, className = '', label, color }) {
   const p = Math.min(1, Math.max(0, value))
   const x = Math.max(6, p * W)
   const id = `wp-${Math.round(p * 1000)}`
@@ -19,7 +19,8 @@ export default function WavyProgress({ value = 0, className = '', label }) {
     <svg
       viewBox={`0 0 ${W} 16`}
       preserveAspectRatio="none"
-      className={`h-4 w-full overflow-visible text-primary ${className}`}
+      className={`h-4 w-full overflow-visible ${color ? '' : 'text-primary'} ${className}`}
+      style={color ? { color } : undefined}
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
