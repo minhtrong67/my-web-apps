@@ -1,18 +1,21 @@
 import { memo, useMemo } from 'react'
 import { getLunarInfo, mondayIndex, pad2, weekdaysShort } from '../lib/dateUtils'
 import { NGAY_CHAY_NHI_TRAI, getHolidaysOnDate } from '../data/holidays'
+import { localizedHoliday } from '../data/holidayI18n'
+import { personalOnDate, usePersonalEvents } from '../lib/personalEvents'
 import { useNow } from '../hooks/useNow'
 import { useTranslation } from '../i18n/useTranslation'
 
 const dateKey = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
 
 /** Dữ liệu 42 ô của tháng — tính 1 lần cho mỗi tháng (âm lịch + ngày lễ), không tính lại khi chọn ngày. */
-function buildCells(year, month) {
+function buildCells(year, month, events, lang) {
   const start = new Date(year, month, 1 - mondayIndex(new Date(year, month, 1).getDay()))
   return Array.from({ length: 42 }, (_, i) => {
     const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i)
     const lunar = getLunarInfo(date)
     const holidays = getHolidaysOnDate(date, lunar)
+    const mine = events.length ? personalOnDate(events, date, lunar) : []
     return {
       date,
       key: dateKey(date),
@@ -20,7 +23,8 @@ function buildCells(year, month) {
       inMonth: date.getMonth() === month,
       isSunday: date.getDay() === 0,
       isHoliday: holidays.length > 0,
-      holidayNames: holidays.map((h) => h.name).join(', '),
+      holidayNames: [...holidays.map((h) => localizedHoliday(h, lang).name), ...mine.map((e) => e.name)].join(', '),
+      hasMine: mine.length > 0,
       isChay: NGAY_CHAY_NHI_TRAI.includes(lunar.lunarDay),
       isLunarMark: lunar.lunarDay === 15 || lunar.lunarDay === 1,
       lunarLabel: lunar.lunarDay === 1 ? `${lunar.lunarDay}/${pad2(lunar.lunarMonth)}` : pad2(lunar.lunarDay),
@@ -52,7 +56,7 @@ const DayCell = memo(function DayCell({ cell, selected, isToday, lunarWord, chay
       className={`state day-wave focus-ring relative mx-auto flex aspect-square w-full max-w-[3.75rem] flex-col items-center justify-center rounded-full transition-[box-shadow,color] duration-effects ease-effects active:scale-90 lg:max-w-[4.5rem] ${tone}${ring} ${tintClass} ${
         cell.inMonth ? '' : 'opacity-40'
       }`}
-      aria-label={`${cell.label}, ${lunarWord} ${cell.lunarAria}${cell.isHoliday ? `, ${cell.holidayNames}` : ''}${cell.isChay ? `, ${chayWord}` : ''}`}
+      aria-label={`${cell.label}, ${lunarWord} ${cell.lunarAria}${cell.holidayNames ? `, ${cell.holidayNames}` : ''}${cell.isChay ? `, ${chayWord}` : ''}`}
       aria-pressed={selected}
       aria-current={isToday ? 'date' : undefined}
     >
@@ -66,6 +70,8 @@ const DayCell = memo(function DayCell({ cell, selected, isToday, lunarWord, chay
       >
         {cell.lunarLabel}
       </span>
+      {/* Sự kiện cá nhân: chấm nhỏ dưới số ngày */}
+      {cell.hasMine && <span className={`absolute bottom-[9%] h-1.5 w-1.5 rounded-full ${selected ? 'bg-on-primary' : 'bg-error'}`} aria-hidden="true" />}
       {/* Ô đang chọn bị cookie màu chủ đạo che nền → giữ lại chấm nhỏ để vẫn biết đó là ngày lễ / chay */}
       {selected && (cell.isHoliday || cell.isChay) && (
         <span className="absolute right-[14%] top-[14%] flex flex-col gap-0.5" aria-hidden="true">
@@ -84,7 +90,8 @@ export default function CalendarGrid({ year, month, selectedDate, onSelect }) {
   const now = useNow(60000) // cập nhật "hôm nay" khi qua nửa đêm mà không cần tải lại
   const todayKey = dateKey(now)
   const selectedKey = selectedDate ? dateKey(selectedDate) : null
-  const cells = useMemo(() => buildCells(year, month), [year, month])
+  const events = usePersonalEvents()
+  const cells = useMemo(() => buildCells(year, month, events, lang), [year, month, events, lang])
   const lunarWord = t('vanNienDetail.lunar')
   const chayWord = t('calendar.legendVegetarian')
 

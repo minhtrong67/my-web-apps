@@ -234,3 +234,16 @@ Thông tin tác giả và Claude AI cũng được nêu bật trong trang **Cài
 Dự án được xây dựng cho mục đích học tập / tham khảo cá nhân. Các phông chữ, icon và thư viện bên thứ ba tuân theo giấy phép riêng của từng dự án.
 
 <div align="center"><sub>Thiết kế bởi <b>minhtrong67</b> · Phát triển cùng <b>Claude AI</b></sub></div>
+
+
+## Phát triển
+
+```bash
+npm run dev          # chạy thử
+npm test             # unit test (lịch âm, ngày lễ, xuất .ics)
+npm run lint         # ESLint
+npm run icons:check  # kiểm tra danh sách icon trong index.html khớp với code (build tự đồng bộ: npm run icons:sync)
+npm run build
+```
+
+Sự kiện cá nhân (sinh nhật, kỷ niệm, ngày giỗ — dương hoặc âm lịch) được lưu trong `localStorage` của trình duyệt, không gửi lên máy chủ.

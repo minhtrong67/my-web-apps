@@ -33,7 +33,7 @@ export default function Accounts({pending,setPending}){
  const active=(f.part!=='all')+(f.sort!=='new')
  const tags=[...(f.part!=='all'?[{k:'p',label:t('flt.'+f.part),off:()=>set({part:'all'})}]:[]),...(f.sort!=='new'?[{k:'o',label:t('sort.'+f.sort),off:()=>set({sort:'new'})}]:[])]
  const del=async()=>{setBusy(true);try{await removeAccount(ask.id);setAsk(null)}catch(e){toast(e.message,'error')}setBusy(false)}
- const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3':'flex flex-col gap-3'
+ const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3 2xl:grid-cols-4':'flex flex-col gap-3'
  return <>
   <PageHead title={t('nav.accounts')} sub={accounts&&t('accounts.count',{n:accounts.length})} onAdd={()=>setDlg({})} addLabel={t('add')}/>
   <Toolbar ph={t('accounts.search')} q={f.q} setQ={q=>set({q})} count={shown?.length} active={active} clear={()=>setV(V0A)} view={view} setView={setView} tags={tags}>

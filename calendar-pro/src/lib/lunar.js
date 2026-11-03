@@ -205,24 +205,17 @@ export function canChiDay(dd, mm, yy) {
   return `${can} ${chi}`
 }
 
-const GIO_HOANG_DAO_CHI = {
-  0: [0, 2, 4, 5, 8, 10], // ngày Tý,Sửu... => mapped by can-chi index of day; simplified table below
-}
-
-// Bảng giờ hoàng đạo theo Chi ngày (index 0-11 = Tý..Hợi)
-const HOANG_DAO_TABLE = [
-  [1, 3, 5, 8, 9, 11], // Tý
-  [1, 2, 4, 7, 9, 10], // Sửu
-  [0, 3, 5, 6, 8, 11], // Dần
-  [0, 2, 5, 6, 8, 10], // Mão... (giá trị minh hoạ, dùng để hiển thị tương đối)
-  [1, 3, 4, 6, 9, 11],
-  [1, 2, 5, 7, 8, 10],
-  [0, 3, 4, 6, 9, 11],
-  [0, 2, 4, 7, 9, 10],
-  [1, 3, 5, 6, 8, 11],
-  [1, 2, 4, 6, 9, 10],
-  [0, 3, 5, 7, 8, 11],
-  [0, 2, 4, 7, 9, 11]
+// Bảng giờ hoàng đạo theo Chi của ngày (chỉ số 0–11 = Tý…Hợi; giá trị là chỉ số giờ Tý…Hợi). Mỗi cặp chi cách nhau 6 ngày dùng chung một bộ giờ:
+//   Tý–Ngọ: Tý, Sửu, Mão, Ngọ, Thân, Dậu        Sửu–Mùi: Dần, Mão, Tỵ, Thân, Tuất, Hợi
+//   Dần–Thân: Tý, Sửu, Thìn, Tỵ, Mùi, Tuất      Mão–Dậu: Tý, Dần, Mão, Ngọ, Mùi, Dậu
+//   Thìn–Tuất: Dần, Thìn, Tỵ, Thân, Dậu, Hợi    Tỵ–Hợi: Sửu, Thìn, Ngọ, Mùi, Tuất, Hợi
+const HOANG_DAO_BY_PAIR = [
+  [0, 1, 3, 6, 8, 9], // Tý – Ngọ
+  [2, 3, 5, 8, 10, 11], // Sửu – Mùi
+  [0, 1, 4, 5, 7, 10], // Dần – Thân
+  [0, 2, 3, 6, 7, 9], // Mão – Dậu
+  [2, 4, 5, 8, 9, 11], // Thìn – Tuất
+  [1, 4, 6, 7, 10, 11] // Tỵ – Hợi
 ]
 
 const GIO_CHI_LABEL = [
@@ -234,8 +227,51 @@ const GIO_CHI_LABEL = [
 export function gioHoangDao(dd, mm, yy) {
   const jd = jdFromDate(dd, mm, yy)
   const chiIndex = (jd + 1) % 12
-  const goodHours = HOANG_DAO_TABLE[chiIndex]
+  const goodHours = HOANG_DAO_BY_PAIR[chiIndex % 6]
   return goodHours.map((i) => GIO_CHI_LABEL[i])
+}
+
+// ---- Ngày hoàng đạo / hắc đạo ----
+// 12 vị thần theo thứ tự vòng: 6 sao hoàng đạo (tốt) xen kẽ 6 sao hắc đạo (xấu).
+const SAO_NGAY = [
+  { name: 'Thanh Long', good: true },
+  { name: 'Minh Đường', good: true },
+  { name: 'Thiên Hình', good: false },
+  { name: 'Chu Tước', good: false },
+  { name: 'Kim Quỹ', good: true },
+  { name: 'Bảo Quang', good: true },
+  { name: 'Bạch Hổ', good: false },
+  { name: 'Ngọc Đường', good: true },
+  { name: 'Thiên Lao', good: false },
+  { name: 'Nguyên Vũ', good: false },
+  { name: 'Tư Mệnh', good: true },
+  { name: 'Câu Trần', good: false }
+]
+// Chi của ngày bắt đầu vòng (Thanh Long) theo tháng âm lịch: tháng 1,7 → Tý; 2,8 → Dần; 3,9 → Thìn; 4,10 → Ngọ; 5,11 → Thân; 6,12 → Tuất
+const SAO_START_CHI = [0, 2, 4, 6, 8, 10]
+
+/** Ngày hoàng đạo hay hắc đạo: trả về { name: tên sao, good: true nếu hoàng đạo } */
+export function saoNgay(dd, mm, yy, lunarMonth) {
+  const jd = jdFromDate(dd, mm, yy)
+  const dayChi = (jd + 1) % 12
+  const start = SAO_START_CHI[(lunarMonth - 1) % 6]
+  return SAO_NGAY[(dayChi - start + 12) % 12]
+}
+
+// ---- Hướng xuất hành (theo Can của ngày) ----
+const HUONG = {
+  dongBac: 'Đông Bắc', dong: 'Chính Đông', dongNam: 'Đông Nam', nam: 'Chính Nam',
+  tayNam: 'Tây Nam', tay: 'Chính Tây', tayBac: 'Tây Bắc', bac: 'Chính Bắc'
+}
+// Hỷ thần: Giáp-Kỷ Đông Bắc · Ất-Canh Tây Bắc · Bính-Tân Tây Nam · Đinh-Nhâm Chính Nam · Mậu-Quý Đông Nam
+const HY_THAN = [HUONG.dongBac, HUONG.tayBac, HUONG.tayNam, HUONG.nam, HUONG.dongNam]
+// Tài thần theo Can: Giáp, Ất Đông Nam · Bính, Đinh Chính Đông · Mậu Chính Bắc · Kỷ Chính Nam · Canh, Tân Tây Nam · Nhâm Chính Tây · Quý Tây Bắc
+const TAI_THAN = [HUONG.dongNam, HUONG.dongNam, HUONG.dong, HUONG.dong, HUONG.bac, HUONG.nam, HUONG.tayNam, HUONG.tayNam, HUONG.tay, HUONG.tayBac]
+
+/** Hướng xuất hành tốt trong ngày (theo quan niệm dân gian, chỉ mang tính tham khảo) */
+export function huongXuatHanh(dd, mm, yy) {
+  const can = (jdFromDate(dd, mm, yy) + 9) % 10
+  return { hyThan: HY_THAN[can % 5], taiThan: TAI_THAN[can] }
 }
 
 /** Ngày Rằm (15) hoặc Mùng Một (1) âm lịch */

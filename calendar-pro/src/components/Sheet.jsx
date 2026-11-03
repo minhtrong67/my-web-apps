@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { createPortal } from "react-dom";
-import Icon from "./Icon";
+import Icon from "./Icon"
+import Button from "./Button";
 import { useTranslation } from "../i18n/useTranslation";
 import { useExitTransition } from "../hooks/useExitTransition";
 import { useModal } from "../hooks/useModal";
@@ -99,9 +100,19 @@ export default function Sheet({ open, onClose, title, children, fullScreen = fal
             </button>
           </div>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-2 sm:px-5">
+        <div className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-2 sm:px-5 ${fullScreen ? "pb-4" : "pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"}`}>
           <div className={fullScreen ? "mx-auto w-full max-w-2xl" : ""}>{children}</div>
         </div>
+        {/* Sheet toàn màn hình: nút Đóng cố định ở đáy, tầm ngón cái, không phải với lên icon X */}
+        {fullScreen && (
+          <div className="shrink-0 border-t border-outline-variant/60 bg-surface px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 sm:px-5">
+            <div className="mx-auto w-full max-w-2xl">
+              <Button variant="secondary" className="w-full" onClick={onClose}>
+                {t("common.close")}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>,
     document.body,

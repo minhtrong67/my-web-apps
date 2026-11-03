@@ -1,11 +1,18 @@
 import Icon from './Icon'
 import RollingNumber from './RollingNumber'
 import { holidayIconName } from '../lib/iconMap'
-import { canChiDay, canChiMonth, canChiYear, chiAnimalYear, gioHoangDao, lunarMonthName } from '../lib/lunar'
+import { canChiDay, canChiMonth, canChiYear, chiAnimalYear, gioHoangDao, huongXuatHanh, lunarMonthName, saoNgay } from '../lib/lunar'
 import { getLunarInfo, formatVNDate } from '../lib/dateUtils'
 import CategoryBadge from './CategoryBadge'
 import { NGAY_CHAY_NHI_TRAI, getHolidaysOnDate } from '../data/holidays'
+import { localizedHoliday } from '../data/holidayI18n'
+import { personalOnDate, usePersonalEvents } from '../lib/personalEvents'
 import { useTranslation } from '../i18n/useTranslation'
+
+const DIRECTION_EN = {
+  'Đông Bắc': 'Northeast', 'Chính Đông': 'East', 'Đông Nam': 'Southeast', 'Chính Nam': 'South',
+  'Tây Nam': 'Southwest', 'Chính Tây': 'West', 'Tây Bắc': 'Northwest', 'Chính Bắc': 'North'
+}
 
 export default function VanNienDetail({ date }) {
   const { t, lang } = useTranslation()
@@ -20,6 +27,10 @@ export default function VanNienDetail({ date }) {
   const isRam = lunarDay === 15
   const isMungMot = lunarDay === 1
   const holidaysToday = getHolidaysOnDate(date, lunarInfo)
+  const mine = personalOnDate(usePersonalEvents(), date, lunarInfo)
+  const sao = saoNgay(date.getDate(), date.getMonth() + 1, date.getFullYear(), lunarMonth)
+  const huong = huongXuatHanh(date.getDate(), date.getMonth() + 1, date.getFullYear())
+  const dir = (d) => (lang === 'en' ? DIRECTION_EN[d] ?? d : d)
 
   return (
     <div className="flex flex-col gap-3">
@@ -74,18 +85,55 @@ export default function VanNienDetail({ date }) {
             <Icon name={holidayIconName(h.icon)} size={24} filled />
           </div>
           <div className="min-w-0">
-            <p className="text-title-sm">{h.name}</p>
+            <p className="text-title-sm">{localizedHoliday(h, lang).name}</p>
             <CategoryBadge category={h.category} className="mt-1" />
-            <p className="mt-1.5 text-body-md opacity-85">{h.desc}</p>
+            <p className="mt-1.5 text-body-md opacity-85">{localizedHoliday(h, lang).desc}</p>
           </div>
         </div>
       ))}
+
+      {/* Sự kiện cá nhân trong ngày */}
+      {mine.length > 0 && (
+        <div className="animate-rise rounded-3xl bg-tertiary-container p-4 text-on-tertiary-container">
+          <p className="mb-2 text-title-sm">{t('vanNienDetail.myEvents')}</p>
+          <ul className="flex flex-col gap-1.5">
+            {mine.map((e) => (
+              <li key={e.id} className="flex items-center gap-2 text-body-lg">
+                <Icon name={holidayIconName(e.icon)} size={20} filled />
+                {e.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-3">
         <InfoTile icon="wb_sunny" label={t('vanNienDetail.dayCanChi')} value={canChiN} />
         <InfoTile icon="auto_awesome" label={t('vanNienDetail.monthCanChi')} value={canChiT} />
         <InfoTile icon="cruelty_free" label={t('vanNienDetail.yearAnimal')} value={convat} />
       </div>
+
+      {/* Hoàng đạo / hắc đạo + hướng xuất hành */}
+      <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2">
+        <div className={`flex items-center gap-3 rounded-3xl p-4 ${sao.good ? 'bg-chay-container text-on-chay-container' : 'bg-error-container text-on-error-container'}`}>
+          <span className="shape-scallop flex h-11 w-11 shrink-0 items-center justify-center bg-surface-lowest/60">
+            <Icon name={sao.good ? 'auto_awesome' : 'warning'} size={22} filled />
+          </span>
+          <div className="min-w-0">
+            <p className="text-label-sm opacity-80">{t('vanNienDetail.dayStar')}</p>
+            <p className="text-title-sm">{sao.name}</p>
+            <p className="text-body-sm opacity-85">{sao.good ? t('vanNienDetail.goodDay') : t('vanNienDetail.badDay')}</p>
+          </div>
+        </div>
+        <div className="rounded-3xl bg-surface-container p-4">
+          <p className="mb-2 flex items-center gap-2 text-title-sm text-on-surface-variant">
+            <Icon name="explore" size={20} /> {t('vanNienDetail.directions')}
+          </p>
+          <p className="text-body-md text-on-surface"><span className="text-on-surface-variant">{t('vanNienDetail.hyThan')}: </span>{dir(huong.hyThan)}</p>
+          <p className="text-body-md text-on-surface"><span className="text-on-surface-variant">{t('vanNienDetail.taiThan')}: </span>{dir(huong.taiThan)}</p>
+        </div>
+      </div>
+      <p className="-mt-1 px-2 text-body-sm text-on-surface-variant">{t('vanNienDetail.directionNote')}</p>
 
       <div className="rounded-3xl bg-surface-container p-4">
         <div className="mb-3 flex items-center gap-2 text-on-surface-variant">

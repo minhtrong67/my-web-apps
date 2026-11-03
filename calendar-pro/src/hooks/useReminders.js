@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { HOLIDAYS, NGAY_CHAY_NHI_TRAI } from '../data/holidays'
+import { localizedHoliday } from '../data/holidayI18n'
 import { getLunarInfo, getNextOccurrence, sameDay, startOfDay, addDays, formatShortDate } from '../lib/dateUtils'
 
 const LAST_NOTIFIED_KEY = 'calendar-pro:last-notified-date'
@@ -57,15 +58,16 @@ export function getReminders(from = new Date(), prefs = {}) {
     if (!notifyHolidayIds.includes(h.id)) continue
     const next = getNextOccurrence(h, today)
     if (next && sameDay(next, checkDate)) {
+      const { name: hName, desc: hDesc } = localizedHoliday(h, lang)
       messages.push(
         lang === 'en'
           ? {
-              title: isBefore ? `Coming up: ${h.name}` : `Today: ${h.name}`,
-              body: isBefore ? `${beforeDays} day(s) left (${formatShortDate(next)}). ${h.desc}` : h.desc
+              title: isBefore ? `Coming up: ${hName}` : `Today: ${hName}`,
+              body: isBefore ? `${beforeDays} day(s) left (${formatShortDate(next)}). ${hDesc}` : hDesc
             }
           : {
-              title: isBefore ? `Sắp tới: ${h.name}` : `Hôm nay: ${h.name}`,
-              body: isBefore ? `Còn ${beforeDays} ngày nữa (${formatShortDate(next)}). ${h.desc}` : h.desc
+              title: isBefore ? `Sắp tới: ${hName}` : `Hôm nay: ${hName}`,
+              body: isBefore ? `Còn ${beforeDays} ngày nữa (${formatShortDate(next)}). ${hDesc}` : hDesc
             }
       )
     }

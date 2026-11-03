@@ -41,7 +41,7 @@ export default function Websites({pending,setPending}){
  const tags=[...(f.cat?[{k:'c',label:f.cat==='none'?t('uncat'):wcats?.find(c=>c.id===f.cat)?.name||'…',off:()=>set({cat:''})}]:[]),...(f.sort!=='new'?[{k:'o',label:t('sort.'+f.sort),off:()=>set({sort:'new'})}]:[])]
  const del=async()=>{setBusy(true);try{await removeWebsite(ask.id);setAsk(null)}catch(e){toast(e.message,'error')}setBusy(false)}
  const seed=async()=>{setSeeding(true);try{toast(t('x.imported',{...await importRecords({websites:SEED}),skipped:0}))}catch(e){toast(t(e.message||'x.err'),'error')}setSeeding(false)}
- const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3':'flex flex-col gap-3'
+ const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3 2xl:grid-cols-4':'flex flex-col gap-3'
  return <>
   <PageHead title={t('nav.websites')} sub={websites&&t('websites.count',{n:websites.length})} onAdd={()=>setDlg({})} addLabel={t('add')}/>
   <Toolbar ph={t('websites.search')} q={f.q} setQ={q=>set({q})} count={shown?.length} active={active} clear={()=>setV(V0W)} view={view} setView={setView} tags={tags}>

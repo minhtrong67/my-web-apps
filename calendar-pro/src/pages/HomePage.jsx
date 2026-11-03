@@ -8,6 +8,7 @@ import HolidayDetail from '../components/HolidayDetail'
 import Button from '../components/Button'
 import { Page, PageHeader } from '../components/Page'
 import { HOLIDAYS } from '../data/holidays'
+import { toHoliday, usePersonalEvents } from '../lib/personalEvents'
 import { getNextOccurrence, getLunarInfo, weekdaysShort, sameDay, mondayIndex, addDays } from '../lib/dateUtils'
 import { useNow } from '../hooks/useNow'
 import { useToast } from '../contexts/ToastContext'
@@ -24,12 +25,13 @@ export default function HomePage() {
   const today = useMemo(() => new Date(now.getFullYear(), now.getMonth(), now.getDate()), [todayKey]) // eslint-disable-line react-hooks/exhaustive-deps
   const { lunarDay: todayLunarDay } = useMemo(() => getLunarInfo(today), [today])
 
+  const personal = usePersonalEvents()
   const upcoming = useMemo(() => {
-    return HOLIDAYS.map((h) => ({ holiday: h, next: getNextOccurrence(h, today) }))
+    return [...HOLIDAYS, ...personal.map(toHoliday)].map((h) => ({ holiday: h, next: getNextOccurrence(h, today) }))
       .filter((x) => x.next)
       .sort((a, b) => a.next - b.next)
       .slice(0, 6)
-  }, [today])
+  }, [today, personal])
 
   const weekStrip = useMemo(() => {
     const start = addDays(today, -mondayIndex(today.getDay()))

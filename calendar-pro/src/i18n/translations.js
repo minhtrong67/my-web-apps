@@ -65,7 +65,33 @@ export const translations = {
       legendHoliday: 'Ngày lễ',
       legendSunday: 'Đỏ = Chủ nhật',
       dayDetail: 'Chi tiết ngày',
-      alsoVegetarian: 'Cũng là ngày chay'
+      alsoVegetarian: 'Cũng là ngày chay',
+      pickMonth: 'Chọn tháng và năm',
+      prevYear: 'Năm trước',
+      nextYear: 'Năm sau',
+      legendMine: 'Sự kiện của tôi'
+    },
+    events: {
+      newTitle: 'Thêm sự kiện',
+      editTitle: 'Sửa sự kiện',
+      name: 'Tên sự kiện',
+      namePlaceholder: 'VD: Sinh nhật mẹ',
+      calendarType: 'Loại lịch',
+      solar: 'Dương lịch',
+      lunar: 'Âm lịch',
+      day: 'Ngày',
+      month: 'Tháng',
+      year: 'Năm gốc (tuỳ chọn)',
+      yearHint: 'Dùng để hiện tuổi hoặc lần kỷ niệm, VD: năm sinh.',
+      icon: 'Biểu tượng',
+      save: 'Lưu',
+      nameRequired: 'Vui lòng nhập tên sự kiện.',
+      saved: 'Đã lưu sự kiện.',
+      deleted: 'Đã xoá sự kiện.',
+      limit: 'Đã đạt tối đa 100 sự kiện.',
+      deleteTitle: 'Xoá sự kiện?',
+      deleteBody: (name) => `"${name}" sẽ bị xoá khỏi thiết bị này.`,
+      lunarNote: 'Sự kiện âm lịch sẽ tự quy đổi sang dương lịch mỗi năm.'
     },
     vanNien: {
       title: 'Lịch vạn niên',
@@ -85,12 +111,16 @@ export const translations = {
     countdown: {
       title: 'Đếm ngược',
       subtitle: 'Ngày lễ nổi bật Việt Nam',
-      desc: 'Theo dõi thời gian còn lại đến các ngày lễ, kỷ niệm nổi bật. Chạm vào một thẻ để xem chi tiết.',
+      desc: 'Theo dõi thời gian còn lại đến các ngày lễ, kỷ niệm nổi bật. Bấm nút “Xem chi tiết” trên thẻ để xem ý nghĩa và phong tục.',
       filterAll: 'Tất cả',
       empty: 'Không có sự kiện nào trong danh mục này.',
       occursToday: 'Diễn ra hôm nay!',
       daysShort: (d) => `${d} ngày`,
-      eventDetail: 'Chi tiết sự kiện'
+      eventDetail: 'Chi tiết sự kiện',
+      viewDetail: 'Xem chi tiết',
+      addEvent: 'Thêm sự kiện',
+      emptyMine: 'Bạn chưa có sự kiện nào. Thêm sinh nhật, ngày kỷ niệm hay ngày giỗ để đếm ngược cùng các ngày lễ.',
+      mineHint: 'Sự kiện của bạn chỉ lưu trên thiết bị này.'
     },
     holidayDetail: {
       lastOccurrence: 'Ngày diễn ra gần nhất',
@@ -101,6 +131,18 @@ export const translations = {
       customs: 'Phong tục & hoạt động',
       fact: 'Có thể bạn chưa biết',
       daysLeft: 'Còn lại',
+      addToCalendar: 'Thêm vào lịch',
+      shareImage: 'Chia sẻ ảnh',
+      icsDone: 'Đã tạo file lịch (.ics) — mở file để thêm vào ứng dụng lịch.',
+      imageSaved: 'Đã lưu ảnh về máy.',
+      imageFailed: 'Không tạo được ảnh, vui lòng thử lại.',
+      shareUnit: 'ngày nữa',
+      shareToday: 'Hôm nay!',
+      repeatsYearly: 'Lặp lại hằng năm',
+      anniversary: (n) => `Lần thứ ${n}`,
+      personalNote: 'Sự kiện của riêng bạn, lưu trên thiết bị này.',
+      edit: 'Sửa',
+      remove: 'Xoá',
     },
     vanNienDetail: {
       solar: 'Dương lịch',
@@ -117,7 +159,15 @@ export const translations = {
       dayCanChi: 'Ngày (Can Chi)',
       monthCanChi: 'Tháng (Can Chi)',
       yearAnimal: 'Con giáp năm',
-      luckyHours: 'Giờ hoàng đạo'
+      luckyHours: 'Giờ hoàng đạo',
+      dayStar: 'Sao ngày',
+      goodDay: 'Ngày hoàng đạo',
+      badDay: 'Ngày hắc đạo',
+      directions: 'Hướng xuất hành',
+      hyThan: 'Hỷ thần',
+      taiThan: 'Tài thần',
+      directionNote: 'Theo quan niệm dân gian, chỉ mang tính tham khảo.',
+      myEvents: 'Sự kiện của tôi'
     },
     notFound: {
       title: 'Không tìm thấy trang',
@@ -185,7 +235,8 @@ export const translations = {
       'truyen-thong': 'Truyền thống',
       'ky-niem': 'Kỷ niệm',
       'quoc-te': 'Quốc tế',
-      'ton-giao': 'Tôn giáo'
+      'ton-giao': 'Tôn giáo',
+      'ca-nhan': 'Của tôi'
     }
   },
 
@@ -250,7 +301,33 @@ export const translations = {
       legendHoliday: 'Holiday',
       legendSunday: 'Red = Sunday',
       dayDetail: 'Day details',
-      alsoVegetarian: 'Also a vegetarian day'
+      alsoVegetarian: 'Also a vegetarian day',
+      pickMonth: 'Choose month and year',
+      prevYear: 'Previous year',
+      nextYear: 'Next year',
+      legendMine: 'My events'
+    },
+    events: {
+      newTitle: 'Add event',
+      editTitle: 'Edit event',
+      name: 'Event name',
+      namePlaceholder: "e.g. Mom's birthday",
+      calendarType: 'Calendar',
+      solar: 'Solar',
+      lunar: 'Lunar',
+      day: 'Day',
+      month: 'Month',
+      year: 'Original year (optional)',
+      yearHint: 'Used to show an age or anniversary number, e.g. birth year.',
+      icon: 'Icon',
+      save: 'Save',
+      nameRequired: 'Please enter an event name.',
+      saved: 'Event saved.',
+      deleted: 'Event deleted.',
+      limit: 'You have reached the limit of 100 events.',
+      deleteTitle: 'Delete event?',
+      deleteBody: (name) => `"${name}" will be removed from this device.`,
+      lunarNote: 'Lunar events are converted to the solar calendar automatically each year.'
     },
     vanNien: {
       title: 'Perpetual Almanac',
@@ -270,12 +347,16 @@ export const translations = {
     countdown: {
       title: 'Countdown',
       subtitle: "Vietnam's notable holidays",
-      desc: 'Track the time remaining until notable holidays and anniversaries. Tap a card to view details.',
+      desc: 'Track the time remaining until notable holidays and anniversaries. Press “View details” on a card for its meaning and customs.',
       filterAll: 'All',
       empty: 'No events in this category.',
       occursToday: 'Happening today!',
       daysShort: (d) => `${d} days`,
-      eventDetail: 'Event details'
+      eventDetail: 'Event details',
+      viewDetail: 'View details',
+      addEvent: 'Add event',
+      emptyMine: 'You have no events yet. Add birthdays, anniversaries or memorial days to count down alongside the holidays.',
+      mineHint: 'Your events are stored on this device only.'
     },
     holidayDetail: {
       lastOccurrence: 'Next occurrence',
@@ -286,6 +367,18 @@ export const translations = {
       customs: 'Customs & activities',
       fact: 'Did you know?',
       daysLeft: 'Time left',
+      addToCalendar: 'Add to calendar',
+      shareImage: 'Share as image',
+      icsDone: 'Calendar file (.ics) created — open it to add to your calendar app.',
+      imageSaved: 'Image saved to your device.',
+      imageFailed: 'Could not create the image, please try again.',
+      shareUnit: 'days to go',
+      shareToday: 'Today!',
+      repeatsYearly: 'Repeats every year',
+      anniversary: (n) => `#${n}`,
+      personalNote: 'Your own event, stored on this device.',
+      edit: 'Edit',
+      remove: 'Delete',
     },
     vanNienDetail: {
       solar: 'Solar date',
@@ -302,7 +395,15 @@ export const translations = {
       dayCanChi: 'Day (Can Chi)',
       monthCanChi: 'Month (Can Chi)',
       yearAnimal: 'Year animal',
-      luckyHours: 'Auspicious hours'
+      luckyHours: 'Auspicious hours',
+      dayStar: 'Day star',
+      goodDay: 'Auspicious day (Hoàng đạo)',
+      badDay: 'Inauspicious day (Hắc đạo)',
+      directions: 'Travel directions',
+      hyThan: 'Joy deity',
+      taiThan: 'Wealth deity',
+      directionNote: 'Based on folk belief; for reference only.',
+      myEvents: 'My events'
     },
     notFound: {
       title: 'Page not found',
@@ -370,7 +471,8 @@ export const translations = {
       'truyen-thong': 'Traditional',
       'ky-niem': 'Anniversary',
       'quoc-te': 'International',
-      'ton-giao': 'Religious'
+      'ton-giao': 'Religious',
+      'ca-nhan': 'Mine'
     }
   }
 }

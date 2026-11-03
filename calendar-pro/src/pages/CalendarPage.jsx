@@ -17,6 +17,8 @@ export default function CalendarPage() {
   const [direction, setDirection] = useState(null) // 'next' | 'prev' — hướng trượt khi đổi tháng
   const [selected, setSelected] = useState(today)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [pickerYear, setPickerYear] = useState(today.getFullYear())
   const touchRef = useRef(null)
   const isWide = useMediaQuery('(min-width: 1280px)') // ≥1280px: chi tiết ngày nằm cạnh lịch, không mở sheet
 
@@ -80,7 +82,15 @@ export default function CalendarPage() {
       <header className="mb-5 flex items-center justify-between gap-3 sm:mb-6">
         <div className="min-w-0">
           <h1 key={`${cursor.year}-${cursor.month}`} className={`text-headline-lg text-on-surface sm:text-display-md ${slideClass}`}>
-            {MONTH_NAMES[cursor.month]} {cursor.year}
+            <button
+              onClick={() => { setPickerYear(cursor.year); setPickerOpen(true) }}
+              className="state focus-ring -mx-2 inline-flex items-center gap-1 rounded-2xl px-2 text-left"
+              aria-label={t('calendar.pickMonth')}
+              aria-haspopup="dialog"
+            >
+              {MONTH_NAMES[cursor.month]} {cursor.year}
+              <Icon name="expand_more" size={28} className="shrink-0 text-on-surface-variant" />
+            </button>
           </h1>
           <p className="mt-0.5 inline-flex items-center gap-1.5 text-body-lg text-on-surface-variant">
             <Icon name="bedtime" size={18} filled className="text-tertiary" />
@@ -107,6 +117,7 @@ export default function CalendarPage() {
           <span className="rounded-full bg-surface-high px-3 py-1.5 font-bold text-on-surface">{t('calendar.legendLunarMark')}</span>
           <LegendDot color="bg-chay-container shadow-[inset_0_0_0_1.5px_var(--chay)]" label={t('calendar.legendVegetarian')} />
           <LegendDot color="bg-holiday-container shadow-[inset_0_0_0_1.5px_var(--holiday)]" label={t('calendar.legendHoliday')} />
+          <LegendDot color="bg-error !h-2 !w-2" label={t('calendar.legendMine')} />
           <span className="rounded-full bg-surface-high px-3 py-1.5 text-error">{t('calendar.legendSunday')}</span>
         </div>
       </section>
@@ -118,6 +129,42 @@ export default function CalendarPage() {
       </aside>
       </div>
 
+      {/* Chọn nhanh tháng / năm */}
+      <Sheet open={pickerOpen} onClose={() => setPickerOpen(false)} title={t('calendar.pickMonth')}>
+        <div className="flex items-center justify-between pb-3">
+          <button onClick={() => setPickerYear((y) => y - 1)} className="state focus-ring flex h-12 w-12 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container" aria-label={t('calendar.prevYear')}>
+            <Icon name="chevron_left" size={26} weight={500} />
+          </button>
+          <p className="num text-headline-sm text-on-surface" aria-live="polite">{pickerYear}</p>
+          <button onClick={() => setPickerYear((y) => y + 1)} className="state focus-ring flex h-12 w-12 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container" aria-label={t('calendar.nextYear')}>
+            <Icon name="chevron_right" size={26} weight={500} />
+          </button>
+        </div>
+        <div className="grid grid-cols-3 gap-2 pb-2">
+          {MONTH_NAMES.map((name, m) => {
+            const active = pickerYear === cursor.year && m === cursor.month
+            const isNow = pickerYear === today.getFullYear() && m === today.getMonth()
+            return (
+              <button
+                key={m}
+                aria-pressed={active}
+                onClick={() => {
+                  const delta = (pickerYear - cursor.year) * 12 + m - cursor.month
+                  setDirection(delta === 0 ? null : delta > 0 ? 'next' : 'prev')
+                  setCursor({ year: pickerYear, month: m })
+                  setPickerOpen(false)
+                }}
+                className={`state focus-ring h-14 rounded-2xl text-label-lg transition-colors duration-effects ease-effects ${
+                  active ? 'bg-primary text-on-primary' : isNow ? 'bg-primary-container text-on-primary-container' : 'bg-surface-high text-on-surface'
+                }`}
+              >
+                {name}
+              </button>
+            )
+          })}
+        </div>
+      </Sheet>
+
       {/* FAB mở rộng: về hôm nay */}
       <button
         onClick={goToday}
@@ -128,7 +175,7 @@ export default function CalendarPage() {
         <span className="hidden text-label-lg sm:inline">{t('calendar.goToday')}</span>
       </button>
 
-      <Sheet open={sheetOpen && !isWide} onClose={() => setSheetOpen(false)} title={t('calendar.dayDetail')}>
+      <Sheet fullScreen open={sheetOpen && !isWide} onClose={() => setSheetOpen(false)} title={t('calendar.dayDetail')}>
         {selected && <VanNienDetail date={selected} />}
       </Sheet>
     </Page>

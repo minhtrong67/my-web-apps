@@ -37,7 +37,7 @@ export default function ApiKeys({pending,setPending}){
  const used=PROVIDERS.filter(p=>(apikeys||[]).some(k=>k.provider===p))
  const del=async()=>{setBusy(true);try{await removeKey(ask.id);setAsk(null)}catch(e){toast(e.message,'error')}setBusy(false)}
  const copy=async k=>{try{await navigator.clipboard.writeText(k.key);toast(t('keys.copied'))}catch{toast(t('web.copyfail'),'error')}}
- const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3':'flex flex-col gap-3'
+ const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3 2xl:grid-cols-4':'flex flex-col gap-3'
  return <>
   <PageHead title={t('nav.keys')} sub={apikeys&&t('keys.count',{n:apikeys.length})} onAdd={()=>setDlg({})} addLabel={t('add')}/>
   <div className="mb-5 flex items-start gap-3 rounded-2xl bg-warn-container p-4 text-sm text-on-warn-container"><TriangleAlert className="mt-0.5 size-5 shrink-0"/><p>{t('keys.warn')}</p></div>

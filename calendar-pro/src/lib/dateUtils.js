@@ -44,30 +44,38 @@ export function addDays(d, n) {
   return nd
 }
 
-/** Tìm ngày dương lịch kế tiếp (kể từ hôm nay) ứng với một ngày lễ */
+/** Ngày dương lịch (00:00) của một ngày âm lịch trong năm âm `lunarYear`; null nếu không tồn tại */
+function lunarDateInYear(day, month, lunarYear) {
+  const [sd, sm, sy] = lunarToSolar(day, month, lunarYear, 0)
+  return sd ? new Date(sy, sm - 1, sd) : null
+}
+
+/**
+ * Tìm lần diễn ra kế tiếp (kể từ hôm nay) của một ngày lễ / sự kiện, trả về Date.
+ * - Dương lịch: lặp lại hằng năm cùng ngày/tháng.
+ * - Âm lịch: quy đổi từng năm âm; ngày lễ có `isEve` (Giao thừa) là TỐI NGÀY TRƯỚC mùng 1 → trả về 23:59:59 của ngày đó
+ *   (đồng hồ đếm ngược chạy đúng đến giao thừa, và ngày hiển thị là 29/30 tháng Chạp chứ không trùng với Tết).
+ */
 export function getNextOccurrence(holiday, from = new Date()) {
   const today = startOfDay(from)
   if (holiday.type === 'solar') {
-    let year = today.getFullYear()
+    const year = today.getFullYear()
     let candidate = new Date(year, holiday.month - 1, holiday.day)
     if (startOfDay(candidate) < today) {
       candidate = new Date(year + 1, holiday.month - 1, holiday.day)
     }
     return candidate
   }
-  // lunar
-  let year = today.getFullYear()
-  const tryYears = [year, year + 1]
-  for (const y of tryYears) {
-    // Ước lượng năm âm quanh năm dương y: thử cả năm âm y-1..y+1 để bắt đúng
-    for (const ly of [y - 1, y, y + 1]) {
-      const [d, m, yy] = [holiday.day, holiday.month, ly]
-      const [sd, sm, sy] = lunarToSolar(d, m, yy, 0)
-      if (!sd) continue
-      const candidate = new Date(sy, sm - 1, sd)
-      if (startOfDay(candidate) >= today) {
-        return candidate
-      }
+  // Âm lịch: năm âm ứng với năm dương y có thể là y-1, y hoặc y+1 → duyệt tăng dần, lấy ngày đầu tiên chưa qua
+  const year = today.getFullYear()
+  for (let ly = year - 1; ly <= year + 2; ly++) {
+    const base = lunarDateInYear(holiday.day, holiday.month, ly)
+    if (!base) continue
+    if (holiday.isEve) {
+      const eve = new Date(base.getFullYear(), base.getMonth(), base.getDate() - 1, 23, 59, 59)
+      if (startOfDay(eve) >= today) return eve
+    } else if (startOfDay(base) >= today) {
+      return base
     }
   }
   return null
@@ -96,6 +104,13 @@ export function diffParts(target, from = new Date()) {
   const minutes = Math.floor((clamped / 60000) % 60)
   const seconds = Math.floor((clamped / 1000) % 60)
   return { days, hours, minutes, seconds }
+}
+
+/** Lần kỷ niệm / tuổi của một sự kiện cá nhân (cần có `year` gốc) tại lần diễn ra `date`; 0 nếu không có năm gốc */
+export function anniversaryNumber(event, date) {
+  if (!event.year) return 0
+  const y = event.type === 'lunar' ? getLunarInfo(date).lunarYear : date.getFullYear()
+  return Math.max(0, y - event.year)
 }
 
 export function getLunarInfo(date) {

@@ -1,13 +1,14 @@
-import {lazy,Suspense,useEffect,useMemo,useState} from 'react'
+import {lazy,Suspense,useEffect,useMemo,useRef,useState} from 'react'
 import {Cog,Menu,Monitor,Moon,Plus,Search,Sun,X} from 'lucide-react'
 import {useT} from './i18n'
 import {V0A,V0P,V0R,V0W,useSettings} from './hooks'
 import {DataProvider,useData} from './data'
 import {MODS,MOD_KEYS,normRoute} from './routes'
-import {Logo,ScrollTop,Skeleton} from './ui'
+import {ErrorBoundary,Logo,ScrollTop,Skeleton} from './ui'
 import Projects from './pages/Projects'
 import Accounts from './pages/Accounts'
-const lazyPage=f=>lazy(f)
+// thử nạp lại module 1 lần khi lỗi mạng / dev server vừa tối ưu lại thư viện
+const lazyPage=f=>lazy(()=>f().catch(()=>new Promise(r=>setTimeout(r,500)).then(f)))
 const Stats=lazyPage(()=>import('./pages/Stats')),Websites=lazyPage(()=>import('./pages/Websites')),WebStats=lazyPage(()=>import('./pages/WebStats')),Categories=lazyPage(()=>import('./pages/Categories'))
 const Prompts=lazyPage(()=>import('./pages/Prompts')),ApiKeys=lazyPage(()=>import('./pages/ApiKeys')),PromptStats=lazyPage(()=>import('./pages/PromptStats')),Settings=lazyPage(()=>import('./pages/Settings'))
 
@@ -46,7 +47,14 @@ function Shell({user}){
  const [[mod,sub],setRoute]=useState(()=>normRoute(s.home).split('/')),[nonce,setNonce]=useState(0),[drawer,setDrawer]=useState(false),[pal,setPal]=useState(false),[pending,setPending]=useState(null)
  const go=(m,sb,reload)=>{setRoute([m,sb||(m==='settings'?'':MODS[m].subs[0][0])]);setDrawer(false);reload&&setNonce(n=>n+1);scrollTo({top:0,behavior:'instant'})}
  const mi=Math.max(0,MODES.findIndex(m=>m[0]===s.mode)),ModeIcon=MODES[mi][1],nextMode=()=>set({mode:MODES[(mi+1)%3][0]})
- useEffect(()=>{const k=e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();setPal(p=>!p)}};addEventListener('keydown',k);return()=>removeEventListener('keydown',k)},[])
+ // phím tắt: Ctrl+K tìm nhanh, N thêm mới ở trang hiện tại, / tới ô tìm kiếm (bỏ qua khi đang gõ hoặc đang mở dialog)
+ const ADD={'projects/list':'project','projects/accounts':'account','websites/list':'website','websites/categories':'wcategory','prompts/list':'prompt','prompts/categories':'pcategory','prompts/keys':'key'}
+ const routeRef=useRef();routeRef.current=`${mod}/${sub}`
+ useEffect(()=>{const k=e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();setPal(p=>!p);return}
+  const el=e.target;if(e.ctrlKey||e.metaKey||e.altKey||el.closest?.('input,textarea,select,[contenteditable=true]')||document.querySelector('[role=dialog]'))return
+  if(e.key==='n'&&ADD[routeRef.current]){e.preventDefault();setPending(ADD[routeRef.current])}
+  else if(e.key==='/'){const i=document.querySelector('input.search');if(i){e.preventDefault();i.focus()}}}
+  addEventListener('keydown',k);return()=>removeEventListener('keydown',k)},[])
  const items=useMemo(()=>{const page=(m,sb,store,v0,q)=>()=>{store&&sessionStorage.setItem(store,JSON.stringify({...v0,q}));go(m,sb,!!store)},add=(m,sb,p)=>()=>{go(m,sb);setPending(p)}
   return [
   ...MOD_KEYS.flatMap(m=>MODS[m].subs.map(([sb,l,I])=>({label:`${t('mod.'+m)} › ${t(l)}`,hint:t('pal.page'),icon:I,run:page(m,sb)}))),
@@ -62,19 +70,19 @@ function Shell({user}){
  const route=`${mod}/${sub}`
  return <div className="md:pl-[5.5rem] lg:pl-72">
   <aside className="fixed inset-y-0 left-0 z-30 hidden bg-sidebar text-sidebar-foreground md:block md:w-[5.5rem] lg:w-72"><SideNav rail mod={mod} go={go} user={user}/></aside>
-  <header className="sticky top-0 z-30 bg-background/90 backdrop-blur"><div className="mx-auto flex h-16 max-w-7xl items-center gap-1 px-3 sm:px-5 lg:px-8">
+  <header className="sticky top-0 z-30 bg-background/90 backdrop-blur"><div className="mx-auto flex h-16 max-w-[1520px] items-center gap-1 px-3 sm:px-5 lg:px-8">
    <button type="button" aria-label={t('menu.open')} title={t('menu.open')} onClick={()=>setDrawer(true)} className={`${iconBtn} md:hidden`}><Menu className="size-6"/></button>
-   <span className="ml-1 flex-1 text-xl font-medium tracking-tight md:ml-0">{title}</span>
+   <span className="ml-1 flex-1 text-xl font-medium tracking-tight md:ml-0 lg:hidden">{title}</span><span className="hidden flex-1 lg:block"/>
    <button type="button" onClick={()=>setPal(true)} aria-label={t('search.title')} title={t('search.title')} className={`${iconBtn} md:hidden`}><Search className="size-5"/></button>
-   <button type="button" onClick={()=>setPal(true)} className="hidden h-11 items-center gap-3 rounded-full bg-popover px-4 text-sm text-muted-foreground transition-colors hover:bg-card md:flex md:w-48 lg:w-72"><Search className="size-5"/><span className="min-w-0 flex-1 truncate text-left">{t('pal.ph').split('...')[0]}...</span><kbd className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium">Ctrl K</kbd></button>
+   <button type="button" onClick={()=>setPal(true)} className="hidden h-11 items-center gap-3 rounded-full bg-popover px-4 text-sm text-muted-foreground transition-colors hover:bg-card md:flex md:w-48 lg:w-80"><Search className="size-5"/><span className="min-w-0 flex-1 truncate text-left">{t('pal.ph').split('...')[0]}...</span><kbd className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium">Ctrl K</kbd></button>
    <button type="button" onClick={nextMode} aria-label={t('theme.now',{mode:t('theme.'+s.mode)})} title={t('theme.now',{mode:t('theme.'+s.mode)})} className={iconBtn}><ModeIcon className="size-5"/></button></div></header>
-  <main className="mx-auto max-w-7xl px-4 pb-[calc(8rem+env(safe-area-inset-bottom))] pt-3 sm:px-5 md:pb-12 md:pt-4 lg:px-8">
+  <main className="mx-auto max-w-[1520px] px-4 pb-[calc(8rem+env(safe-area-inset-bottom))] pt-3 sm:px-5 md:pb-12 md:pt-4 lg:px-8">
    {mod!=='settings'&&<SubTabs mod={mod} sub={sub} go={go}/>}
-   <div key={`${route}-${nonce}`} className="anim-fade"><Suspense fallback={<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"><Skeleton n={6} className="h-44"/></div>}>
+   <div key={`${route}-${nonce}`} className="anim-fade"><ErrorBoundary title={t('err.title')} retry={t('err.retry')} reload={t('err.reload')}><Suspense fallback={<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"><Skeleton n={6} className="h-44"/></div>}>
     {route==='projects/list'&&<Projects {...P}/>}{route==='projects/accounts'&&<Accounts {...P}/>}{route==='projects/stats'&&<Stats/>}
     {route==='websites/list'&&<Websites {...P}/>}{route==='websites/categories'&&<Categories kind="website" {...P}/>}{route==='websites/stats'&&<WebStats/>}
     {route==='prompts/list'&&<Prompts {...P}/>}{route==='prompts/categories'&&<Categories kind="prompt" {...P}/>}{route==='prompts/keys'&&<ApiKeys {...P}/>}{route==='prompts/stats'&&<PromptStats/>}
-    {mod==='settings'&&<Settings user={user}/>}</Suspense></div></main>
+    {mod==='settings'&&<Settings user={user}/>}</Suspense></ErrorBoundary></div></main>
   <ScrollTop/>
   {/* Navigation bar M3 Expressive: chỉ báo hình viên thuốc 64x32 bật lên có độ nảy */}
   <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden">

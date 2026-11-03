@@ -40,7 +40,7 @@ export default function Prompts({pending,setPending}){
  const tags=[...(f.cat?[{k:'c',label:f.cat==='none'?t('uncat'):pcats?.find(c=>c.id===f.cat)?.name||'…',off:()=>set({cat:''})}]:[]),...(f.sort!=='new'?[{k:'o',label:t('sort.'+f.sort),off:()=>set({sort:'new'})}]:[])]
  const del=async()=>{setBusy(true);try{await removePrompt(ask.id);setAsk(null)}catch(e){toast(e.message,'error')}setBusy(false)}
  const copy=p=>copyText(p.content,t('copied'),t('web.copyfail'),toast)
- const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3':'flex flex-col gap-3'
+ const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3 2xl:grid-cols-4':'flex flex-col gap-3'
  return <>
   <PageHead title={t('nav.prompts')} sub={prompts&&t('prompts.count',{n:prompts.length})} onAdd={()=>setDlg({})} addLabel={t('add')}/>
   <Toolbar ph={t('prompts.search')} q={f.q} setQ={q=>set({q})} count={shown?.length} active={active} clear={()=>setV(V0R)} view={view} setView={setView} tags={tags}>

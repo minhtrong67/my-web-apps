@@ -292,7 +292,13 @@ html:not(.icons-ready) .material-symbols-outlined { opacity: 0; }
   opacity: 0.4;
   filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.25));
   animation: holiday-float 5.5s ease-in-out infinite;
+  /* Thẻ trong danh sách đứng yên (đỡ tốn pin khi có nhiều thẻ); chỉ chuyển động khi rê chuột hoặc trong banner chi tiết */
+  animation-play-state: paused;
 }
+.fx-spot:hover .holiday-emoji,
+.holiday-live .holiday-emoji { animation-play-state: running; }
+/* Bóng chữ nhẹ giúp chữ trắng đọc rõ trên đầu gradient sáng (cam / hồng) */
+.holiday-text { text-shadow: 0 1px 2px rgb(0 0 0 / 0.28); }
 @keyframes holiday-float {
   0%, 100% { transform: translateY(0) rotate(-5deg); }
   50% { transform: translateY(-7px) rotate(5deg); }

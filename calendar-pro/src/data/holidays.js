@@ -1,3 +1,5 @@
+import { getLunarInfo } from '../lib/dateUtils'
+
 /**
  * Danh sách các ngày lễ, ngày kỷ niệm nổi bật ở Việt Nam
  * type: 'solar' (theo dương lịch, lặp lại hàng năm cùng ngày/tháng)
@@ -42,7 +44,8 @@ export const CATEGORY_LABEL = {
   'truyen-thong': 'Truyền thống',
   'ky-niem': 'Kỷ niệm',
   'quoc-te': 'Quốc tế',
-  'ton-giao': 'Tôn giáo'
+  'ton-giao': 'Tôn giáo',
+  'ca-nhan': 'Của tôi'
 }
 
 /** Màu nhận diện danh mục — dùng vai trò màu của theme (tự đổi theo màu chủ đạo, sáng/tối) */
@@ -51,7 +54,8 @@ export const CATEGORY_DOT = {
   'truyen-thong': 'bg-holiday',
   'ky-niem': 'bg-tertiary',
   'quoc-te': 'bg-chay',
-  'ton-giao': 'bg-secondary'
+  'ton-giao': 'bg-secondary',
+  'ca-nhan': 'bg-error'
 }
 
 /** Danh sách ngày chay trong tháng âm lịch (Thập trai - 10 ngày chay/tháng) */
@@ -61,8 +65,14 @@ export const NGAY_CHAY_NHI_TRAI = [1, 15]
 
 /** Tìm các ngày lễ rơi vào một ngày dương lịch cụ thể (cần truyền kèm thông tin âm lịch của ngày đó) */
 export function getHolidaysOnDate(date, lunarInfo) {
+  // Giao thừa (isEve) rơi vào ngày liền trước mùng 1 tháng Giêng: chỉ cần xét khi đang ở cuối tháng Chạp
+  let tomorrow = null
+  if (lunarInfo.lunarMonth === 12 && lunarInfo.lunarDay >= 29) {
+    tomorrow = getLunarInfo(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1))
+  }
   return HOLIDAYS.filter((h) => {
     if (h.type === 'solar') return h.day === date.getDate() && h.month === date.getMonth() + 1
+    if (h.isEve) return !!tomorrow && tomorrow.lunarDay === h.day && tomorrow.lunarMonth === h.month && !tomorrow.isLeap
     return h.day === lunarInfo.lunarDay && h.month === lunarInfo.lunarMonth && !lunarInfo.isLeap
   })
 }

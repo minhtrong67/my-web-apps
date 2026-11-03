@@ -56,7 +56,7 @@ export default function Projects({pending,setPending}){
  const toggle=id=>setSel(x=>{const n=new Set(x);n.has(id)?n.delete(id):n.add(id);return n})
  const exitSel=()=>{setSelMode(false);setSel(new Set())}
  const run=async(fn,msg)=>{setBusy(true);try{await fn();toast(t(msg,{n:ids.length}));exitSel();setBulk(null)}catch(e){toast(e.message,'error')}setBusy(false)}
- const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3':'flex flex-col gap-3'
+ const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3 2xl:grid-cols-4':'flex flex-col gap-3'
  return <>
   <PageHead title={t('nav.projects')} sub={projects&&t('projects.count',{n:projects.length})} onAdd={()=>setDlg({})} addLabel={t('add')}>
    {!!projects?.length&&!selMode&&<Btn variant="outline" icon={ListChecks} onClick={()=>setSelMode(true)}>{t('select')}</Btn>}</PageHead>

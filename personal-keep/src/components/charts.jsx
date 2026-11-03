@@ -1,22 +1,29 @@
+// Biểu đồ tròn (donut) + thanh tiến độ %: bộ biểu đồ duy nhất của các trang thống kê
 export const COLORS=['var(--chart-4)','var(--chart-2)','var(--chart-5)','var(--chart-1)','var(--chart-3)']
-const col=i=>COLORS[i%COLORS.length],alpha=i=>i<COLORS.length?1:.55
-const cut=(s,n)=>s.length>n?s.slice(0,n-1)+'…':s
-// Biểu đồ cột dọc: có nhãn trục X, số liệu trên đầu cột, đường lưới
-export function BarChart({data,colors=false}){
- const max=Math.max(1,...data.map(d=>d.value)),W=Math.max(data.length*64,300),H=230,T=26,B=46,h=H-T-B,step=W/data.length,bw=Math.min(40,step*.55)
- return <div className="max-w-full overflow-x-auto"><svg viewBox={`0 0 ${W} ${H}`} style={{minWidth:data.length>6?W:undefined}} className="h-auto w-full" role="img">
-  {[0,.5,1].map(g=><line key={g} x1="0" x2={W} y1={T+h*(1-g)} y2={T+h*(1-g)} className="stroke-border" strokeDasharray={g?'4 4':'0'}/>)}
-  {data.map((d,i)=>{const cx=step*(i+.5),bh=d.value/max*h,y=T+h-bh
-   return <g key={d.label+i}><title>{`${d.label}: ${d.value}`}</title>
-    <rect x={cx-bw/2} y={y} width={bw} height={bh} rx="8" style={{fill:colors?col(i):'var(--primary-text)',transformOrigin:`${cx}px ${T+h}px`,animation:'grow .6s cubic-bezier(.2,.8,.2,1) both',animationDelay:`${i*50}ms`}}/>
-    <text x={cx} y={y-7} textAnchor="middle" fontSize="13" fontWeight="600" className="fill-foreground">{d.value}</text>
-    <text x={cx} y={H-B+20} textAnchor="middle" fontSize="11.5" className="fill-muted-foreground">{cut(d.label,11)}</text></g>})}</svg></div>}
-// Biểu đồ tròn: kèm chú thích gồm màu, nhãn, số lượng và phần trăm
-export function PieChart({data}){
+// 5 màu chính của theme; từ phần tử thứ 6 trở đi pha sáng / tối để vẫn phân biệt được
+export const col=i=>i<5?COLORS[i]:i<10?`color-mix(in oklab,${COLORS[i%5]} 55%,var(--md-surface))`:`color-mix(in oklab,${COLORS[i%5]} 65%,var(--md-on-surface))`
+// gộp các phần nhỏ thành "Khác" để biểu đồ gọn
+export const top=(arr,n,other)=>arr.length<=n?arr:[...arr.slice(0,n),{label:other,value:arr.slice(n).reduce((s,d)=>s+d.value,0)}]
+export const pct=(v,total)=>total?Math.round(v/total*100):0
+
+export function PieChart({data,center}){
  const total=data.reduce((s,d)=>s+d.value,0),R=56,C=2*Math.PI*R,gap=data.length>1?1.5:0;let acc=0
- return <div className="flex min-w-0 flex-col items-center gap-5 sm:flex-row"><svg viewBox="0 0 160 160" className="size-44 shrink-0" role="img">
-  <g transform="rotate(-90 80 80)">{data.map((d,i)=>{const len=d.value/total*C,o=-acc;acc+=len
-   return <circle key={d.label+i} cx="80" cy="80" r={R} fill="none" strokeWidth="26" stroke={col(i)} opacity={alpha(i)} strokeDasharray={`${Math.max(len-gap,0.5)} ${C-len+gap}`} strokeDashoffset={o}><title>{`${d.label}: ${d.value}`}</title></circle>})}</g>
-  <text x="80" y="80" textAnchor="middle" dominantBaseline="central" fontSize="28" fontWeight="600" className="fill-foreground">{total}</text></svg>
-  <ul className="w-full min-w-0 flex-1 space-y-2">{data.map((d,i)=><li key={d.label+i} className="flex items-center gap-2.5 text-sm"><i className="size-2.5 shrink-0 rounded-[3px]" style={{background:col(i),opacity:alpha(i)}}/>
-   <span className="min-w-0 flex-1 truncate">{d.label}</span><b className="tabular-nums">{d.value}</b><span className="w-12 text-right tabular-nums text-muted-foreground">{Math.round(d.value/total*100)}%</span></li>)}</ul></div>}
+ return <div className="flex min-w-0 flex-col items-center gap-5 2xl:flex-row">
+  <div className="relative size-44 shrink-0 lg:size-48"><svg viewBox="0 0 160 160" className="size-full" role="img">
+   <circle cx="80" cy="80" r={R} fill="none" strokeWidth="26" className="stroke-muted"/>
+   <g transform="rotate(-90 80 80)">{data.map((d,i)=>{const len=d.value/total*C,o=-acc;acc+=len
+    return <circle key={d.label+i} cx="80" cy="80" r={R} fill="none" strokeWidth="26" stroke={col(i)} strokeDasharray={`${Math.max(len-gap,0.5)} ${C-len+gap}`} strokeDashoffset={o} style={{transition:'stroke-dasharray .6s var(--ease-emph)'}}><title>{`${d.label}: ${d.value}`}</title></circle>})}</g></svg>
+   <div className="absolute inset-0 grid place-items-center text-center"><div><b className="block text-3xl font-semibold leading-none tabular-nums">{center??total}</b></div></div></div>
+  <ul className="w-full min-w-0 flex-1 space-y-2.5">{data.map((d,i)=><li key={d.label+i} className="text-sm"><div className="flex items-center gap-2.5"><i className="size-3 shrink-0 rounded-[4px]" style={{background:col(i)}}/>
+   <span className="min-w-0 flex-1 truncate">{d.label}</span><b className="tabular-nums">{d.value}</b><span className="w-11 text-right tabular-nums text-muted-foreground">{pct(d.value,total)}%</span></div>
+   <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full transition-[width] duration-700 [transition-timing-function:var(--ease-emph)]" style={{width:`${pct(d.value,total)}%`,background:col(i)}}/></div></li>)}</ul></div>}
+
+// Một dòng tiến độ: nhãn, giá trị / tổng, phần trăm và thanh tiến độ
+export const Progress=({label,value,total,color='var(--primary)',cls='',hint})=>{const p=pct(value,total)
+ return <div className={`text-sm ${cls}`}><div className="mb-1.5 flex items-center justify-between gap-3"><span className="min-w-0 truncate font-medium">{label}</span><span className="shrink-0 tabular-nums text-muted-foreground">{hint??`${value}/${total}`} · <b className="text-foreground">{p}%</b></span></div>
+  <div className="h-2.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full transition-[width] duration-700 [transition-timing-function:var(--ease-emph)]" style={{width:`${p}%`,background:color}}/></div></div>}
+// Thẻ tiến độ lớn: số % to + thanh
+export const Meter=({label,value,total,color='var(--primary)'})=>{const p=pct(value,total)
+ return <div><div className="flex items-end justify-between gap-3"><p className="text-sm text-muted-foreground">{label}</p><p className="text-4xl font-semibold leading-none tabular-nums">{p}<span className="text-xl text-muted-foreground">%</span></p></div>
+  <div className="mt-3 h-4 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full transition-[width] duration-700 [transition-timing-function:var(--ease-emph)]" style={{width:`${p}%`,background:color}}/></div>
+  <p className="mt-1.5 text-xs tabular-nums text-muted-foreground">{value}/{total}</p></div>}

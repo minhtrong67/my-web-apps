@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Icon from './Icon'
 import { useTranslation } from '../i18n/useTranslation'
@@ -13,7 +13,10 @@ export default function ScrollToTop() {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const [visible, setVisible] = useState(false)
-  const hasFab = pathname.startsWith('/lich')
+  // Trang Lịch có FAB "Hôm nay" (mọi cỡ màn hình); trang Đếm ngược có FAB thêm sự kiện (chỉ di động) → nhích nút lên trên
+  const fabMobile = pathname.startsWith('/lich') || pathname.startsWith('/dem-nguoc')
+  const fabDesktop = pathname.startsWith('/lich')
+  const rafRef = useRef(0)
 
   useEffect(() => {
     let raf = 0
@@ -27,19 +30,40 @@ export default function ScrollToTop() {
     update()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
+      cancelAnimationFrame(rafRef.current)
       window.removeEventListener('scroll', onScroll)
       if (raf) cancelAnimationFrame(raf)
     }
   }, [pathname])
 
+  // Tự chạy hoạt ảnh cuộn bằng requestAnimationFrame thay vì phụ thuộc scroll-behavior của trình duyệt
+  // (bị tắt khi hệ điều hành bật "giảm chuyển động", hoặc bị CSS ghi đè). Người dùng chạm/lăn chuột thì dừng ngay.
   function scrollTop() {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    window.scrollTo({ top: 0, left: 0, behavior: reduce ? 'auto' : 'smooth' })
+    cancelAnimationFrame(rafRef.current)
+    const from = window.scrollY
+    if (from <= 0) return
+    const duration = Math.min(700, 280 + from * 0.12)
+    const start = performance.now()
+    const stop = () => {
+      cancelAnimationFrame(rafRef.current)
+      window.removeEventListener('wheel', stop)
+      window.removeEventListener('touchstart', stop)
+    }
+    window.addEventListener('wheel', stop, { passive: true, once: true })
+    window.addEventListener('touchstart', stop, { passive: true, once: true })
+    const step = (now) => {
+      const p = Math.min(1, (now - start) / duration)
+      const eased = 1 - Math.pow(1 - p, 3) // easeOutCubic
+      window.scrollTo({ top: from * (1 - eased), left: 0, behavior: 'instant' })
+      if (p < 1) rafRef.current = requestAnimationFrame(step)
+      else stop()
+    }
+    rafRef.current = requestAnimationFrame(step)
   }
 
-  const position = hasFab
-    ? 'bottom-[calc(env(safe-area-inset-bottom)+11rem)] sm:bottom-[6.5rem]'
-    : 'bottom-[calc(env(safe-area-inset-bottom)+6.5rem)] sm:bottom-8'
+  const position = `${fabMobile ? 'bottom-[calc(env(safe-area-inset-bottom)+11rem)]' : 'bottom-[calc(env(safe-area-inset-bottom)+6.5rem)]'} ${
+    fabDesktop ? 'sm:bottom-[6.5rem]' : 'sm:bottom-8'
+  }`
 
   return (
     <button

@@ -6,6 +6,8 @@
  *  customs: danh sách phong tục, hoạt động thường làm
  *  fact:    (tuỳ chọn) một điều thú vị
  */
+import { HOLIDAY_EN } from './holidayI18n'
+
 export const HOLIDAY_DETAILS = {
   'tet-duong': {
     meaning: [
@@ -326,6 +328,11 @@ export const HOLIDAY_DETAILS = {
   }
 }
 
-export function getHolidayDetail(holiday) {
+export function getHolidayDetail(holiday, lang = 'vi') {
+  if (holiday.personal) return { meaning: [], customs: [] }
+  if (lang === 'en') {
+    const en = HOLIDAY_EN[holiday.id]
+    if (en?.meaning) return { meaning: en.meaning, customs: en.customs ?? [], fact: en.fact }
+  }
   return HOLIDAY_DETAILS[holiday.id] ?? { meaning: [holiday.desc], customs: [] }
 }

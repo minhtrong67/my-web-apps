@@ -5,7 +5,13 @@ import HolidayArt from './HolidayArt'
 import { holidayIconName } from '../lib/iconMap'
 import { getHolidayTheme } from '../data/holidayThemes'
 import { getHolidayDetail } from '../data/holidayDetails'
-import { diffParts, formatVNDate } from '../lib/dateUtils'
+import Button from './Button'
+import { localizedHoliday } from '../data/holidayI18n'
+import { anniversaryNumber, diffParts, formatVNDate } from '../lib/dateUtils'
+import { buildIcs, downloadText } from '../lib/ics'
+import { renderShareCard, shareOrDownload } from '../lib/shareImage'
+import { useToast } from '../contexts/ToastContext'
+import { useState } from 'react'
 import CategoryBadge from './CategoryBadge'
 import { useNow } from '../hooks/useNow'
 import { useTranslation } from '../i18n/useTranslation'
@@ -14,24 +20,56 @@ import { useTranslation } from '../i18n/useTranslation'
  * Nội dung chi tiết ngày lễ (hiện trong sheet toàn màn hình): banner (có chủ đề riêng cho ngày đặc biệt),
  * đồng hồ đếm ngược, thông tin lịch, ý nghĩa chi tiết, phong tục / hoạt động và điều thú vị.
  */
-export default function HolidayDetail({ holiday, nextDate }) {
+export default function HolidayDetail({ holiday, nextDate, onEdit, onDelete }) {
   const now = useNow(1000)
   const { t, lang } = useTranslation()
+  const { notify } = useToast()
+  const [sharing, setSharing] = useState(false)
+  const { name, desc } = localizedHoliday(holiday, lang)
+  const nth = holiday.personal ? anniversaryNumber(holiday, nextDate) : 0
   const iconName = holidayIconName(holiday.icon)
   const { days, hours, minutes, seconds } = diffParts(nextDate, now)
   const isTodayEvent = days === 0
   const progress = 1 - Math.min(days, 365) / 365
   const theme = getHolidayTheme(holiday.id)
-  const detail = getHolidayDetail(holiday)
+  const detail = getHolidayDetail(holiday, lang)
   // Biểu tượng đầu mỗi mục: nền theo màu chủ đề của ngày lễ (nếu có)
   const badgeStyle = theme ? { background: theme.bg } : undefined
   const badgeClass = theme ? 'text-white' : 'bg-primary-container text-on-primary-container'
+
+  function addToCalendar() {
+    const item = { id: holiday.id, name, description: desc || undefined, type: holiday.type, day: holiday.day, month: holiday.month, isEve: holiday.isEve }
+    downloadText(`${holiday.id}.ics`, buildIcs([item]))
+    notify(t('holidayDetail.icsDone'), { type: 'success' })
+  }
+
+  async function shareImage() {
+    setSharing(true)
+    try {
+      const css = getComputedStyle(document.documentElement)
+      const blob = await renderShareCard({
+        name,
+        dateText: formatVNDate(nextDate, lang),
+        daysText: isTodayEvent ? t('holidayDetail.shareToday') : String(days),
+        unitText: isTodayEvent ? '' : t('holidayDetail.shareUnit'),
+        footer: 'calendar-pro-rouge.vercel.app',
+        theme,
+        fallbackColors: [css.getPropertyValue('--primary').trim() || '#BE003A', css.getPropertyValue('--tertiary').trim() || '#7a0027']
+      })
+      const result = await shareOrDownload(blob, `${holiday.id}.png`, name)
+      if (result === 'downloaded') notify(t('holidayDetail.imageSaved'), { type: 'success' })
+    } catch {
+      notify(t('holidayDetail.imageFailed'), { type: 'error' })
+    } finally {
+      setSharing(false)
+    }
+  }
 
   return (
     <div className="flex flex-col gap-3 pb-4">
       {/* Banner */}
       <div
-        className={`fx-shine relative isolate overflow-hidden rounded-[32px] p-6 sm:p-8 ${theme ? 'text-white' : 'bg-primary text-on-primary'}`}
+        className={`holiday-live holiday-text fx-shine relative isolate overflow-hidden rounded-[32px] p-6 sm:p-8 ${theme ? 'text-white' : 'bg-primary text-on-primary'}`}
         style={theme ? { background: theme.bg, boxShadow: `0 14px 30px -16px ${theme.glow}` } : undefined}
       >
         {theme ? (
@@ -43,9 +81,12 @@ export default function HolidayDetail({ holiday, nextDate }) {
           <div className={`shape-cookie flex h-16 w-16 items-center justify-center ${theme ? 'bg-white/20 text-white' : 'bg-primary-container text-on-primary-container'}`}>
             <Icon name={iconName} size={32} filled />
           </div>
-          <h3 className="mt-5 text-headline-md sm:text-display-md">{holiday.name}</h3>
+          <h3 className="mt-5 text-headline-md sm:text-display-md">{name}</h3>
           <p className="mt-1.5 text-body-lg opacity-90">{formatVNDate(nextDate, lang)}</p>
-          <CategoryBadge category={holiday.category} className="mt-4 !bg-surface-lowest !text-on-surface" />
+          <div className="mt-4 flex flex-wrap items-center gap-2" style={{ textShadow: 'none' }}>
+            <CategoryBadge category={holiday.category} className="!bg-surface-lowest !text-on-surface" />
+            {nth > 0 && <span className="inline-flex items-center rounded-full bg-tertiary-container px-2.5 py-1 text-label-sm text-on-tertiary-container">{t('holidayDetail.anniversary', nth)}</span>}
+          </div>
         </div>
       </div>
 
@@ -76,8 +117,29 @@ export default function HolidayDetail({ holiday, nextDate }) {
         />
       </div>
 
+      {/* Hành động: thêm vào lịch / chia sẻ ảnh (+ sửa, xoá với sự kiện cá nhân) */}
+      <div className="grid grid-cols-2 gap-3">
+        <Button variant="secondary" icon={(p) => <Icon name="event" {...p} />} onClick={addToCalendar}>
+          {t('holidayDetail.addToCalendar')}
+        </Button>
+        <Button variant="secondary" icon={(p) => <Icon name="share" {...p} />} loading={sharing} onClick={shareImage}>
+          {t('holidayDetail.shareImage')}
+        </Button>
+        {onEdit && (
+          <Button variant="outline" icon={(p) => <Icon name="edit" {...p} />} onClick={onEdit}>
+            {t('holidayDetail.edit')}
+          </Button>
+        )}
+        {onDelete && (
+          <Button variant="outline" icon={(p) => <Icon name="delete" {...p} />} onClick={onDelete} className="!text-error">
+            {t('holidayDetail.remove')}
+          </Button>
+        )}
+      </div>
+      {holiday.personal && <p className="px-2 text-body-sm text-on-surface-variant">{t('holidayDetail.personalNote')} {t('holidayDetail.repeatsYearly')}.</p>}
+
       {/* Ý nghĩa */}
-      <Section icon="auto_stories" title={t('holidayDetail.meaning')} badgeClass={badgeClass} badgeStyle={badgeStyle}>
+      {detail.meaning.length > 0 && <Section icon="auto_stories" title={t('holidayDetail.meaning')} badgeClass={badgeClass} badgeStyle={badgeStyle}>
         <div className="flex flex-col gap-3">
           {detail.meaning.map((p, i) => (
             <p key={i} className="text-body-lg leading-7 text-on-surface-variant">
@@ -85,7 +147,7 @@ export default function HolidayDetail({ holiday, nextDate }) {
             </p>
           ))}
         </div>
-      </Section>
+      </Section>}
 
       {/* Phong tục & hoạt động */}
       {detail.customs.length > 0 && (

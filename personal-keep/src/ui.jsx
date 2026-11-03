@@ -1,4 +1,4 @@
-import {createContext,useCallback,useContext,useEffect,useId,useLayoutEffect,useRef,useState} from 'react'
+import {Component,createContext,useCallback,useContext,useEffect,useId,useLayoutEffect,useRef,useState} from 'react'
 import {createPortal} from 'react-dom'
 import {AlertCircle,ArrowUp,Bookmark,Check,CheckCircle2,ChevronDown,Info,Loader2,Minus,Pencil,Plus,Save,Trash2,TriangleAlert,X,Download} from 'lucide-react'
 import {useT} from './i18n'
@@ -74,15 +74,12 @@ export function Dialog({title,onClose,footer,full,children}){
  const head=<div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-2 pt-4 md:px-6 md:pt-6"><h2 className="text-2xl font-medium leading-8 tracking-tight">{title}</h2>
   <button type="button" aria-label={t('close')} title={`${t('close')} (Esc)`} onClick={onClose} className="icon-btn -mr-1"><X className="size-5"/></button></div>
  const bar="flex gap-2 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 [&>*]:flex-1 md:[&>*]:flex-none md:justify-end"
- // render qua portal để không bị bottom bar / header (z-30) của trang che
- return createPortal(full
-  ?<div role="dialog" aria-modal="true" aria-label={title} className="anim-up fixed inset-0 z-50 flex h-dvh flex-col bg-background">
-    {head}<div className="min-h-0 flex-1 overflow-y-auto"><div className="mx-auto w-full max-w-2xl px-4 py-6 md:px-6">{children}</div></div>
-    {footer&&<div className="shrink-0 bg-background"><div className={`mx-auto max-w-2xl px-4 md:px-6 ${bar}`}>{footer}</div></div>}</div>
-  :<div className="anim-fade fixed inset-0 z-50 flex items-end justify-center bg-black/55 backdrop-blur-[3px] sm:items-center sm:p-4" onMouseDown={e=>e.target===e.currentTarget&&onClose()}>
-    <div role="dialog" aria-modal="true" aria-label={title} style={{'--notch':'var(--popover)'}} className="anim-up flex max-h-[92dvh] w-full flex-col rounded-t-2xl bg-popover shadow-xl sm:max-w-lg sm:rounded-2xl">
-     {head}<div className="min-h-0 overflow-y-auto px-4 pb-2 pt-5 md:px-6">{children}</div>
-     {footer&&<div className={`shrink-0 px-4 md:px-6 ${bar}`}>{footer}</div>}</div></div>,document.body)}
+ // render qua portal để không bị bottom bar / header (z-30) của trang che.
+ // full = form dài: mobile / tablet là sheet toàn màn hình, từ laptop (lg) trở lên là dialog giữa màn hình, rộng hơn dialog thường.
+ return createPortal(<div className={`anim-fade fixed inset-0 z-50 flex bg-black/55 backdrop-blur-[3px] ${full?'items-stretch lg:items-center lg:justify-center lg:p-6':'items-end justify-center sm:items-center sm:p-4'}`} onMouseDown={e=>!full&&e.target===e.currentTarget&&onClose()}>
+   <div role="dialog" aria-modal="true" aria-label={title} style={{'--notch':'var(--popover)'}} className={`anim-up flex flex-col bg-popover shadow-xl ${full?'h-dvh w-full lg:h-auto lg:max-h-[90dvh] lg:max-w-3xl lg:rounded-2xl':'max-h-[92dvh] w-full rounded-t-2xl sm:max-w-lg sm:rounded-2xl'}`}>
+    {head}<div className="min-h-0 flex-1 overflow-y-auto px-4 pb-2 pt-5 md:px-6">{children}</div>
+    {footer&&<div className={`shrink-0 px-4 md:px-6 ${bar}`}>{footer}</div>}</div></div>,document.body)}
 
 // Dropdown render qua portal + position:fixed nên không bao giờ làm dài/xê dịch form.
 // Desktop: popover bám theo ô chọn (tự lật lên nếu thiếu chỗ). Mobile: bottom sheet. multi: chọn nhiều.
@@ -153,7 +150,7 @@ export function ExportMenu({formats,onPick,busy}){
 
 export function PageHead({title,sub,onAdd,addLabel,children}){
  return <div className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><h1 className="text-3xl font-semibold leading-tight tracking-tight md:text-[2rem]">{title}</h1>{sub&&<p className="mt-1 text-sm text-muted-foreground">{sub}</p>}</div>
-  <div className="flex items-center gap-2">{children}{onAdd&&<Btn icon={Plus} onClick={onAdd} className="hidden md:inline-flex">{addLabel}</Btn>}</div></div>}
+  <div className="flex items-center gap-2">{children}{onAdd&&<Btn icon={Plus} onClick={onAdd} title={`${addLabel} (N)`} className="hidden md:inline-flex">{addLabel}<kbd className="ml-1 hidden rounded-md bg-primary-foreground/20 px-1.5 py-0.5 text-[11px] font-semibold leading-none lg:inline">N</kbd></Btn>}</div></div>}
 // FAB M3 Expressive: container primary, bo góc 24px, nhấn thì co về 16px
 export const Fab=({onClick,label})=><button type="button" aria-label={label} title={label} onClick={onClick} className="anim-pop fixed bottom-[calc(6.5rem+env(safe-area-inset-bottom))] right-4 z-20 grid size-16 place-items-center rounded-[24px] bg-primary-container text-on-primary-container shadow-lg transition-[border-radius,transform,box-shadow] duration-300 [transition-timing-function:var(--ease-spring)] hover:shadow-xl active:scale-95 active:rounded-[16px] md:hidden"><Plus className="size-7"/></button>
 // Hình "cookie" 9 thuỳ trong bộ shape của Material 3 Expressive
@@ -171,3 +168,13 @@ export const CardSkeleton=({n=6,lines=3})=>Array.from({length:n},(_,i)=><div key
  <div className="flex gap-1.5"><div className="skeleton h-6 w-20"/><div className="skeleton h-6 w-16"/></div>
  {Array.from({length:Math.max(lines-2,1)},(_,k)=><div key={k} className={`skeleton h-4 ${k?'w-1/2':'w-full'}`}/>)}
  <div className="mt-1 flex items-center gap-3 pt-3"><div className="skeleton size-9 !rounded-full"/><div className="flex-1 space-y-1.5"><div className="skeleton h-3.5 w-1/2"/><div className="skeleton h-3 w-2/3"/></div><div className="skeleton size-10 !rounded-full"/><div className="skeleton size-10 !rounded-full"/></div></div>)
+
+// Chặn lỗi hiển thị của một trang: báo rõ nguyên nhân, cho thử lại; lỗi tải module (dev server / mạng) thì tự tải lại trang một lần
+export class ErrorBoundary extends Component{
+ state={err:null}
+ static getDerivedStateFromError(err){return {err}}
+ componentDidCatch(err){console.error(err);if(/dynamically imported module|Importing a module script|Loading chunk|Failed to fetch/i.test(String(err?.message))&&!sessionStorage.getItem('chunk-reload')){sessionStorage.setItem('chunk-reload','1');location.reload()}}
+ render(){const {err}=this.state;if(!err)return this.props.children
+  return <div role="alert" className="anim-fade mx-auto max-w-xl rounded-2xl bg-error-container p-6 text-on-error-container"><div className="flex items-center gap-3"><TriangleAlert className="size-6 shrink-0"/><h2 className="text-lg font-semibold">{this.props.title}</h2></div>
+   <p className="mt-3 break-words rounded-xl bg-black/5 p-3 font-mono text-xs dark:bg-white/10">{String(err?.message||err)}</p>
+   <div className="mt-4 flex flex-wrap gap-2"><Btn variant="neutral" onClick={()=>this.setState({err:null})}>{this.props.retry}</Btn><Btn onClick={()=>location.reload()}>{this.props.reload}</Btn></div></div>}}
