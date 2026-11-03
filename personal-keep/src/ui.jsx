@@ -1,21 +1,54 @@
-import {createContext,useCallback,useContext,useEffect,useId,useRef,useState} from 'react'
+import {createContext,useCallback,useContext,useEffect,useId,useLayoutEffect,useRef,useState} from 'react'
 import {createPortal} from 'react-dom'
-import {AlertCircle,Bookmark,Check,CheckCircle2,ChevronDown,Info,Loader2,Pencil,Plus,Trash2,X,Download} from 'lucide-react'
+import {AlertCircle,ArrowUp,Bookmark,Check,CheckCircle2,ChevronDown,Info,Loader2,Minus,Pencil,Plus,Save,Trash2,TriangleAlert,X,Download} from 'lucide-react'
 import {useT} from './i18n'
 
 let locks=0
+const stack=[] // dialog đang mở: Esc chỉ đóng dialog trên cùng (confirm nằm trên form)
 function useScrollLock(on=true){useEffect(()=>{if(!on)return;const b=document.body;if(!locks++)b.style.overflow='hidden';return()=>{if(!--locks)b.style.overflow=''}},[on])}
 
 const ToastCtx=createContext()
 export const useToast=()=>useContext(ToastCtx)
-const TI={success:[CheckCircle2,'text-inverse-primary'],error:[AlertCircle,'text-[var(--inverse-error)]'],info:[Info,'text-inverse-primary']}
+// 4 biến thể toast, màu lấy từ token nên tự đổi theo sáng / tối: success, info, warning, error
+const TI={success:[CheckCircle2,'bg-ok-container text-on-ok-container'],info:[Info,'bg-primary-container text-on-primary-container'],warning:[TriangleAlert,'bg-warn-container text-on-warn-container'],error:[AlertCircle,'bg-error-container text-on-error-container']}
 export function ToastProvider({children}){
  const [list,setList]=useState([])
- const push=useCallback((msg,type='success')=>{const id=Math.random();setList(x=>[...x.slice(-2),{id,msg,type}]);setTimeout(()=>setList(x=>x.filter(i=>i.id!==id)),type==='error'?4500:3000)},[])
+ const drop=id=>setList(x=>x.filter(i=>i.id!==id))
+ const push=useCallback((msg,type='success')=>{const id=Math.random();setList(x=>[...x.slice(-2),{id,msg,type}]);setTimeout(()=>drop(id),type==='error'||type==='warning'?5000:3000)},[])
  return <ToastCtx.Provider value={push}>{children}
-  <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[calc(6.5rem+env(safe-area-inset-bottom))] z-[70] flex flex-col items-center gap-2 px-4 md:bottom-6 md:items-end md:pr-6">
-   {list.map(i=>{const [I,c]=TI[i.type]||TI.info;return <div key={i.id} role="status" className="anim-pop pointer-events-auto flex max-w-sm items-start gap-3 rounded-xl bg-inverse-surface px-4 py-3.5 text-sm text-inverse-on-surface shadow-lg"><I className={`mt-0.5 size-5 shrink-0 ${c}`}/><span>{i.msg}</span></div>})}
+  <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[calc(6.5rem+env(safe-area-inset-bottom))] z-[70] flex flex-col items-center gap-2 px-4 md:bottom-8">
+   {list.map(i=>{const [I,c]=TI[i.type]||TI.info;return <div key={i.id} role={i.type==='error'?'alert':'status'} onClick={()=>drop(i.id)} className={`anim-pop pointer-events-auto flex max-w-md cursor-pointer items-start gap-3 rounded-xl px-4 py-3.5 text-sm font-medium shadow-lg ring-1 ring-black/5 dark:ring-white/10 ${c}`}><I className="mt-0.5 size-5 shrink-0"/><span>{i.msg}</span></div>})}
   </div></ToastCtx.Provider>}
+
+// Tooltip tuỳ chỉnh dùng chung: bắt mọi phần tử có title / data-tip (nút icon...), thay cho tooltip mặc định của trình duyệt.
+// Chỉ hiện với chuột và bàn phím (không hiện khi chạm), tự lật lên / xuống và không tràn khỏi màn hình.
+export function Tooltips(){
+ const [tip,setTip]=useState(null),[pos,setPos]=useState(null),box=useRef(),timer=useRef()
+ useEffect(()=>{
+  const hide=()=>{clearTimeout(timer.current);setTip(null);setPos(null)}
+  const find=t=>{const el=t instanceof Element?t.closest('[title],[data-tip]'):null;if(!el)return null
+   if(el.hasAttribute('title')){el.dataset.tip=el.getAttribute('title');el.removeAttribute('title')}
+   return el.dataset.tip?el:null}
+  const show=(el,delay)=>{clearTimeout(timer.current);timer.current=setTimeout(()=>el.isConnected&&setTip({text:el.dataset.tip,r:el.getBoundingClientRect()}),delay)}
+  const over=e=>{if(e.pointerType&&e.pointerType!=='mouse')return;const el=find(e.target);el?show(el,350):hide()}
+  const fin=e=>{const el=find(e.target);el&&e.target.matches?.(':focus-visible')&&show(el,150)}
+  addEventListener('pointerover',over);addEventListener('focusin',fin);addEventListener('focusout',hide);addEventListener('pointerdown',hide,true);addEventListener('scroll',hide,true);addEventListener('keydown',hide,true)
+  return()=>{hide();removeEventListener('pointerover',over);removeEventListener('focusin',fin);removeEventListener('focusout',hide);removeEventListener('pointerdown',hide,true);removeEventListener('scroll',hide,true);removeEventListener('keydown',hide,true)}},[])
+ useLayoutEffect(()=>{if(!tip||!box.current)return;const w=box.current.offsetWidth,h=box.current.offsetHeight,r=tip.r
+  const above=r.top>h+16,left=Math.min(Math.max(8,r.left+r.width/2-w/2),innerWidth-w-8),top=above?r.top-h-8:r.bottom+8
+  setPos({left,top,o:above?'bottom':'top'})},[tip])
+ return tip?createPortal(<div ref={box} role="tooltip" style={{left:pos?.left??0,top:pos?.top??0,visibility:pos?'visible':'hidden','--o':pos?.o}} className="anim-pop pointer-events-none fixed z-[95] max-w-64 rounded-lg bg-inverse-surface px-3 py-1.5 text-xs font-medium leading-snug text-inverse-on-surface shadow-lg">{tip.text}</div>,document.body):null}
+
+// Nút lên đầu trang: chỉ hiện khi đã cuộn xa, cuộn mượt
+export function ScrollTop(){
+ const {t}=useT(),[show,setShow]=useState(false)
+ useEffect(()=>{const f=()=>setShow(scrollY>480);f();addEventListener('scroll',f,{passive:true});return()=>removeEventListener('scroll',f)},[])
+ return show?<button type="button" aria-label={t('scrollTop')} title={t('scrollTop')} onClick={()=>scrollTo({top:0,behavior:'smooth'})} className="anim-pop fixed bottom-[calc(10rem+env(safe-area-inset-bottom))] right-4 z-20 grid size-12 place-items-center rounded-[16px] bg-secondary text-secondary-foreground shadow-lg transition-[border-radius,transform] duration-300 [transition-timing-function:var(--ease-spring)] hover:shadow-xl active:scale-90 active:rounded-[12px] md:bottom-6 md:right-6 md:size-14"><ArrowUp className="size-6"/></button>:null}
+
+// Checkbox M3 (có trạng thái chọn một phần)
+export const Checkbox=({checked,mixed,onChange,label,className=''})=><button type="button" role="checkbox" aria-checked={mixed?'mixed':!!checked} aria-label={label} title={label} onClick={e=>{e.stopPropagation();onChange(!checked)}} className={`check ${className}`}>{mixed?<Minus className="size-4"/>:checked&&<Check className="size-4"/>}</button>
+// Chip danh mục có màu; không có danh mục thì hiện 'Chưa phân loại'
+export const CatChip=({cat})=>{const {t}=useT();return <span className={`cchip ${cat?'cc-'+(cat.color||'indigo'):''}`}><i className="size-2 shrink-0 rounded-full bg-current opacity-70"/><span className="truncate">{cat?.name||t('uncat')}</span></span>}
 
 export function Btn({variant='primary',icon:I,loading,disabled,children,className='',...p}){
  return <button type="button" disabled={loading||disabled} className={`btn btn-${variant} ${className}`} {...p}>
@@ -36,8 +69,8 @@ export function Segmented({value,onChange,options,label,iconOnly,className=''}){
 export function Dialog({title,onClose,footer,full,children}){
  const {t}=useT(),closeRef=useRef(onClose);closeRef.current=onClose
  useScrollLock()
- useEffect(()=>{const prev=document.activeElement,k=e=>e.key==='Escape'&&closeRef.current();addEventListener('keydown',k)
-  return()=>{removeEventListener('keydown',k);prev?.isConnected&&prev.focus?.({preventScroll:true})}},[])
+ useEffect(()=>{const prev=document.activeElement,me={},k=e=>e.key==='Escape'&&stack[stack.length-1]===me&&closeRef.current();stack.push(me);addEventListener('keydown',k)
+  return()=>{removeEventListener('keydown',k);stack.splice(stack.indexOf(me),1);prev?.isConnected&&prev.focus?.({preventScroll:true})}},[])
  const head=<div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-2 pt-4 md:px-6 md:pt-6"><h2 className="text-2xl font-medium leading-8 tracking-tight">{title}</h2>
   <button type="button" aria-label={t('close')} title={`${t('close')} (Esc)`} onClick={onClose} className="icon-btn -mr-1"><X className="size-5"/></button></div>
  const bar="flex gap-2 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 [&>*]:flex-1 md:[&>*]:flex-none md:justify-end"
@@ -46,7 +79,7 @@ export function Dialog({title,onClose,footer,full,children}){
   ?<div role="dialog" aria-modal="true" aria-label={title} className="anim-up fixed inset-0 z-50 flex h-dvh flex-col bg-background">
     {head}<div className="min-h-0 flex-1 overflow-y-auto"><div className="mx-auto w-full max-w-2xl px-4 py-6 md:px-6">{children}</div></div>
     {footer&&<div className="shrink-0 bg-background"><div className={`mx-auto max-w-2xl px-4 md:px-6 ${bar}`}>{footer}</div></div>}</div>
-  :<div className="anim-fade fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-4" onMouseDown={e=>e.target===e.currentTarget&&onClose()}>
+  :<div className="anim-fade fixed inset-0 z-50 flex items-end justify-center bg-black/55 backdrop-blur-[3px] sm:items-center sm:p-4" onMouseDown={e=>e.target===e.currentTarget&&onClose()}>
     <div role="dialog" aria-modal="true" aria-label={title} style={{'--notch':'var(--popover)'}} className="anim-up flex max-h-[92dvh] w-full flex-col rounded-t-2xl bg-popover shadow-xl sm:max-w-lg sm:rounded-2xl">
      {head}<div className="min-h-0 overflow-y-auto px-4 pb-2 pt-5 md:px-6">{children}</div>
      {footer&&<div className={`shrink-0 px-4 md:px-6 ${bar}`}>{footer}</div>}</div></div>,document.body)}
@@ -85,7 +118,7 @@ export function Dropdown({label,value,onChange,options,placeholder,multi,compact
    <span id={uid} className={`truncate ${text?'':'text-muted-foreground'}`}>{text||placeholder}</span>
    <ChevronDown className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${open?'rotate-180':''}`}/></button>
   {open&&createPortal(pos.sheet
-   ?<div className="fixed inset-0 z-[80]"><div className="anim-fade absolute inset-0 bg-black/40" onClick={close}/>
+   ?<div className="fixed inset-0 z-[80]"><div className="anim-fade absolute inset-0 bg-black/55 backdrop-blur-[3px]" onClick={close}/>
      <div className="anim-sheet absolute inset-x-0 bottom-0 flex max-h-[75dvh] flex-col rounded-t-2xl bg-popover text-popover-foreground shadow-xl">
       <div className="mx-auto mt-3 h-1 w-8 shrink-0 rounded-full bg-muted-foreground/40"/>
       <div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-1 pt-2"><span className="truncate text-base font-semibold">{label||placeholder}</span>
@@ -94,12 +127,21 @@ export function Dropdown({label,value,onChange,options,placeholder,multi,compact
       <div className="shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2">{multi&&<Btn className="w-full" onClick={close}>{t('done')}</Btn>}</div></div></div>
    :<div className="fixed inset-0 z-[80]" onMouseDown={e=>e.target===e.currentTarget&&close()}>{list}</div>,document.body)}</div>}
 
-export function Confirm({title,message,confirmLabel,busy,onConfirm,onClose,danger=true}){
- const {t}=useT()
+// Confirm: nút Huỷ (xám, icon X) + nút hành động có màu theo ngữ cảnh: xoá = đỏ, cập nhật / xác nhận = màu chủ đề
+export function Confirm({title,message,confirmLabel,busy,onConfirm,onClose,danger=true,icon}){
+ const {t}=useT(),I=icon||(danger?Trash2:Check)
  return <Dialog title={title} onClose={()=>!busy&&onClose()} footer={<>
-  <Btn variant="ghost" icon={X} disabled={busy} onClick={onClose}>{t('cancel')}</Btn>
-  <Btn variant={danger?'danger':'primary'} icon={danger?Trash2:undefined} loading={busy} onClick={onConfirm}>{confirmLabel}</Btn></>}>
-  <p className="text-muted-foreground ">{message}</p></Dialog>}
+  <Btn variant="neutral" icon={X} disabled={busy} onClick={onClose}>{t('cancel')}</Btn>
+  <Btn variant={danger?'danger':'primary'} icon={I} loading={busy} onClick={onConfirm}>{confirmLabel}</Btn></>}>
+  <p className="text-muted-foreground">{message}</p></Dialog>}
+
+// Luồng lưu cho form: thêm mới lưu luôn, sửa thì hỏi xác nhận cập nhật. check() trả về dữ liệu đã kiểm tra (hoặc null nếu lỗi).
+export function useSaveFlow({check,save,edit,name}){
+ const {t}=useT(),[ask,setAsk]=useState(null)
+ const go=()=>{const d=check();if(!d)return;edit?setAsk(d):save(d)}
+ const node=ask&&<Confirm danger={false} icon={Save} title={t('c.updTitle')} message={t('c.upd',{name})} confirmLabel={t('update')} onClose={()=>setAsk(null)} onConfirm={()=>{const d=ask;setAsk(null);save(d)}}/>
+ return {go,node}}
+export const FormButtons=({busy,onClose,onSave,edit})=>{const {t}=useT();return <><Btn variant="neutral" icon={X} disabled={busy} onClick={onClose}>{t('cancel')}</Btn><Btn icon={edit?Check:Save} loading={busy} onClick={onSave}>{t(edit?'update':'save')}</Btn></>}
 
 export function ExportMenu({formats,onPick,busy}){
  const {t}=useT(),[open,setOpen]=useState(false),[up,setUp]=useState(false)

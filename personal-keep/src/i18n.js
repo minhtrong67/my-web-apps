@@ -35,7 +35,7 @@ const RAW=[
 ['st.install.ios','Trên iPhone/iPad: nhấn nút Chia sẻ rồi chọn "Thêm vào Màn hình chính".','On iPhone/iPad: tap Share, then choose "Add to Home Screen".'],['st.install.manual','Mở menu trình duyệt và chọn "Cài đặt ứng dụng" hoặc "Thêm vào màn hình chính".','Open your browser menu and choose "Install app" or "Add to Home screen".'],
 ['st.appearance','Giao diện','Appearance'],['st.theme','Chế độ hiển thị','Display mode'],['theme.light','Sáng','Light'],['theme.dark','Tối','Dark'],['theme.system','Hệ thống','System'],
 ['st.accent','Màu chủ đề','Accent color'],['st.fontsize','Cỡ chữ','Font size'],['st.preview','Xem trước: Lưu giữ mọi thứ hữu ích ở một nơi.','Preview: Keep everything useful in one place.'],['st.lang','Ngôn ngữ','Language'],
-['st.home','Trang mặc định khi mở','Default page on launch'],['st.data','Dữ liệu','Data'],['st.data.desc','Nhập / xuất dự án, tài khoản và trang web (CSV, JSON, Excel, PDF, PNG) hoặc sao lưu toàn bộ bằng JSON. Dữ liệu trùng sẽ được ghi đè, không bị nhân đôi.','Import / export projects, accounts and websites (CSV, JSON, Excel, PDF, PNG) or back up everything as JSON. Matching data is overwritten, never duplicated.'],
+['st.home','Trang mặc định khi mở','Default page on launch'],['st.data','Dữ liệu','Data'],['st.data.desc','Nhập / xuất dự án, tài khoản, trang web và prompt (CSV, JSON, Excel, PDF, PNG) hoặc sao lưu toàn bộ bằng JSON. Dữ liệu trùng sẽ được ghi đè, không bị nhân đôi. API key không bao giờ được xuất để tránh lộ.','Import / export projects, accounts, websites and prompts (CSV, JSON, Excel, PDF, PNG) or back up everything as JSON. Matching data is overwritten, never duplicated. API keys are never exported, to avoid leaks.'],
 ['st.reset','Khôi phục mặc định','Restore defaults'],['st.reset.desc','Đặt lại giao diện, ngôn ngữ, cỡ chữ, màu chủ đề và trang mở đầu. Dữ liệu của bạn không bị ảnh hưởng.','Reset theme, language, font size, accent color and start page. Your data is not affected.'],['st.reset.done','Đã khôi phục cài đặt mặc định','Defaults restored'],
 ['st.account','Tài khoản đăng nhập','Signed-in account'],['st.logout','Đăng xuất','Sign out'],['st.about','Giới thiệu','About'],['st.version','Phiên bản','Version'],
 ['accent.indigo','Chàm','Indigo'],['accent.violet','Tím','Violet'],['accent.sky','Xanh trời','Sky'],['accent.teal','Xanh mòng két','Teal'],['accent.emerald','Lục bảo','Emerald'],['accent.amber','Hổ phách','Amber'],['accent.orange','Cam','Orange'],['accent.rose','Hồng','Rose'],
@@ -52,6 +52,29 @@ const RAW=[
 ['item.open','Mở trang','Open'],['item.copy','Sao chép liên kết','Copy link'],['web.copied','Đã sao chép liên kết','Link copied'],['web.copyfail','Không thể sao chép','Could not copy'],
 ['pal.addWebsite','Thêm trang web','Add website'],['s.websites','Trang web','Websites'],['s.byWcat','Trang web theo danh mục','Websites by category'],
 ['st.seed','Danh sách trang web có sẵn','Starter website list'],['st.seed.desc','{n} trang web từ Utilities Vault','{n} sites from Utilities Vault'],
+['mod.projects','Dự án','Projects'],['mod.websites','Trang web','Websites'],['mod.prompts','Prompt','Prompts'],['nav.categories','Danh mục','Categories'],['nav.prompts','Prompt','Prompts'],['nav.keys','API Key','API Keys'],
+['pal.addPrompt','Thêm prompt','Add prompt'],['pal.addKey','Thêm API key','Add API key'],
+['update','Cập nhật','Update'],['select','Chọn','Select'],['selectAll','Chọn tất cả','Select all'],['selected','{n} đã chọn','{n} selected'],['copy','Sao chép','Copy'],['copied','Đã sao chép','Copied'],['view','Xem','View'],['reveal','Hiện','Show'],['hide','Ẩn','Hide'],['uncat','Chưa phân loại','Uncategorized'],['scrollTop','Lên đầu trang','Back to top'],['select.exit','Thoát chọn','Exit selection'],
+['c.updTitle','Xác nhận cập nhật','Confirm update'],['c.upd','Lưu thay đổi cho "{name}"?','Save changes to "{name}"?'],
+['b.status','Cập nhật trạng thái','Update status'],['b.statusDesc','Chọn trạng thái mới cho {n} dự án đã chọn.','Choose a new status for the {n} selected projects.'],['b.delTitle','Xoá {n} dự án','Delete {n} projects'],['b.del','Xoá {n} dự án đã chọn? Hành động này không thể hoàn tác.','Delete the {n} selected projects? This cannot be undone.'],
+['b.done.status','Đã cập nhật {n} dự án','Updated {n} projects'],['b.done.del','Đã xoá {n} dự án','Deleted {n} projects'],['b.none','Hãy chọn ít nhất một dự án','Select at least one project'],
+['categories.count','{n} danh mục','{n} categories'],['categories.empty','Chưa có danh mục nào. Nhấn Thêm để tạo danh mục đầu tiên.','No categories yet. Press Add to create your first one.'],
+['dlg.addCategory','Thêm danh mục','Add category'],['dlg.editCategory','Sửa danh mục','Edit category'],['f.cname','Tên danh mục','Category name'],['f.cname.ph','VD: Công cụ','e.g. Tools'],['f.ccolor','Màu danh mục','Category colour'],
+['e.cname.req','Vui lòng nhập tên danh mục','Please enter a category name'],['e.cname.len','Tên danh mục tối đa 40 ký tự','Category name is limited to 40 characters'],['e.cname.dup','Danh mục này đã tồn tại','This category already exists'],
+['c.delCategory','Xoá danh mục "{name}"? {n} mục đang dùng sẽ chuyển thành "Chưa phân loại".','Delete category "{name}"? {n} items using it will become "Uncategorized".'],['item.nitems','{n} mục','{n} items'],
+['pcat.coding','Viết code','Coding'],['pcat.writing','Viết nội dung','Writing'],['pcat.translate','Dịch thuật','Translation'],['pcat.analysis','Phân tích','Analysis'],['pcat.image','Hình ảnh','Image'],['pcat.other','Khác','Other'],
+['prompts.count','{n} prompt','{n} prompts'],['prompts.search','Tìm theo tiêu đề, nội dung, hashtag...','Search by title, content, hashtag...'],['prompts.empty','Chưa có prompt nào. Nhấn Thêm để lưu prompt đầu tiên.','No prompts yet. Press Add to save your first one.'],
+['dlg.addPrompt','Thêm prompt','Add prompt'],['dlg.editPrompt','Sửa prompt','Edit prompt'],['f.ptitle','Tiêu đề','Title'],['f.ptitle.ph','VD: Viết commit message chuẩn','e.g. Write a clean commit message'],['f.content','Nội dung prompt','Prompt content'],['f.content.ph','Nhập nội dung prompt...','Write your prompt...'],['f.pcat','Danh mục','Category'],
+['e.ptitle.req','Vui lòng nhập tiêu đề','Please enter a title'],['e.ptitle.len','Tiêu đề từ 2 đến 100 ký tự','Title must be 2 to 100 characters'],['e.ptitle.dup','Đã có prompt cùng tiêu đề','A prompt with this title already exists'],['e.content.req','Vui lòng nhập nội dung prompt','Please enter the prompt content'],['e.content.len','Nội dung tối đa 10.000 ký tự','Content is limited to 10,000 characters'],
+['c.delPrompt','Xoá prompt "{name}"? Hành động này không thể hoàn tác.','Delete prompt "{name}"? This cannot be undone.'],['col.title','Tiêu đề','Title'],['col.content','Nội dung','Content'],['item.chars','{n} ký tự','{n} chars'],
+['keys.count','{n} API key','{n} API keys'],['keys.search','Tìm theo tên, nhà cung cấp, ghi chú...','Search by name, provider, note...'],['keys.empty','Chưa lưu API key nào. Nhấn Thêm để lưu key đầu tiên.','No API keys saved yet. Press Add to save your first one.'],
+['keys.warn','API key được lưu trong Firestore của tài khoản bạn và chỉ bạn đọc được, nhưng không mã hoá đầu cuối. Tránh lưu key quyền cao hoặc key production.','API keys are stored in your own Firestore account and only you can read them, but they are not end-to-end encrypted. Avoid storing high-privilege or production keys.'],['keys.copied','Đã sao chép API key','API key copied'],
+['dlg.addKey','Thêm API key','Add API key'],['dlg.editKey','Sửa API key','Edit API key'],['f.kname','Tên gợi nhớ','Label'],['f.kname.ph','VD: OpenAI cá nhân','e.g. Personal OpenAI'],['f.provider','Nhà cung cấp','Provider'],['f.key','API key','API key'],['f.key.ph','sk-...','sk-...'],['f.knote','Ghi chú','Note'],['f.knote.ph','VD: dùng cho dự án blog','e.g. used for the blog project'],
+['e.kname.req','Vui lòng nhập tên gợi nhớ','Please enter a label'],['e.kname.len','Tên gợi nhớ tối đa 60 ký tự','Label is limited to 60 characters'],['e.key.req','Vui lòng nhập API key','Please enter the API key'],['e.key.len','API key tối đa 500 ký tự','API key is limited to 500 characters'],['e.key.dup','API key này đã được lưu','This API key is already saved'],
+['c.delKey','Xoá API key "{name}"? Hành động này không thể hoàn tác.','Delete API key "{name}"? This cannot be undone.'],['flt.provider','Nhà cung cấp','Provider'],
+['s.w.total','Tổng trang web','Total websites'],['s.w.cats','Danh mục','Categories'],['s.w.domains','Tên miền','Domains'],['s.w.uncat','Chưa phân loại','Uncategorized'],['s.w.byCat','Trang web theo danh mục','Websites by category'],['s.w.top','Tên miền xuất hiện nhiều','Most frequent domains'],['s.w.recent','Thêm gần đây','Recently added'],
+['s.p.total','Tổng prompt','Total prompts'],['s.p.cats','Danh mục','Categories'],['s.p.keys','API key','API keys'],['s.p.avg','Độ dài TB (ký tự)','Avg. length (chars)'],['s.p.byCat','Prompt theo danh mục','Prompts by category'],['s.p.byProv','API key theo nhà cung cấp','API keys by provider'],['s.p.tags','Hashtag phổ biến','Popular hashtags'],['s.p.longest','Prompt dài nhất','Longest prompts'],
+['st.font','Phông chữ','Font'],['st.font.system','Mặc định hệ thống','System default'],['st.landing','Xem landing page','View landing page'],['st.landing.desc','Trang giới thiệu Personal Keep với đầy đủ tính năng.','The Personal Keep showcase page with all features.'],
 ['credit.by','Tác giả','Author'],['credit.with','Có sự hỗ trợ của','Built with help from'],
 ]
 export const DICT={vi:{},en:{}}
@@ -68,5 +91,22 @@ export const toolKey=x=>x==='Khác'?'Other':x
 export const locale=lang=>lang==='en'?'en-US':'vi-VN'
 
 export const WCAT_KEYS=['tool','utility','extension','mobile','desktop','other']
+export const PCAT_KEYS=['coding','writing','translate','analysis','image','other']
 const WLEGACY={tools:'tool',utilities:'utility','mobile app':'mobile','desktop app':'desktop','khác':'other'}
-export const wcatKey=c=>{const k=String(c??'').trim().toLowerCase();return WCAT_KEYS.includes(k)?k:WLEGACY[k]||(['vi','en'].map(l=>WCAT_KEYS.find(x=>DICT[l]['wcat.'+x].toLowerCase()===k)).find(Boolean))||'other'}
+// khớp văn bản với khoá danh mục mặc định (khoá, nhãn vi/en hoặc tên cũ); không khớp thì trả về ''
+const matchKey=(c,keys,pre,legacy={})=>{const k=String(c??'').trim().toLowerCase();if(!k)return '';return keys.includes(k)?k:legacy[k]||['vi','en'].map(l=>keys.find(x=>DICT[l][pre+x].toLowerCase()===k)).find(Boolean)||''}
+export const wcatMatch=c=>matchKey(c,WCAT_KEYS,'wcat.',WLEGACY)
+export const pcatMatch=c=>matchKey(c,PCAT_KEYS,'pcat.')
+export const wcatKey=c=>wcatMatch(c)||'other'
+export const CAT_COLORS=['indigo','violet','sky','teal','emerald','amber','orange','rose']
+export const WCAT_COLORS={tool:'indigo',utility:'teal',extension:'violet',mobile:'emerald',desktop:'orange',other:'rose'}
+export const PCAT_COLORS={coding:'indigo',writing:'violet',translate:'teal',analysis:'sky',image:'rose',other:'amber'}
+export const PROVIDERS=['OpenAI','Anthropic','Google Gemini','Mistral','xAI','DeepSeek','OpenRouter','Groq','Hugging Face','GitHub','Other']
+// phông chữ: stack CSS + tham số Google Fonts (không có thì dùng font cục bộ)
+export const FONTS={system:{label:null,css:'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",Arial,sans-serif'},
+ gsf:{label:'Google Sans Flex',css:'"Google Sans Flex","Google Sans",system-ui,sans-serif',gf:'Google+Sans+Flex:wght@400;500;600;700'},
+ rf:{label:'Roboto Flex',css:'"Roboto Flex",Roboto,system-ui,sans-serif',gf:'Roboto+Flex:wght@400;500;600;700'},
+ roboto:{label:'Roboto',css:'Roboto,system-ui,sans-serif',gf:'Roboto:wght@400;500;700'},
+ arial:{label:'Arial',css:'Arial,"Helvetica Neue",Helvetica,sans-serif'},
+ inter:{label:'Inter',css:'Inter,system-ui,sans-serif',gf:'Inter:wght@400;500;600;700'},
+ bvp:{label:'Be Vietnam Pro',css:'"Be Vietnam Pro",system-ui,sans-serif',gf:'Be+Vietnam+Pro:wght@400;500;600;700'}}

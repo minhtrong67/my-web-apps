@@ -47,7 +47,7 @@
   --font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 
 @layer base{
-  html{color-scheme:light;-webkit-text-size-adjust:100%;scroll-behavior:smooth;scrollbar-gutter:stable;font-family:var(--font-sans);background:var(--background);-webkit-tap-highlight-color:transparent}html.dark{color-scheme:dark}
+  html{color-scheme:light;-webkit-text-size-adjust:100%;scroll-behavior:smooth;scrollbar-gutter:stable;font-family:var(--app-font,var(--font-sans));background:var(--background);-webkit-tap-highlight-color:transparent}html.dark{color-scheme:dark}
   button,input,select,textarea{font-family:inherit}
   button,a,summary,[role=button]{touch-action:manipulation}
   *{border-color:var(--border)}
@@ -95,10 +95,18 @@
   .btn-primary:hover{background:color-mix(in oklab,var(--md-primary) 90%,var(--md-on-primary));box-shadow:0 1px 3px 1px color-mix(in oklab,var(--md-on-surface) 14%,transparent)}
   .btn-soft{@apply bg-secondary text-secondary-foreground}
   .btn-soft:hover{background:color-mix(in oklab,var(--md-secondary-container) 90%,var(--md-on-secondary-container))}
+  .btn-neutral{@apply bg-muted text-foreground}
+  .btn-neutral:hover{background:color-mix(in oklab,var(--muted) 88%,var(--md-on-surface))}
   .btn-ghost{@apply px-4 text-primary hover:bg-primary/10}
   .btn-outline{@apply border border-input px-5 text-primary hover:bg-primary/10}
   .btn-danger{@apply bg-destructive text-on-error hover:opacity-90}
   .btn-danger-soft{@apply text-destructive hover:bg-destructive/10}
+  /* chip danh mục có màu: nền pha 20% màu gốc, chữ pha 55%, đúng cả sáng lẫn tối */
+  .cchip{@apply inline-flex max-w-full items-center gap-1.5 truncate rounded-lg px-2.5 py-1 text-xs font-medium;background:color-mix(in oklab,var(--cc,var(--md-outline)) 20%,var(--md-surface-container-highest));color:color-mix(in oklab,var(--cc,var(--md-outline)) 55%,var(--md-on-surface))}
+  .cc-indigo{--cc:#6366f1}.cc-violet{--cc:#8b5cf6}.cc-sky{--cc:#0ea5e9}.cc-teal{--cc:#14b8a6}.cc-emerald{--cc:#10b981}.cc-amber{--cc:#f59e0b}.cc-orange{--cc:#f97316}.cc-rose{--cc:#f43f5e}
+  .check{@apply grid size-6 shrink-0 place-items-center rounded-md border-2 border-input text-primary-foreground transition-[background-color,border-color,transform] duration-200;}
+  .check[aria-checked=true],.check[aria-checked=mixed]{@apply border-primary bg-primary}
+  .check:active{transform:scale(.88)}
   .badge{@apply inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium}
   .chip{@apply inline-flex max-w-full items-center truncate rounded-lg bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground}
   .avatar{@apply grid size-9 shrink-0 place-items-center rounded-full bg-primary-container text-sm font-semibold uppercase text-on-primary-container ring-2 ring-card}

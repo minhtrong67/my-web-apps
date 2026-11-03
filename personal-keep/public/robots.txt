@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://personal-keep.vercel.app/sitemap.xml
