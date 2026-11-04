@@ -18,6 +18,7 @@ export default function CafeShopFormModal({ open, onClose, editing }) {
   const [form, setForm] = useState(blank);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -33,6 +34,7 @@ export default function CafeShopFormModal({ open, onClose, editing }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (photoBusy) return notify.warning(t('image.waitUpload'));
     const payload = { ...form, name: trimValue(form.name), address: trimValue(form.address), description: trimValue(form.description) };
     const existing = cafeShops.filter((s) => s.id !== editing?.id).map((s) => s.name);
     const { valid, errors: errs } = validateCafeShop(payload, existing, t);
@@ -69,7 +71,7 @@ export default function CafeShopFormModal({ open, onClose, editing }) {
       }
     >
       <form id="cafe-shop-form" onSubmit={handleSubmit} className="flex flex-col gap-5 pb-2" noValidate>
-        <ImageUpload label={t('cafe.photo')} value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} />
+        <ImageUpload label={t('cafe.photo')} value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} onBusyChange={setPhotoBusy} />
         <TextInput label={t('cafe.shopName')} required icon="storefront" maxLength={60} value={form.name} onChange={set('name')} error={errors.name} />
         <TextInput label={t('cafe.address')} icon="location_on" maxLength={200} value={form.address} onChange={set('address')} error={errors.address} />
         <RatingInput label={t('cafe.rating')} value={form.rating} onChange={(v) => setForm((f) => ({ ...f, rating: v }))} error={errors.rating} />

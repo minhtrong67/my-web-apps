@@ -97,7 +97,7 @@ export default function CafeDrinksPage() {
             {list.map((d, idx) => (
               <SwipeableItem key={d.id} className="animate-slide-up" style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }} onEdit={() => openForm(d)} onDelete={() => setDeleteTarget(d)}>
                 <div className="flex items-start gap-3 rounded-2xl bg-surface-container-low p-4 transition-colors duration-200 hover:bg-surface-container">
-                  <CafeThumb src={d.imageUrl} icon="local_cafe" size={64} />
+                  <CafeThumb src={d.imageUrl} icon="local_cafe" size={64} zoomable title={d.name} />
                   <div className="min-w-0 flex-1">
                     <p className="wrap-any text-title-sm text-on-surface">{d.name}</p>
                     {d.description && <p className="wrap-any line-clamp-2 text-body-sm text-on-surface-variant">{d.description}</p>}

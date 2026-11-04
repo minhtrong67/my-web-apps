@@ -1,41 +1,43 @@
 import { useState } from 'react'
 import { Modal, Icon, hue } from './ui'
+import Select from './Select'
 import { useData } from '../data'
+import { useT, fl } from '../i18n'
 
 export default function RecordDialog({ m, row, onClose }) {
   const { save, data } = useData()
+  const t = useT()
   const [eye, setEye] = useState(false)
-  const v = row || {}
+  const [busy, setBusy] = useState(false)
+  const [vals, setVals] = useState(() => Object.fromEntries(m.fields.map((f) => [f.key, row?.[f.key] ?? f.default ?? ''])))
+  const set = (k) => (v) => setVals((o) => ({ ...o, [k]: v }))
 
   const submit = async (e) => {
-    e.preventDefault()
-    const fd = new FormData(e.target)
-    const values = Object.fromEntries(m.fields.map((f) => [f.key, String(fd.get(f.key) ?? '').trim()]))
-    try { await save(m, values, row?.id); onClose() } catch { /* toast đã báo lỗi */ }
+    e.preventDefault(); setBusy(true)
+    try { await save(m, Object.fromEntries(Object.entries(vals).map(([k, v]) => [k, String(v ?? '').trim()])), row?.id); onClose() }
+    catch { setBusy(false) } // toast đã báo lỗi
   }
 
   const input = (f) => {
-    const val = v[f.key] ?? f.default ?? ''
-    if (f.type === 'textarea') return <textarea name={f.key} rows={3} defaultValue={val} />
-    if (f.type === 'select')
-      return <select name={f.key} defaultValue={val}>{[...new Set([...f.options, val].filter(Boolean))].map((o) => <option key={o}>{o}</option>)}</select>
+    const v = vals[f.key]
+    if (f.type === 'textarea') return <textarea rows={3} value={v} onChange={(e) => set(f.key)(e.target.value)} />
+    if (f.type === 'select') return <Select value={v} onChange={set(f.key)} options={[...new Set([...f.options, v].filter(Boolean))]} />
     if (f.type === 'reference')
-      return <input name={f.key} defaultValue={val} list="refs" required={f.required} autoComplete="off" />
+      return <Select free required={f.required} value={v} onChange={set(f.key)} options={[...new Set((data.danbooru_tag_categories || []).map((c) => c.category))]} />
     if (f.type === 'password')
-      return <div><input name={f.key} type={eye ? 'text' : 'password'} defaultValue={val} autoComplete="new-password" />
-        <button type="button" className="ic" onClick={() => setEye(!eye)} title="Hiện/ẩn"><Icon name={eye ? 'visibility_off' : 'visibility'} /></button></div>
-    return <input name={f.key} type={f.type === 'email' ? 'email' : 'text'} defaultValue={val} required={f.required} autoComplete="off" />
+      return <div><input type={eye ? 'text' : 'password'} value={v} onChange={(e) => set(f.key)(e.target.value)} autoComplete="new-password" />
+        <button type="button" className="ic" data-tip={t('pw_toggle')} onClick={() => setEye(!eye)}><Icon name={eye ? 'visibility_off' : 'visibility'} /></button></div>
+    return <input type={f.type === 'email' ? 'email' : 'text'} value={v} required={f.required} autoComplete="off" onChange={(e) => set(f.key)(e.target.value)} />
   }
 
   return (
     <Modal onClose={onClose} style={hue(m.key)}>
       <form onSubmit={submit}>
-        <h2>{row ? 'Sửa' : 'Thêm'} {m.label}</h2>
-        {m.fields.map((f) => <label key={f.key} className="fld"><span>{f.label}{f.required ? ' *' : ''}</span>{input(f)}</label>)}
-        <datalist id="refs">{(data.danbooru_tag_categories || []).map((c) => <option key={c.id} value={c.category} />)}</datalist>
+        <h2><Icon name={row ? 'edit' : 'add'} size={26} />{t(row ? 'edit_x' : 'add_x', { x: m.label })}</h2>
+        {m.fields.map((f) => <label key={f.key} className="fld"><span>{fl(f.label)}{f.required ? ' *' : ''}</span>{input(f)}</label>)}
         <div className="btns">
-          <button type="button" className="b t" onClick={onClose}>Huỷ</button>
-          <button className="b f">Lưu</button>
+          <button type="button" className="b n" onClick={onClose}><Icon name="close" />{t('cancel')}</button>
+          <button className="b p" disabled={busy}><Icon name="check" />{t('save')}</button>
         </div>
       </form>
     </Modal>

@@ -8,11 +8,17 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import { FONT_OPTIONS, getFont, loadFont } from '../lib/fonts'
 import { withThemeTransition } from '../lib/themeTransition'
 import THEME_JSON from '../theme/swatches.json'
-import { useSettings, COLOR_OPTIONS, LANGUAGE_OPTIONS, FONT_SIZE_OPTIONS } from '../contexts/SettingsContext'
+import { useSettings, COLOR_OPTIONS, LANGUAGE_OPTIONS, FONT_SIZE_OPTIONS, colorLabel } from '../contexts/SettingsContext'
 import { useToast } from '../contexts/ToastContext'
 import { usePwaInstall } from '../hooks/usePwaInstall'
 import { formatVNDate } from '../lib/dateUtils'
 import { useTranslation } from '../i18n/useTranslation'
+
+/** Màu chữ/dấu tích đọc được trên một màu nền hex (theo độ sáng tương đối) */
+function readableOn(hex) {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.4 ? '#1b1b1b' : '#ffffff'
+}
 
 const PREVIEW_DATE = new Date(2026, 7, 7) // 07/08/2026 — cố định để bản xem trước cỡ chữ luôn nhất quán
 
@@ -49,7 +55,7 @@ export default function SettingsPage() {
     const others = COLOR_OPTIONS.filter((c) => c.id !== settings.color)
     const pick = others[Math.floor(Math.random() * others.length)] ?? COLOR_OPTIONS[0]
     update({ color: pick.id, dailyColorRotation: false })
-    notify(t('settings.colorChanged', pick.label), { type: 'success' })
+    notify(t('settings.colorChanged', colorLabel(pick, lang)), { type: 'success' })
   }
 
   return (
@@ -93,11 +99,11 @@ export default function SettingsPage() {
         summary={
           <>
             {swatch && <span className="h-3.5 w-3.5 shrink-0 rounded-full" style={{ background: swatch.primary }} />}
-            <span className="truncate">{effectiveColorOption?.label}</span>
+            <span className="truncate">{colorLabel(effectiveColorOption, lang)}</span>
           </>
         }
       >
-        <div className="flex flex-wrap gap-3.5" role="group" aria-label={t('settings.colorTitle')}>
+        <div className="mx-auto grid max-w-md grid-cols-5 justify-items-center gap-y-4 sm:max-w-xl sm:grid-cols-10" role="group" aria-label={t('settings.colorTitle')}>
           {COLOR_OPTIONS.map((c) => {
             const active = !settings.dailyColorRotation && settings.color === c.id
             const scheme = THEME_JSON[c.id][isDark ? 'dark' : 'light']
@@ -107,37 +113,50 @@ export default function SettingsPage() {
                 onClick={() => update({ color: c.id, dailyColorRotation: false })}
                 className="focus-ring group relative h-12 w-12 rounded-full transition-transform duration-spatial-fast ease-spatial-fast active:scale-90"
                 aria-pressed={active}
-                aria-label={c.label}
-                title={c.label}
+                aria-label={colorLabel(c, lang)}
+                title={colorLabel(c, lang)}
               >
                 {/* Hình biến từ tròn → cookie khi chọn (cùng số điểm clip-path nên morph được) */}
                 <span
                   className="absolute inset-0 block transition-[clip-path,transform] duration-spatial ease-spatial group-hover:scale-105"
                   style={{
                     clipPath: active ? 'var(--shape-cookie)' : 'var(--shape-circle)',
-                    background: `linear-gradient(135deg, ${scheme.primary} 0 66%, ${scheme['tertiary-container']} 66% 100%)`
+                    // Phần lớn ô = đúng màu Material (nhận ra ngay Yellow, Lime...); góc nhỏ = màu chủ đạo thực tế của giao diện ở chế độ hiện tại
+                    background: `linear-gradient(135deg, ${c.hex} 0 68%, ${scheme.primary} 68% 100%)`
                   }}
                 />
                 {active && (
-                  <Icon name="check" size={26} weight={600} className="animate-pop-in absolute inset-0 m-auto" style={{ color: scheme['on-primary'] }} />
+                  <Icon name="check" size={26} weight={600} className="animate-pop-in absolute inset-0 m-auto" style={{ color: readableOn(c.hex) }} />
                 )}
               </button>
             )
           })}
+          {/* Ô thứ 20: chọn màu ngẫu nhiên ngay (cũng giúp lưới 19 màu + 1 ô đủ 4 hàng × 5 cột / 2 hàng × 10 cột, không bị hụt) */}
+          <button
+            onClick={handleRandomColor}
+            className="focus-ring group relative h-12 w-12 rounded-full transition-transform duration-spatial-fast ease-spatial-fast active:scale-90"
+            aria-label={t('settings.randomColorNow')}
+            title={t('settings.randomColorNow')}
+          >
+            <span
+              className="absolute inset-0 block rounded-full transition-transform duration-spatial ease-spatial group-hover:rotate-12 group-hover:scale-105"
+              style={{ background: 'conic-gradient(from 0deg, #f44336, #ff9800, #ffeb3b, #4caf50, #00bcd4, #2196f3, #9c27b0, #f44336)' }}
+            />
+            <span className="absolute inset-[5px] flex items-center justify-center rounded-full bg-surface-container text-on-surface">
+              <Icon name="shuffle" size={22} weight={500} />
+            </span>
+          </button>
         </div>
 
         <div className="mt-4 border-t border-outline-variant/70">
           <Row
             icon="autorenew"
             title={t('settings.dailyRotationTitle')}
-            desc={settings.dailyColorRotation ? t('settings.dailyRotationOn', effectiveColorOption?.label) : t('settings.dailyRotationOff')}
+            desc={settings.dailyColorRotation ? t('settings.dailyRotationOn', colorLabel(effectiveColorOption, lang)) : t('settings.dailyRotationOff')}
           >
             <Switch checked={settings.dailyColorRotation} onChange={(v) => update({ dailyColorRotation: v })} label={t('settings.dailyRotationTitle')} />
           </Row>
         </div>
-        <Button variant="secondary" icon={(p) => <Icon name="shuffle" {...p} />} onClick={handleRandomColor} className="mt-2">
-          {t('settings.randomColorNow')}
-        </Button>
       </Accordion>
 
       {/* Phông chữ — accordion (tải trước các font mẫu khi mở lần đầu) */}

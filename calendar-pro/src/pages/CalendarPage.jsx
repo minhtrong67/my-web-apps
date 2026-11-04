@@ -7,6 +7,7 @@ import { Page } from '../components/Page'
 import { monthNames, getLunarInfo } from '../lib/dateUtils'
 import { canChiYear } from '../lib/lunar'
 import { useMediaQuery } from '../hooks/useMediaQuery'
+import { useRegisterFab } from '../lib/fabStore'
 import { useTranslation } from '../i18n/useTranslation'
 
 export default function CalendarPage() {
@@ -30,6 +31,7 @@ export default function CalendarPage() {
     })
   }, [])
 
+  useRegisterFab(true)
   const goToday = useCallback(() => {
     const now = new Date()
     setCursor((c) => {

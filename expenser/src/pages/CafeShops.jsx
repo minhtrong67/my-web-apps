@@ -101,7 +101,7 @@ export default function CafeShopsPage() {
             {list.map((s, idx) => (
               <SwipeableItem key={s.id} className="animate-slide-up" style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }} onEdit={() => openForm(s)} onDelete={() => setDeleteTarget(s)}>
                 <div className="flex items-start gap-3 rounded-2xl bg-surface-container-low p-4 transition-colors duration-200 hover:bg-surface-container">
-                  <CafeThumb src={s.imageUrl} icon="storefront" size={64} />
+                  <CafeThumb src={s.imageUrl} icon="storefront" size={64} zoomable title={s.name} />
                   <div className="min-w-0 flex-1">
                     <p className="wrap-any text-title-sm text-on-surface">{s.name}</p>
                     {s.rating > 0 && <Stars value={s.rating} size={15} />}

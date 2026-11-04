@@ -51,7 +51,7 @@ try:
             ctx = browser.new_context(viewport={"width": 1440, "height": 900}, device_scale_factor=2, locale="vi-VN", color_scheme=mode)
             ctx.add_init_script(
                 "localStorage.setItem('calendar-pro:settings', %s)"
-                % json.dumps(json.dumps({"themeMode": mode, "color": "rose", "language": "vi", "fontFamily": "google-sans-flex", "fontSize": "vua"}))
+                % json.dumps(json.dumps({"themeMode": mode, "color": "pink", "language": "vi", "fontFamily": "google-sans-flex", "fontSize": "vua"}))
             )
             page = ctx.new_page()
             page.clock.set_fixed_time(datetime(2026, 11, 23, 9, 30, 0))

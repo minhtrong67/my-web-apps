@@ -139,7 +139,7 @@ Sửa `src/theme/colors.json` (`id`, `label`, `seed`) rồi chạy `npm run them
 - `src/theme/motion.css`, `src/theme/shapes.css` — token spring và hình dạng
 - `src/theme/swatches.json`, `surfaces.json` và khối `SURF` trong `index.html` (màu nền khởi động)
 
-Màu mặc định là mục có `id: "rose"` và giá trị `DEFAULTS.color` trong `SettingsContext.jsx`.
+Màu mặc định là mục có `id: "pink"` và giá trị `DEFAULTS.color` trong `SettingsContext.jsx`.
 </details>
 
 <details>

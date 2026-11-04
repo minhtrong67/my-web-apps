@@ -4,6 +4,10 @@ import { useSettings } from '../contexts/SettingsContext'
 import { useTranslation } from '../i18n/useTranslation'
 import { withThemeTransition } from '../lib/themeTransition'
 
+/** Vòng đổi chế độ giao diện và icon tương ứng */
+const THEME_NEXT = { light: 'dark', dark: 'system', system: 'light' }
+const THEME_ICON = { light: 'light_mode', dark: 'dark_mode', system: 'brightness_auto' }
+
 /** Khoá dịch tiêu đề theo đường dẫn (khớp với tên mục trong menu điều hướng) */
 const TITLE_KEYS = [
   { match: (p) => p === '/', key: 'nav.home' },
@@ -26,7 +30,8 @@ export function usePageTitle() {
  * Tên trang đổi bằng hiệu ứng trượt-nảy mỗi lần điều hướng. Đổi sáng/tối dùng View Transition lan tròn từ điểm bấm.
  */
 export default function Header({ onMenuClick }) {
-  const { isDark, update } = useSettings()
+  const { settings, update } = useSettings()
+  const mode = settings.themeMode
   const { t } = useTranslation()
   const title = usePageTitle()
   const { pathname } = useLocation()
@@ -48,12 +53,14 @@ export default function Header({ onMenuClick }) {
       </p>
 
       <div className="flex shrink-0 items-center gap-1">
+        {/* 3 chế độ xoay vòng: Sáng → Tối → Theo hệ thống; icon hiện chế độ ĐANG dùng */}
         <button
-          onClick={(e) => withThemeTransition(() => update({ themeMode: isDark ? 'light' : 'dark' }), e)}
+          onClick={(e) => withThemeTransition(() => update({ themeMode: THEME_NEXT[mode] ?? 'light' }), e)}
           className="state morph focus-ring flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant"
-          aria-label={t('header.toggleTheme')}
+          aria-label={`${t('header.toggleTheme')}: ${t(`settings.${THEME_NEXT[mode] ? mode : 'system'}`)}`}
+          title={`${t('settings.themeModeTitle')}: ${t(`settings.${THEME_NEXT[mode] ? mode : 'system'}`)}`}
         >
-          <Icon name={isDark ? 'light_mode' : 'dark_mode'} size={24} />
+          <Icon key={mode} name={THEME_ICON[mode] ?? 'brightness_auto'} size={24} className="animate-pop-in" />
         </button>
         <Link
           to="/cai-dat"

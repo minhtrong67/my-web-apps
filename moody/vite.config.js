@@ -43,8 +43,8 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         display: 'standalone',
-        theme_color: '#009688',
-        background_color: '#009688',
+        theme_color: '#80CBC4',
+        background_color: '#80CBC4',
         categories: ['health', 'lifestyle', 'productivity'],
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },

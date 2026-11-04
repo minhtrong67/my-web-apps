@@ -14,7 +14,8 @@ export default function TransactionFilters({ filters, setFilters, categories, wa
   const { t, locale } = useI18n();
   const set = (patch) => setFilters((f) => ({ ...f, ...patch }));
 
-  const sortedCategories = useMemo(() => [...categories].sort((a, b) => a.name.localeCompare(b.name, locale)), [categories, locale]);
+  // `categories` already arrive in the user's saved order (Categories > Reorder)
+  const sortedCategories = categories;
   const sortedWallets = useMemo(() => [...wallets].sort((a, b) => a.name.localeCompare(b.name, locale)), [wallets, locale]);
 
   return (

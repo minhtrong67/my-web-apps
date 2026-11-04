@@ -18,7 +18,7 @@ import { usePwaInstall } from '../hooks/usePwaInstall';
 import { useReminderSettings } from '../hooks/useReminder';
 import { useSessionState } from '../hooks/useSessionState';
 import { isNonEmpty, isStrongPassword } from '../utils/validators';
-import { ACCENT_PRESETS, DEFAULT_ACCENT, isValidHex } from '../theme';
+import { ACCENT_PRESETS, DEFAULT_ACCENT, isLightColor, isValidHex } from '../theme';
 
 const FONT_SIZES = ['sm', 'md', 'lg'];
 
@@ -95,34 +95,30 @@ function ThemeColorPicker({ value, onChange }) {
   const { t } = useI18n();
   const current = (value || '').toLowerCase();
   const isPreset = ACCENT_PRESETS.some((p) => p.hex.toLowerCase() === current);
-  const ring = 'ring-2 ring-primary ring-offset-2 ring-offset-surface-container-low';
+  const tile = 'state-layer flex flex-col items-center gap-1.5 rounded-2xl px-1 py-2.5 transition-colors duration-200';
+  const on = 'bg-secondary-container text-on-secondary-container';
+  const off = 'text-on-surface-variant';
+  const dot = 'flex h-11 w-11 items-center justify-center rounded-full shadow-elev-1 transition-transform duration-200 ease-emphasized';
   return (
-    <div className="flex flex-wrap items-center gap-3" role="radiogroup" aria-label={t('settings.color')}>
+    // 19 Material colours + the free picker = 20 tiles: 4 x 5 on phones, 5 x 4 from the sm breakpoint
+    <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-5 sm:gap-2" role="radiogroup" aria-label={t('settings.color')}>
       {ACCENT_PRESETS.map((p) => {
         const active = p.hex.toLowerCase() === current;
         return (
-          <button
-            key={p.id}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            aria-label={t(`settings.colors.${p.id}`)}
-            title={t(`settings.colors.${p.id}`)}
-            onClick={() => onChange(p.hex)}
-            className={`flex h-9 w-9 items-center justify-center rounded-full text-white transition-transform duration-200 ease-emphasized hover:scale-110 ${active ? ring : ''}`}
-            style={{ backgroundColor: p.swatch }}
-          >
-            {active && <Icon name="check" size={18} />}
+          <button key={p.id} type="button" role="radio" aria-checked={active} onClick={() => onChange(p.hex)} className={`${tile} ${active ? on : off}`}>
+            <span className={`${dot} ${active ? 'scale-110' : ''} ${isLightColor(p.swatch) ? 'text-black/70' : 'text-white'}`} style={{ backgroundColor: p.swatch }}>
+              {active && <Icon name="check" size={22} />}
+            </span>
+            <span className="w-full truncate text-center text-label-sm">{t(`settings.colors.${p.id}`)}</span>
           </button>
         );
       })}
-      {/* Free colour: any hex via the native colour picker (only its hue is used) */}
-      <label
-        title={t('settings.colors.custom')}
-        className={`relative flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-outline text-on-surface-variant transition-transform duration-200 ease-emphasized hover:scale-110 ${!isPreset ? ring : ''}`}
-        style={!isPreset ? { backgroundColor: value } : undefined}
-      >
-        <Icon name="colorize" size={18} className={!isPreset ? 'text-white' : ''} />
+      {/* Free colour: any hex via the native colour picker */}
+      <label className={`${tile} relative cursor-pointer ${!isPreset ? on : off}`}>
+        <span className={`${dot} border border-outline ${!isPreset ? `scale-110 ${isLightColor(value) ? 'text-black/70' : 'text-white'}` : ''}`} style={!isPreset ? { backgroundColor: value } : undefined}>
+          <Icon name={!isPreset ? 'check' : 'colorize'} size={22} />
+        </span>
+        <span className="w-full truncate text-center text-label-sm">{t('settings.colors.customShort')}</span>
         <input type="color" value={isPreset ? '#4CAF50' : value} aria-label={t('settings.colors.custom')} onChange={(e) => isValidHex(e.target.value) && onChange(e.target.value.toUpperCase())} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
       </label>
     </div>

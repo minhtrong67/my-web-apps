@@ -117,7 +117,7 @@ export default function Modal({ open, onClose, title, children, size = 'md', var
 
   return createPortal(
     <div className={`fixed inset-0 z-50 flex ${wrapperClass} ${closing ? 'pointer-events-none' : ''}`}>
-      <div className={`absolute inset-0 bg-scrim/32 ${closing ? 'animate-fade-out' : 'animate-fade-in'}`} onClick={onClose} aria-hidden="true" />
+      <div className={`absolute inset-0 bg-scrim/50 backdrop-blur-sm ${closing ? 'animate-fade-out' : 'animate-fade-in'}`} onClick={onClose} aria-hidden="true" />
       <div
         ref={panelRef}
         data-modal={closing ? undefined : ''}

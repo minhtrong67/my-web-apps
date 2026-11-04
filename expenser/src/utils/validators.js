@@ -42,6 +42,11 @@ export function validateTransaction(form, t) {
   if (!isValidDate(form.date)) errors.date = t('validation.dateInvalid');
   else if (new Date(form.date) > new Date(new Date().setHours(23, 59, 59, 999))) errors.date = t('validation.dateFuture');
   if (note && !maxLength(note, 200)) errors.note = t('validation.noteMax');
+  // Cafe category: the shop and the drink are mandatory (form.cafe is only set for the cafe category).
+  if (form.cafe) {
+    if (!isNonEmpty(form.cafe.shopId)) errors.shopId = t('validation.shopRequired');
+    if (!isNonEmpty(form.cafe.drinkId)) errors.drinkId = t('validation.drinkRequired');
+  }
   return { valid: Object.keys(errors).length === 0, errors };
 }
 

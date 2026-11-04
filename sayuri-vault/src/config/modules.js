@@ -153,3 +153,15 @@ export const STYLE = {
   pixiv_tags: { h: 200, l: 8 }, pixiv_accounts: { h: 230, l: 10 }, x_artists: { h: 150, l: 5 },
   pixai_loras: { h: 340, l: 12 }, r34video_artists: { h: 75, l: 11 },
 }
+
+// Trường dùng để nhận diện bản ghi trùng khi nhập CSV
+export const KEYS = {
+  accounts: ['site', 'username'], danbooru_tags: ['tag', 'category'], danbooru_tag_categories: ['category'],
+  pixiv_tags: ['english_tag'], pixiv_accounts: ['name', 'username'], x_artists: ['username'],
+  pixai_loras: ['lora'], r34video_artists: ['artist'],
+}
+export const keyOf = (m, r) => (KEYS[m.key] || [m.fields[0].key]).map((k) => String(r[k] ?? '').trim().toLowerCase()).join('\u0001')
+
+// Mục không hiện ở menu (vẫn truy cập được từ trang Danbooru Tag)
+export const HIDDEN = ['danbooru_tag_categories']
+export const VISIBLE = MODULES.filter((m) => !HIDDEN.includes(m.key))

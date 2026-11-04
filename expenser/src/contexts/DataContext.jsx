@@ -18,10 +18,11 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firestore';
 import { useAuth } from './AuthContext';
-import { useT } from '../i18n';
+import { useT, useI18n } from '../i18n';
 import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_WALLETS } from '../utils/defaults';
 import { monthKey, dayKey } from '../utils/format';
 import { sortByOrder } from '../utils/cafe';
+import { sortCategories } from '../utils/categoryOrder';
 
 const DataContext = createContext(null);
 
@@ -65,10 +66,11 @@ function cafeLogData(c) {
 export function DataProvider({ children }) {
   const { user } = useAuth();
   const t = useT();
+  const { locale } = useI18n();
   const uid = user?.uid || null;
 
   const [transactions, setTransactions] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [rawCategories, setCategories] = useState([]);
   const [wallets, setWallets] = useState([]);
   // Cafe mini-module: shops, drinks and the per-transaction cafe details (doc id = transaction id).
   const [cafeShops, setCafeShops] = useState([]);
@@ -76,6 +78,8 @@ export function DataProvider({ children }) {
   const [cafeLogs, setCafeLogs] = useState([]);
   const [cafeReady, setCafeReady] = useState({ shops: false, drinks: false, logs: false });
   const [ready, setReady] = useState({ tx: false, cat: false, wal: false });
+  // Manual order first, then alphabetical: the one order every list and dropdown in the app shows.
+  const categories = useMemo(() => sortCategories(rawCategories, locale), [rawCategories, locale]);
   const tRef = useRef(t);
   useEffect(() => {
     tRef.current = t;
@@ -338,16 +342,34 @@ export function DataProvider({ children }) {
     async (payload) => {
       if (!uid) return;
       const ref = doc(col(uid, 'categories'));
-      await settle(
-        setDoc(ref, {
-          name: payload.name.trim(),
-          type: payload.type,
-          emoji: payload.emoji || '🏷️',
-          color: payload.color || '#64748B',
-          createdAt: serverTimestamp(),
-        }),
-      );
+      // The new category goes to the END of its type's list. Categories that were never ordered
+      // (older data) get their current position written first so the list keeps looking the same.
+      const siblings = categories.filter((c) => c.type === payload.type);
+      const batch = writeBatch(db);
+      siblings.forEach((c, i) => {
+        if (c.order !== i) batch.update(doc(db, 'users', uid, 'categories', c.id), { order: i });
+      });
+      batch.set(ref, {
+        name: payload.name.trim(),
+        type: payload.type,
+        emoji: payload.emoji || '🏷️',
+        color: payload.color || '#64748B',
+        order: siblings.length,
+        createdAt: serverTimestamp(),
+      });
+      await settle(batch.commit());
       return ref.id;
+    },
+    [uid, categories],
+  );
+
+  // Persist a manual category order: item i of `ids` (one type's categories) gets order i.
+  const reorderCategories = useCallback(
+    async (ids) => {
+      if (!uid) return;
+      const batch = writeBatch(db);
+      ids.forEach((id, i) => batch.update(doc(db, 'users', uid, 'categories', id), { order: i }));
+      await settle(batch.commit());
     },
     [uid],
   );
@@ -605,6 +627,7 @@ export function DataProvider({ children }) {
       importTransactions,
       importCategories,
       addCategory,
+      reorderCategories,
       updateCategory,
       deleteCategory,
       addWallet,
@@ -618,7 +641,7 @@ export function DataProvider({ children }) {
       addCafeShop, updateCafeShop, deleteCafeShop, addCafeDrink, updateCafeDrink, deleteCafeDrink,
       reorderCafeShops, reorderCafeDrinks,
       addTransaction, updateTransaction, deleteTransaction, importTransactions, importCategories,
-      addCategory, updateCategory, deleteCategory, addWallet, updateWallet, deleteWallet, transferBetweenWallets,
+      addCategory, reorderCategories, updateCategory, deleteCategory, addWallet, updateWallet, deleteWallet, transferBetweenWallets,
     ],
   );
 

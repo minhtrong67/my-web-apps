@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Icon from './Icon'
+import { useFabPresence } from '../lib/fabStore'
 import { useTranslation } from '../i18n/useTranslation'
 
 const SHOW_AFTER = 320 // px đã cuộn xuống thì mới hiện nút
@@ -13,9 +14,8 @@ export default function ScrollToTop() {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const [visible, setVisible] = useState(false)
-  // Trang Lịch có FAB "Hôm nay" (mọi cỡ màn hình); trang Đếm ngược có FAB thêm sự kiện (chỉ di động) → nhích nút lên trên
-  const fabMobile = pathname.startsWith('/lich') || pathname.startsWith('/dem-nguoc')
-  const fabDesktop = pathname.startsWith('/lich')
+  // Trang đang có FAB (Lịch: "Hôm nay"; Đếm ngược > Sự kiện: thêm sự kiện) → nhích nút lên trên để không đè nhau
+  const fab = useFabPresence()
   const rafRef = useRef(0)
 
   useEffect(() => {
@@ -61,8 +61,8 @@ export default function ScrollToTop() {
     rafRef.current = requestAnimationFrame(step)
   }
 
-  const position = `${fabMobile ? 'bottom-[calc(env(safe-area-inset-bottom)+11rem)]' : 'bottom-[calc(env(safe-area-inset-bottom)+6.5rem)]'} ${
-    fabDesktop ? 'sm:bottom-[6.5rem]' : 'sm:bottom-8'
+  const position = `${fab.mobile ? 'bottom-[calc(env(safe-area-inset-bottom)+11rem)]' : 'bottom-[calc(env(safe-area-inset-bottom)+6.5rem)]'} ${
+    fab.desktop ? 'sm:bottom-[6.5rem]' : 'sm:bottom-8'
   }`
 
   return (

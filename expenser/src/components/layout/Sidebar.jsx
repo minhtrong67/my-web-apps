@@ -12,10 +12,16 @@ export default function Sidebar({ open, onClose }) {
 
   return (
     <>
-      {open && <div className="fixed inset-0 z-30 animate-fade-in bg-scrim/32 lg:hidden" onClick={onClose} aria-hidden="true" />}
+      {/* Dims + blurs the page behind the drawer (phones / tablets). Always mounted so it can fade out with the drawer;
+          above the bottom nav and the floating buttons (z-40) but below the drawer itself. */}
+      <div
+        className={`fixed inset-0 z-[45] bg-scrim/50 backdrop-blur-sm transition-[opacity,visibility] duration-[420ms] ease-smooth lg:hidden ${open ? 'visible opacity-100' : 'invisible pointer-events-none opacity-0'}`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
       <aside
         aria-label={t('nav.menu')}
-        className={`fixed inset-y-0 left-0 z-40 flex w-[19rem] max-w-[85vw] flex-col rounded-r-2xl bg-surface-container-low transition-transform duration-[420ms] ease-decelerate lg:rounded-none ${
+        className={`fixed inset-y-0 left-0 z-[46] flex w-[19rem] max-w-[85vw] flex-col rounded-r-2xl bg-surface-container-low transition-transform duration-[420ms] ease-decelerate lg:rounded-none ${
           open ? 'translate-x-0 shadow-elev-3 lg:shadow-none' : '-translate-x-full'
         }`}
       >

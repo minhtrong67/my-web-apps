@@ -14,6 +14,7 @@ import { setFormatLocale } from '../utils/format';
 import { DEFAULT_REMINDER, normalizeTime } from '../services/reminders';
 import {
   DEFAULT_ACCENT,
+  LEGACY_ACCENTS,
   applyBrowserThemeColor,
   applyTheme,
   cacheAccent,
@@ -77,6 +78,7 @@ export function SettingsProvider({ children }) {
     const { seedColor: legacySeed, ...merged } = { ...DEFAULT_SETTINGS, ...stored }; // seedColor = removed Material 3 setting
     if (!LANGUAGES.some((l) => l.id === merged.language)) merged.language = DEFAULT_SETTINGS.language;
     if (merged.accentColor && !isValidHex(merged.accentColor)) merged.accentColor = DEFAULT_ACCENT;
+    merged.accentColor = LEGACY_ACCENTS[merged.accentColor?.toUpperCase()] || merged.accentColor;
     merged.reminder = { enabled: !!merged.reminder?.enabled, time: normalizeTime(merged.reminder?.time) };
     if (merged.fontSize === 'xl') merged.fontSize = 'lg'; // removed size
     if (!FONT_SCALES[merged.fontSize]) merged.fontSize = 'md';

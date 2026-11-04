@@ -48,18 +48,20 @@ const CUSTOM = { chay: '#2E9E4F', holiday: '#E8A317' }
 function build(def, isDark, contrast) {
   const src = Hct.fromInt(argbFromHex(def.seed))
   let scheme
-  if (def.id === 'mono') {
+  if (def.mono) {
     scheme = new SchemeMonochrome(src, isDark, contrast)
   } else {
     const h = src.hue
+    // Màu gốc ít bão hoà (Brown, Blue Grey) khai báo `chroma` riêng trong colors.json để không bị đẩy thành cam / xanh rực
+    const c = def.chroma ?? 200
     scheme = new DynamicScheme({
       sourceColorArgb: src.toInt(),
       variant: 3, /* Variant.VIBRANT */
       contrastLevel: contrast,
       isDark,
-      primaryPalette: TonalPalette.fromHueAndChroma(h, 200),
-      secondaryPalette: TonalPalette.fromHueAndChroma((h + 14) % 360, 34),
-      tertiaryPalette: TonalPalette.fromHueAndChroma((h + 310) % 360, 44),
+      primaryPalette: TonalPalette.fromHueAndChroma(h, c),
+      secondaryPalette: TonalPalette.fromHueAndChroma((h + 14) % 360, Math.min(34, c * 0.6)),
+      tertiaryPalette: TonalPalette.fromHueAndChroma((h + 310) % 360, Math.min(44, c * 0.8)),
       neutralPalette: TonalPalette.fromHueAndChroma(h, 9),
       neutralVariantPalette: TonalPalette.fromHueAndChroma(h, 15)
     })
@@ -68,7 +70,7 @@ function build(def, isDark, contrast) {
   for (const [name, role] of Object.entries(ROLES)) out[name] = hexFromArgb(role.getArgb(scheme)).toLowerCase()
 
   for (const [name, hex] of Object.entries(CUSTOM)) {
-    const harmonized = def.id === 'mono' ? argbFromHex(hex) : Blend.harmonize(argbFromHex(hex), src.toInt())
+    const harmonized = def.mono ? argbFromHex(hex) : Blend.harmonize(argbFromHex(hex), src.toInt())
     const hh = Hct.fromInt(harmonized)
     // Giảm bão hoà (≤ 36) để mảng màu xanh/vàng dịu, không lấn át màu chủ đạo
     const pal = TonalPalette.fromHueAndChroma(hh.hue, Math.min(hh.chroma, 36))
@@ -109,6 +111,8 @@ writeFileSync(join(root, 'src/theme/material-theme.json'), JSON.stringify(json, 
 const htmlPath = join(root, 'index.html')
 let html = readFileSync(htmlPath, 'utf8')
 const map = JSON.stringify(surfaces)
+const ids = JSON.stringify(colors.map((c) => c.id)).replace(/"/g, "'").replace(/,/g, ', ')
+html = html.replace(/var ids = \[[^\]]*\];/, `var ids = ${ids};`)
 html = html.replace(/\/\* @surfaces:start \*\/[\s\S]*?\/\* @surfaces:end \*\//, `/* @surfaces:start */ var SURF = ${map}; /* @surfaces:end */`)
 writeFileSync(htmlPath, html)
 

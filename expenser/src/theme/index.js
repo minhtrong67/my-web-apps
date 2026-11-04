@@ -8,15 +8,36 @@
 
 // Seeds offered in Settings. `hex: ''` is the default green (colors.css) - nothing is overridden.
 export const ACCENT_PRESETS = [
-  { id: 'green', hex: '', swatch: '#4CAF50' },
-  { id: 'blue', hex: '#2196F3', swatch: '#2196F3' },
-  { id: 'teal', hex: '#009688', swatch: '#009688' },
-  { id: 'amber', hex: '#FFB300', swatch: '#FFB300' },
-  { id: 'orange', hex: '#FF6D00', swatch: '#FF6D00' },
-  { id: 'rose', hex: '#E91E63', swatch: '#E91E63' },
+  { id: 'red', hex: '#F44336', swatch: '#F44336' },
+  { id: 'pink', hex: '#E91E63', swatch: '#E91E63' },
   { id: 'purple', hex: '#9C27B0', swatch: '#9C27B0' },
+  { id: 'deepPurple', hex: '#673AB7', swatch: '#673AB7' },
   { id: 'indigo', hex: '#3F51B5', swatch: '#3F51B5' },
+  { id: 'blue', hex: '#2196F3', swatch: '#2196F3' },
+  { id: 'lightBlue', hex: '#03A9F4', swatch: '#03A9F4' },
+  { id: 'cyan', hex: '#00BCD4', swatch: '#00BCD4' },
+  { id: 'teal', hex: '#009688', swatch: '#009688' },
+  { id: 'green', hex: '', swatch: '#4CAF50' },
+  { id: 'lightGreen', hex: '#8BC34A', swatch: '#8BC34A' },
+  { id: 'lime', hex: '#CDDC39', swatch: '#CDDC39' },
+  { id: 'yellow', hex: '#FFEB3B', swatch: '#FFEB3B' },
+  { id: 'amber', hex: '#FFC107', swatch: '#FFC107' },
+  { id: 'orange', hex: '#FF9800', swatch: '#FF9800' },
+  { id: 'deepOrange', hex: '#FF5722', swatch: '#FF5722' },
+  { id: 'brown', hex: '#795548', swatch: '#795548' },
+  { id: 'grey', hex: '#9E9E9E', swatch: '#9E9E9E' },
+  { id: 'blueGrey', hex: '#607D8B', swatch: '#607D8B' },
 ];
+
+// Colours offered by earlier versions -> the Material 3 palette value that replaced them.
+export const LEGACY_ACCENTS = { '#FFB300': '#FFC107', '#FF6D00': '#FF9800' };
+
+/** True for light swatches (lime, yellow, amber...) that need a dark check mark on top. */
+export function isLightColor(hex) {
+  if (!isValidHex(hex)) return false;
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return 0.299 * r + 0.587 * g + 0.114 * b > 160;
+}
 
 export const DEFAULT_ACCENT = '';
 export const DEFAULT_SEED = '#4CAF50';

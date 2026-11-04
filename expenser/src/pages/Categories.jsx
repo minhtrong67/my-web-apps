@@ -9,14 +9,15 @@ import EmptyState from '../components/ui/EmptyState';
 import SwipeableItem, { ItemActions } from '../components/ui/SwipeableItem';
 import { TableSkeleton } from '../components/ui/Skeleton';
 import CategoryFormModal from '../components/CategoryFormModal';
+import IconButton from '../components/ui/IconButton';
 import { useData } from '../contexts/DataContext';
 import { useI18n } from '../i18n';
 import { useSessionState } from '../hooks/useSessionState';
 import { getCategoryEmoji } from '../utils/categoryEmoji';
 
 export default function CategoriesPage() {
-  const { t, locale } = useI18n();
-  const { categories, transactions, deleteCategory, loading } = useData();
+  const { t } = useI18n();
+  const { categories, transactions, deleteCategory, reorderCategories, loading } = useData();
   // Remembered across page changes (sessionStorage)
   const [tab, setTab] = useSessionState('categories.tab', 'expense');
   const [search, setSearch] = useSessionState('categories.search', '');
@@ -24,13 +25,15 @@ export default function CategoriesPage() {
   const [editing, setEditing] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [moving, setMoving] = useState(false);
+
+  // Every category of the current tab, in the saved order (the same order the form dropdowns use).
+  const tabCategories = useMemo(() => categories.filter((c) => c.type === tab), [categories, tab]);
 
   const list = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return categories
-      .filter((c) => c.type === tab && (!q || c.name.toLowerCase().includes(q)))
-      .sort((a, b) => a.name.localeCompare(b.name, locale));
-  }, [categories, tab, search, locale]);
+    return tabCategories.filter((c) => !q || c.name.toLowerCase().includes(q));
+  }, [tabCategories, search]);
 
   // One pass over the transactions instead of one scan per category card.
   const usageByCategory = useMemo(() => {
@@ -59,6 +62,24 @@ export default function CategoriesPage() {
       notify.error(t('cat.deleteError'));
     } finally {
       setDeleting(false);
+    }
+  }
+
+  const canMove = !search.trim(); // order only makes sense on the full list
+
+  async function move(id, dir) {
+    const ids = tabCategories.map((c) => c.id);
+    const from = ids.indexOf(id);
+    const to = from + dir;
+    if (from < 0 || to < 0 || to >= ids.length || moving) return;
+    [ids[from], ids[to]] = [ids[to], ids[from]];
+    setMoving(true);
+    try {
+      await reorderCategories(ids);
+    } catch {
+      notify.error(t('cat.reorderError'));
+    } finally {
+      setMoving(false);
     }
   }
 
@@ -101,6 +122,12 @@ export default function CategoriesPage() {
                     <p className="wrap-any text-title-sm text-on-surface">{c.name}</p>
                     <p className="text-body-sm text-on-surface-variant">{t('cat.usage', { n: usageByCategory.get(c.id) || 0 })}</p>
                   </div>
+                  {canMove && list.length > 1 && (
+                    <div className="flex shrink-0 flex-col">
+                      <IconButton icon="expand_less" label={t('cafe.moveUp')} size={22} disabled={moving || idx === 0} onClick={() => move(c.id, -1)} className="!h-8 !w-8" />
+                      <IconButton icon="expand_more" label={t('cafe.moveDown')} size={22} disabled={moving || idx === list.length - 1} onClick={() => move(c.id, 1)} className="!h-8 !w-8" />
+                    </div>
+                  )}
                   <ItemActions onEdit={() => openForm(c)} onDelete={() => setDeleteTarget(c)} />
                 </div>
               </SwipeableItem>

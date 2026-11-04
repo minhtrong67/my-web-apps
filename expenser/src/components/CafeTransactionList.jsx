@@ -7,7 +7,8 @@ import SelectField from './ui/SelectField';
 import ConfirmDialog from './ui/ConfirmDialog';
 import EmptyState from './ui/EmptyState';
 import IconButton from './ui/IconButton';
-import CafeImageViewer from './CafeImageViewer';
+import ImageViewer from './ui/ImageViewer';
+import LazyImage from './ui/LazyImage';
 import TransactionFormModal from './TransactionFormModal';
 import { useData } from '../contexts/DataContext';
 import { useI18n } from '../i18n';
@@ -214,7 +215,7 @@ export default function CafeTransactionList({ items, loading, cafeCategoryId, on
                 <article key={tx.id} className="animate-slide-up overflow-hidden rounded-2xl bg-surface-container-low" style={{ animationDelay: `${Math.min(idx * 30, 240)}ms` }}>
                   {photo ? (
                     <button type="button" onClick={() => setViewer({ src: photo, title: drink?.name || shop?.name || t('cafe.photo') })} aria-label={t('cafe.viewPhoto')} className="group relative block aspect-video w-full cursor-zoom-in overflow-hidden bg-surface-container">
-                      <img src={photo} alt={drink?.name || ''} loading="lazy" referrerPolicy="no-referrer" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
+                      <LazyImage src={photo} alt={drink?.name || ''} className="h-full w-full" imgClassName="object-cover group-hover:scale-[1.02]" iconSize={40} />
                     </button>
                   ) : (
                     <div className="flex aspect-video w-full items-center justify-center bg-secondary-container text-on-secondary-container">
@@ -256,7 +257,7 @@ export default function CafeTransactionList({ items, loading, cafeCategoryId, on
 
       <TransactionFormModal open={!!editingTx} onClose={() => setEditingTx(null)} editingTx={editingTx} />
       <ConfirmDialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} loading={deleting} message={t('tx.confirmDelete')} />
-      <CafeImageViewer src={viewer?.src} title={viewer?.title} onClose={() => setViewer(null)} />
+      <ImageViewer src={viewer?.src} title={viewer?.title} onClose={() => setViewer(null)} />
     </div>
   );
 }

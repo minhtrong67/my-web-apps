@@ -11,9 +11,15 @@ export const LANGUAGE_OPTIONS = [
   { id: 'en', label: 'English' }
 ]
 
-/** 10 màu chủ đạo — "Hồng Rose" (rose của Material 3 Expressive) là mặc định.
+/** 19 màu chủ đạo của Material Design (Red … Blue Grey), "Pink" là mặc định.
  *  Bảng màu đầy đủ (primary / secondary / tertiary / surface...) được sinh từ seed bởi scripts/generate-theme.mjs. */
-export const COLOR_OPTIONS = COLOR_SEEDS.map(({ id, label, seed }) => ({ id, label, hex: seed }))
+export const COLOR_OPTIONS = COLOR_SEEDS.map(({ id, label, labelVi, seed }) => ({ id, label, labelVi, hex: seed }))
+
+/** Tên màu hiển thị theo ngôn ngữ (tiếng Anh dùng đúng tên Material) */
+export const colorLabel = (option, lang) => (option ? (lang === 'vi' ? option.labelVi : option.label) : '')
+
+/** Màu đã lưu từ phiên bản cũ (10 màu tự đặt tên) → màu Material tương ứng. Giữ đồng bộ với bảng `legacy` trong index.html */
+export const LEGACY_COLORS = { m3: 'pink', rose: 'pink', hong: 'pink', mono: 'grey', do: 'red', vang: 'amber', 'xanh-la': 'green', 'xanh-duong': 'blue', tim: 'purple', cam: 'orange', 'ngoc-lam': 'teal' }
 
 /** 3 cỡ chữ: nhỏ / vừa (mặc định) / lớn — hệ số nhân kích thước chữ toàn app */
 export const FONT_SIZE_OPTIONS = [
@@ -24,7 +30,7 @@ export const FONT_SIZE_OPTIONS = [
 
 const DEFAULTS = {
   themeMode: 'system', // 'light' | 'dark' | 'system'
-  color: 'rose',
+  color: 'pink',
   dailyColorRotation: false,
   language: 'vi', // 'vi' | 'en'
   fontSize: 'vua',
@@ -57,7 +63,8 @@ function loadSettings() {
     const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY)
     if (!raw) return DEFAULTS
     const saved = JSON.parse(raw)
-    if (saved.color === 'm3') saved.color = 'rose' // theme "Xanh Material" cũ → Rose
+    if (LEGACY_COLORS[saved.color]) saved.color = LEGACY_COLORS[saved.color]
+    if (!COLOR_OPTIONS.some((c) => c.id === saved.color)) saved.color = DEFAULTS.color
     if (saved.fontSize === 'rat-lon') saved.fontSize = 'lon' // cỡ "Rất lớn" đã bỏ → "Lớn"
     // Tính năng thông báo đã gỡ: dọn các khoá cũ khỏi dữ liệu đã lưu
     for (const key of Object.keys(saved)) if (key === 'notificationsEnabled' || key.startsWith('notify')) delete saved[key]

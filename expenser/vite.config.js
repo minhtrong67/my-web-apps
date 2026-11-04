@@ -43,8 +43,8 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         display: 'standalone',
-        theme_color: '#4CAF50',
-        background_color: '#4CAF50',
+        theme_color: '#A5D6A7',
+        background_color: '#A5D6A7',
         categories: ['finance', 'productivity'],
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },

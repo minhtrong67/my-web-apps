@@ -32,6 +32,7 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -59,9 +60,8 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
     () =>
       categories
         .filter((c) => c.type === form.type)
-        .map((c) => ({ id: c.id, name: c.name, emoji: getCategoryEmoji(c), color: c.color }))
-        .sort((a, b) => a.name.localeCompare(b.name, locale)),
-    [categories, form.type, locale],
+        .map((c) => ({ id: c.id, name: c.name, emoji: getCategoryEmoji(c), color: c.color })),
+    [categories, form.type],
   );
 
   const walletOptions = useMemo(
@@ -72,8 +72,6 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
   // Cafe mini-module: picking the cafe category reveals photo / shop / drink fields.
   const showCafe = form.type === 'expense' && isCafeCategory(getCategory(form.categoryId));
 
-  // Optional dropdowns: once a value is picked, a "none" entry lets the user clear it again.
-  const withNone = (list, value) => (value ? [{ id: '', name: t('cafe.none'), icon: 'remove', color: '#64748B' }, ...list] : list);
   const shopOptions = useMemo(
     () => cafeShops.map((s) => ({ id: s.id, name: s.name, icon: 'storefront', color: '#B45309' })),
     [cafeShops],
@@ -89,6 +87,7 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (photoBusy) return notify.warning(t('image.waitUpload'));
     const payload = {
       ...form,
       note: trimValue(form.note),
@@ -97,7 +96,11 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
     };
     const { valid, errors: errs } = validateTransaction(payload, t);
     setErrors(errs);
-    if (!valid) return;
+    if (!valid) {
+      // The cafe shop / drink fields are mandatory: say so in a toast too, not only under the fields.
+      if (errs.shopId || errs.drinkId) notify.error(errs.shopId && errs.drinkId ? t('cafe.requiredBoth') : errs.shopId || errs.drinkId);
+      return;
+    }
     setSaving(true);
     try {
       if (editingTx) {
@@ -206,19 +209,29 @@ export default function TransactionFormModal({ open, onClose, editingTx, initial
             </p>
             <ChoiceSelect
               label={t('cafe.shop')}
-              options={withNone(shopOptions, form.shopId)}
+              required
+              options={shopOptions}
               value={form.shopId}
-              onChange={(v) => setForm((f) => ({ ...f, shopId: v }))}
+              onChange={(v) => {
+                setForm((f) => ({ ...f, shopId: v }));
+                setErrors((er) => ({ ...er, shopId: undefined }));
+              }}
+              error={errors.shopId}
               emptyLabel={t('cafe.noShops')}
             />
             <ChoiceSelect
               label={t('cafe.drink')}
-              options={withNone(drinkOptions, form.drinkId)}
+              required
+              options={drinkOptions}
               value={form.drinkId}
-              onChange={(v) => setForm((f) => ({ ...f, drinkId: v }))}
+              onChange={(v) => {
+                setForm((f) => ({ ...f, drinkId: v }));
+                setErrors((er) => ({ ...er, drinkId: undefined }));
+              }}
+              error={errors.drinkId}
               emptyLabel={t('cafe.noDrinks')}
             />
-            <ImageUpload label={t('cafe.photo')} value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} />
+            <ImageUpload label={t('cafe.photo')} value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} onBusyChange={setPhotoBusy} />
           </div>
         )}
 

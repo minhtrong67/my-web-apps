@@ -62,7 +62,7 @@ export default function CommandPalette({ open, onClose, onAddTransaction }) {
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-20 sm:pt-28">
-      <div className="absolute inset-0 animate-fade-in bg-scrim/32" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 animate-fade-in bg-scrim/50 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
       <div role="dialog" aria-modal="true" aria-label={t('common.search')} className="relative z-10 w-full max-w-lg animate-scale-in overflow-hidden rounded-2xl bg-surface-container-high shadow-elev-3">
         <div className="flex items-center gap-3 px-5 py-3">
           <Icon name="search" className="text-on-surface-variant" />

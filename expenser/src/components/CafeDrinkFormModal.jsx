@@ -17,6 +17,7 @@ export default function CafeDrinkFormModal({ open, onClose, editing }) {
   const [form, setForm] = useState(blank);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -28,6 +29,7 @@ export default function CafeDrinkFormModal({ open, onClose, editing }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (photoBusy) return notify.warning(t('image.waitUpload'));
     const payload = { ...form, name: trimValue(form.name), description: trimValue(form.description) };
     const existing = cafeDrinks.filter((d) => d.id !== editing?.id).map((d) => d.name);
     const { valid, errors: errs } = validateCafeDrink(payload, existing, t);
@@ -64,7 +66,7 @@ export default function CafeDrinkFormModal({ open, onClose, editing }) {
       }
     >
       <form id="cafe-drink-form" onSubmit={handleSubmit} className="flex flex-col gap-5 pb-2" noValidate>
-        <ImageUpload label={t('cafe.photo')} value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} />
+        <ImageUpload label={t('cafe.photo')} value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} onBusyChange={setPhotoBusy} />
         <TextInput label={t('cafe.drinkName')} required icon="local_cafe" maxLength={60} value={form.name} onChange={set('name')} error={errors.name} />
         <Textarea label={t('cafe.description')} icon="edit_note" maxLength={500} value={form.description} onChange={set('description')} error={errors.description} />
       </form>

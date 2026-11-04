@@ -1,130 +1,139 @@
-import { useMemo, useRef, useState } from 'react'
-import { Icon, Modal, hue } from '../components/ui'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Icon, Confirm } from '../components/ui'
+import Select from '../components/Select'
+import { flashTip } from '../components/Tooltip'
 import RecordDialog from '../components/RecordDialog'
 import { useData } from '../data'
-
-const mask = '••••••••'
+import { useLS } from '../useLS'
+import { useT, fl } from '../i18n'
+import { HIDDEN } from '../config/modules'
 
 function Cell({ f, v }) {
-  if (!v) return null
-  if (f.type === 'password') return <span>{mask}</span>
-  if (f.type === 'url') return <a href={v} target="_blank" rel="noopener noreferrer">{String(v).replace(/^https?:\/\/(www\.)?/, '').slice(0, 48)}</a>
-  if (f.type === 'select' || f.type === 'reference') return <span className="chip">{v}</span>
+  if (f.type === 'password') return <span>••••••••</span>
+  if (f.type === 'url') return <a href={v} target="_blank" rel="noopener noreferrer">{String(v).replace(/^https?:\/\/(www\.)?/, '').slice(0, 52)}</a>
   return v
 }
 
+function Rec({ m, r, i, fl: flash, onEdit, onDel, onCopy }) {
+  const t = useT()
+  const [title, ...rest] = m.fields
+  const chips = rest.filter((f) => (f.type === 'select' || f.type === 'reference') && r[f.key])
+  const rows = rest.filter((f) => !chips.includes(f) && f.key !== 'note' && r[f.key])
+  const cls = (k) => (flash === `${r.id}:${k}` ? 'flash' : '')
+  return (
+    <article className="rec" style={{ '--i': i }}>
+      <header><h3 className={cls(title.key)} data-tip={t('click_copy')} onClick={(e) => onCopy(r, title, e.currentTarget)}>{r[title.key]}</h3></header>
+      {chips.length > 0 && <div className="chips">{chips.map((f) => <span key={f.key} className="chip">{r[f.key]}</span>)}</div>}
+      {rows.length > 0 && (
+        <dl>
+          {rows.map((f) => (
+            <div key={f.key} className={cls(f.key)} onClick={(e) => !e.target.closest('a') && onCopy(r, f, e.currentTarget)}>
+              <dt>{fl(f.label)}</dt><dd className={f.mono ? 'mono' : ''}><Cell f={f} v={r[f.key]} /></dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {r.note && <p className="note">{r.note}</p>}
+      <div className="ra">
+        <button className="ic" data-tip={t('edit')} onClick={() => onEdit(r)}><Icon name="edit" /></button>
+        <button className="ic d" data-tip={t('delete')} onClick={() => onDel(r)}><Icon name="delete" /></button>
+      </div>
+    </article>
+  )
+}
+
 export default function ResourcePage({ m }) {
-  const { data, ready, remove, bulk, toast } = useData()
+  const { data, ready, removeMany, reveal, revealRow } = useData()
+  const t = useT()
+  const [p, setP] = useLS('sv:' + m.key, { view: 'grid', sort: { f: 'createdAt', d: -1 }, flt: {} })
   const [q, setQ] = useState('')
-  const [sort, setSort] = useState({ f: 'createdAt', d: -1 })
-  const [lim, setLim] = useState(50)
-  const [form, setForm] = useState(null) // { row? }
-  const [imp, setImp] = useState(null)
-  const [menu, setMenu] = useState(false)
-  const file = useRef()
-  const all = data[m.key]
+  const [lim, setLim] = useState(48)
+  const [form, setForm] = useState(null)
+  const [del, setDel] = useState(null)
+  const [fop, setFop] = useState(false)
+  const [fl_, setFl] = useState('')
+  const fcount = Object.values(p.flt).filter(Boolean).length
+  const hidden = HIDDEN.includes(m.key)
 
   const rows = useMemo(() => {
-    const k = q.trim().toLowerCase()
-    return (all || [])
-      .filter((r) => !k || m.fields.some((f) => f.type !== 'password' && String(r[f.key] ?? '').toLowerCase().includes(k)))
+    const k = q.trim().toLowerCase(), fe = Object.entries(p.flt).filter(([, v]) => v)
+    return (data[m.key] || [])
+      .filter((r) => (!k || m.fields.some((f) => f.type !== 'password' && String(r[f.key] ?? '').toLowerCase().includes(k)))
+        && fe.every(([key, v]) => String(r[key] ?? '').toLowerCase().includes(v.toLowerCase())))
       .sort((a, b) => {
-        const x = a[sort.f] ?? '', y = b[sort.f] ?? ''
-        return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'vi', { numeric: true })) * sort.d
+        const x = a[p.sort.f] ?? '', y = b[p.sort.f] ?? ''
+        return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'vi', { numeric: true })) * p.sort.d
       })
-  }, [all, q, sort, m])
+  }, [data, q, p, m])
 
-  const copy = (row, f) => row[f.key] && navigator.clipboard.writeText(row[f.key]).then(() => toast('Đã sao chép'))
-
-  const exportAs = async (type) => {
-    setMenu(false)
-    const x = await import('../utils/importExport')
-    const name = `${m.key}_${new Date().toISOString().slice(0, 10)}`
-    if (type === 'csv') x.exportToCSV(rows, m.fields, name)
-    else if (type === 'xlsx') x.exportToExcel(rows, m.fields, name)
-    else x.exportToPDF(rows, m.fields, name, m.pluralLabel, m.color)
+  const copy = async (r, f, el) => {
+    let v = r[f.key]
+    if (!v) return
+    if (f.type === 'password') { v = await reveal(v); if (v == null) return }
+    await navigator.clipboard.writeText(v)
+    setFl(`${r.id}:${f.key}`); setTimeout(() => setFl(''), 1200); flashTip(el, t('copied'))
   }
-
-  const onFile = async (e) => {
-    const f = e.target.files[0]; e.target.value = ''
-    if (!f) return
-    try {
-      const x = await import('../utils/importExport')
-      setImp(x.normalizeImportedRows(await x.parseImportFile(f), m.fields))
-    } catch (err) { toast(err.message) }
+  const edit = async (r) => {
+    if (!r) return setForm({})
+    const x = await revealRow(m, r)
+    if (x) setForm({ row: x })
   }
-
-  const doImport = async () => {
-    try { await bulk(m, imp.valid); toast(`Đã nhập ${imp.valid.length} bản ghi`); setImp(null) } catch (e) { toast('Lỗi: ' + e.message) }
-  }
-
-  const arrow = (f) => sort.f === f && <Icon name={sort.d > 0 ? 'arrow_upward' : 'arrow_downward'} />
+  const sorts = [{ v: 'createdAt', l: t('newest') }, ...m.fields.filter((f) => f.type !== 'password').map((f) => ({ v: f.key, l: fl(f.label) }))]
+  const setFlt = (k) => (v) => setP({ flt: { ...p.flt, [k]: v } })
 
   return (
     <div className="page">
       <header className="head">
+        {hidden && <Link to="/danbooru_tags" className="b n"><Icon name="back" />Danbooru Tag</Link>}
         <h1 className="h1 s">{m.label}</h1>
-        <label className="search"><Icon name="search" />
-          <input type="search" placeholder="Tìm trong danh sách" value={q} onChange={(e) => { setQ(e.target.value); setLim(50) }} /></label>
-        <span className="relative flex flex-wrap gap-2">
-          <button className="b" onClick={() => file.current.click()}><Icon name="upload_file" />Nhập CSV</button>
-          <button className="b" onClick={() => setMenu(!menu)}><Icon name="download" />Xuất</button>
-          {menu && (
-            <div className="menu" style={{ left: 'auto', right: 0 }}>
-              {[['csv', 'CSV', 'csv'], ['xlsx', 'Excel (.xlsx)', 'table_view'], ['pdf', 'PDF', 'picture_as_pdf']].map(([t, l, i]) =>
-                <button key={t} onClick={() => exportAs(t)}><Icon name={i} />{l}</button>)}
-            </div>
-          )}
-        </span>
-        <input ref={file} type="file" accept=".csv,text/csv" hidden onChange={onFile} />
+        {m.key === 'danbooru_tags' && <Link to="/danbooru_tag_categories" className="b n"><Icon name="account_tree" />{t('cats')}</Link>}
+        <div className="tools">
+          <label className="search"><Icon name="search" />
+            <input type="search" placeholder={t('search_ph')} value={q} onChange={(e) => { setQ(e.target.value); setLim(48) }} /></label>
+          <span className="seg">
+            {[['grid', 'grid_view', 'view_grid'], ['list', 'view_list', 'view_list']].map(([v, i, k]) =>
+              <button key={v} data-tip={t(k)} className={p.view === v ? 'on' : ''} onClick={() => setP({ view: v })}><Icon name={i} /></button>)}
+          </span>
+          <Select icon="sort" value={p.sort.f} options={sorts} onChange={(v) => setP({ sort: { f: v, d: v === 'createdAt' ? -1 : 1 } })} />
+          <button className="ic fill" data-tip={t('reverse')} onClick={() => setP({ sort: { ...p.sort, d: -p.sort.d } })}><Icon name={p.sort.d > 0 ? 'arrow_upward' : 'arrow_downward'} /></button>
+          <button className={`b${fop || fcount ? ' p' : ''}`} onClick={() => setFop(!fop)}><Icon name="filter_list" />{t('filters')}{fcount ? ` (${fcount})` : ''}</button>
+        </div>
       </header>
 
-      {!ready[m.key] ? <div className="card empty">Đang tải…</div>
+      {fop && (
+        <div className="card flt">
+          {m.fields.filter((f) => f.type !== 'password').map((f) => (
+            <label key={f.key} className="fld"><span>{fl(f.label)}</span>
+              {f.type === 'select'
+                ? <Select value={p.flt[f.key] || ''} onChange={setFlt(f.key)} options={[{ v: '', l: t('all') }, ...f.options]} />
+                : <input value={p.flt[f.key] || ''} onChange={(e) => setFlt(f.key)(e.target.value)} placeholder={t('contains')} />}
+            </label>
+          ))}
+          <button className="b n" disabled={!fcount} onClick={() => setP({ flt: {} })}><Icon name="filter_alt_off" />{t('filters_clear')}</button>
+        </div>
+      )}
+
+      {!ready[m.key] ? <div className={`recs ${p.view}`}>{[1, 2, 3, 4, 5, 6].map((i) => <div key={i} className="rec sk" />)}</div>
         : !rows.length ? (
-          <div className="card empty"><span className="ms" style={{ fontSize: 48 }}>{m.icon}</span>
-            <b>{q ? 'Không có kết quả khớp' : 'Chưa có bản ghi nào'}</b>
-            <span>{q ? 'Thử từ khoá khác.' : 'Thêm mới hoặc nhập từ file CSV.'}</span></div>
+          <div className="card empty"><Icon name={m.icon} size={44} />
+            <b>{q || fcount ? t('no_match') : t('no_rec')}</b>
+            <span>{q || fcount ? t('try_other') : t('add_hint')}</span></div>
         ) : (
-          <div className="card">
-            <table className="w-full">
-              <thead><tr>
-                {m.fields.map((f) => <th key={f.key} onClick={() => setSort(sort.f === f.key ? { f: f.key, d: -sort.d } : { f: f.key, d: 1 })}>{f.label} {arrow(f.key)}</th>)}
-                <th />
-              </tr></thead>
-              <tbody>
-                {rows.slice(0, lim).map((r) => (
-                  <tr key={r.id}>
-                    {m.fields.map((f) => (
-                      <td key={f.key} data-l={f.label} data-id={r.id} className={f.mono ? 'm' : ''} onClick={(e) => !e.target.closest('a') && copy(r, f)}>
-                        <Cell f={f} v={r[f.key]} />
-                      </td>
-                    ))}
-                    <td className="ac">
-                      <button className="ic" title="Sửa" onClick={() => setForm({ row: r })}><Icon name="edit" /></button>
-                      <button className="ic d" title="Xoá" onClick={() => remove(m, r)}><Icon name="delete" /></button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="foot"><span>{rows.length} bản ghi{q ? ' khớp' : ''} · bấm vào ô để sao chép</span>
-              {rows.length > lim && <button className="b" onClick={() => setLim(lim + 50)}>Hiện thêm</button>}</div>
-          </div>
+          <>
+            <div className={`recs ${p.view}`}>
+              {rows.slice(0, lim).map((r, i) => <Rec key={r.id} m={m} r={r} i={i} fl={fl_} onEdit={edit} onDel={setDel} onCopy={copy} />)}
+            </div>
+            <p className="foot">{t(q || fcount ? 'count_match' : 'count', { n: rows.length })} · {t('copy_hint')}
+              {rows.length > lim && <button className="b n" onClick={() => setLim(lim + 48)}><Icon name="down" />{t('more', { n: rows.length - lim })}</button>}</p>
+          </>
         )}
 
-      <button className="fab" onClick={() => setForm({})}><Icon name="add" />Thêm mới</button>
+      <button className="fab" onClick={() => edit()}><Icon name="add" size={22} />{t('add')}</button>
 
       {form && <RecordDialog m={m} row={form.row} onClose={() => setForm(null)} />}
-      {imp && (
-        <Modal onClose={() => setImp(null)} style={hue(m.key)}>
-          <h2>Nhập vào {m.label}</h2>
-          <p><b>{imp.valid.length}</b> dòng hợp lệ{imp.invalid.length ? <>, <b>{imp.invalid.length}</b> dòng thiếu trường bắt buộc sẽ bị bỏ qua</> : ''}. Cột cần có: {m.fields.map((f) => f.key).join(', ')}.</p>
-          <div className="btns">
-            <button className="b t" onClick={() => setImp(null)}>Huỷ</button>
-            <button className="b f" disabled={!imp.valid.length} onClick={doImport}>Nhập {imp.valid.length} dòng</button>
-          </div>
-        </Modal>
-      )}
+      {del && <Confirm title={t('del_t')} text={t('del_x')} label={t('delete')} icon="delete" onClose={() => setDel(null)}
+        onConfirm={async () => { await removeMany(m, [del]); setDel(null) }} />}
     </div>
   )
 }

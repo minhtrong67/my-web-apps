@@ -6,10 +6,12 @@ import Button from '../components/Button'
 import ConfirmDialog from '../components/ConfirmDialog'
 import EventForm from '../components/EventForm'
 import HolidayDetail from '../components/HolidayDetail'
+import YearProgress from '../components/YearProgress'
 import { Page, PageHeader } from '../components/Page'
 import { HOLIDAYS, CATEGORY_LABEL } from '../data/holidays'
 import { getNextOccurrence } from '../lib/dateUtils'
 import { removeEvent, toHoliday, usePersonalEvents } from '../lib/personalEvents'
+import { useRegisterFab } from '../lib/fabStore'
 import { useNow } from '../hooks/useNow'
 import { useToast } from '../contexts/ToastContext'
 import { useTranslation } from '../i18n/useTranslation'
@@ -17,11 +19,13 @@ import { useTranslation } from '../i18n/useTranslation'
 export default function CountdownPage() {
   const { t } = useTranslation()
   const { notify } = useToast()
+  const [view, setView] = useState('events') // 'events' | 'year'
   const [filter, setFilter] = useState('all')
   const [selected, setSelected] = useState(null)
   const [form, setForm] = useState(null) // null = đóng · {} = thêm mới · {event} = sửa
   const [confirmDelete, setConfirmDelete] = useState(null)
   const events = usePersonalEvents()
+  useRegisterFab(view === 'events', { desktop: false }) // FAB thêm sự kiện chỉ có ở di động, và chỉ ở tab Sự kiện
 
   // "Hôm nay" tự cập nhật khi qua nửa đêm (useNow chỉ đổi giá trị theo phút; danh sách chỉ tính lại khi sang ngày mới)
   const now = useNow(60000)
@@ -61,11 +65,39 @@ export default function CountdownPage() {
 
   return (
     <Page wide>
-      <PageHeader title={t('countdown.title')} subtitle={t('countdown.desc')}>
-        <Button icon={(p) => <Icon name="add" {...p} />} onClick={() => setForm({})} className="hidden sm:inline-flex">
-          {t('countdown.addEvent')}
-        </Button>
+      <PageHeader title={t('countdown.title')} subtitle={view === 'year' ? t('yearProgress.subtitle') : t('countdown.desc')}>
+        {view === 'events' && (
+          <Button icon={(p) => <Icon name="add" {...p} />} onClick={() => setForm({})} className="hidden sm:inline-flex">
+            {t('countdown.addEvent')}
+          </Button>
+        )}
       </PageHeader>
+
+      {/* Chuyển giữa danh sách sự kiện và tiến độ năm */}
+      <div className="mb-4 grid grid-cols-2 gap-1 rounded-full bg-surface-high p-1 sm:max-w-sm" role="tablist" aria-label={t('countdown.title')}>
+        {[
+          { id: 'events', icon: 'hourglass_top', label: t('yearProgress.tabEvents') },
+          { id: 'year', icon: 'donut_large', label: t('yearProgress.tabYear') }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            role="tab"
+            aria-selected={view === tab.id}
+            onClick={() => setView(tab.id)}
+            className={`state focus-ring flex h-11 items-center justify-center gap-2 rounded-full text-label-lg transition-[background-color,color] duration-effects ease-effects ${
+              view === tab.id ? 'bg-primary text-on-primary' : 'text-on-surface-variant'
+            }`}
+          >
+            <Icon name={tab.icon} size={20} filled={view === tab.id} />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {view === 'year' ? (
+        <YearProgress />
+      ) : (
+        <>
 
       {/* Bộ lọc danh mục */}
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 no-scrollbar sm:mx-0 sm:px-0" role="group">
@@ -107,7 +139,11 @@ export default function CountdownPage() {
         {events.length > 0 && <p className="mt-4 px-1 text-body-sm text-on-surface-variant">{t('countdown.mineHint')}</p>}
       </section>
 
+        </>
+      )}
+
       {/* FAB thêm sự kiện (di động, chỉ icon, góc phải; trên máy tính dùng nút ở tiêu đề) */}
+      {view === 'events' && (
       <button
         onClick={() => setForm({})}
         className="state morph-square focus-ring animate-pop-in fixed bottom-[calc(env(safe-area-inset-bottom)+6.5rem)] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-[20px] bg-primary-container text-on-primary-container shadow-fab sm:hidden"
@@ -116,6 +152,7 @@ export default function CountdownPage() {
       >
         <Icon name="add" size={28} weight={500} />
       </button>
+      )}
 
       <Sheet fullScreen open={!!selected} onClose={closeHoliday} title={t('countdown.eventDetail')}>
         {selected && (

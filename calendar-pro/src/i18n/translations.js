@@ -20,7 +20,7 @@ export const translations = {
       closeMenu: 'Đóng menu điều hướng'
     },
     header: {
-      toggleTheme: 'Đổi giao diện sáng/tối',
+      toggleTheme: 'Đổi chế độ giao diện (sáng / tối / hệ thống)',
       toggleLanguage: 'Đổi ngôn ngữ',
       search: 'Tìm kiếm menu'
     },
@@ -70,6 +70,27 @@ export const translations = {
       prevYear: 'Năm trước',
       nextYear: 'Năm sau',
       legendMine: 'Sự kiện của tôi'
+    },
+    yearProgress: {
+      tabEvents: 'Sự kiện',
+      tabYear: 'Tiến độ năm',
+      subtitle: 'Năm nay đã trôi qua bao nhiêu phần trăm? Tiến độ tự về 0% khi sang năm mới.',
+      solar: 'Dương lịch',
+      lunar: 'Âm lịch',
+      yearLabel: (label) => `Năm ${label}`,
+      done: 'đã trôi qua',
+      passed: 'Đã qua',
+      left: 'Còn lại',
+      days: (n) => `${n} ngày`,
+      today: 'Hôm nay',
+      dayOf: (n, total) => `Ngày ${n}/${total}`,
+      weekOf: (n, total) => `Tuần ${n}/${total}`,
+      perDay: (v) => `Mỗi ngày trôi qua bằng ${v}% của cả năm.`,
+      months: 'Các tháng',
+      milestones: 'Cột mốc',
+      reached: 'Đã qua',
+      newYear: (label) => `Chào năm ${label}! Thanh tiến độ đã quay về 0% và bắt đầu một vòng mới.`,
+      lastDay: 'Hôm nay là ngày cuối cùng của năm — sắp sang năm mới!'
     },
     events: {
       newTitle: 'Thêm sự kiện',
@@ -184,10 +205,10 @@ export const translations = {
       dark: 'Tối',
       system: 'Hệ thống',
       colorTitle: 'Màu sắc chủ đề',
-      colorSubtitle: 'Chọn một trong 10 tông màu chủ đạo',
+      colorSubtitle: 'Chọn một trong 19 màu của Material Design',
       dailyRotationTitle: 'Đổi màu ngẫu nhiên mỗi ngày',
       dailyRotationOn: (label) => `Hôm nay: ${label}`,
-      dailyRotationOff: 'Tự động xoay vòng qua 10 màu theo ngày',
+      dailyRotationOff: 'Tự động xoay vòng qua 19 màu theo ngày',
       randomColorNow: 'Đổi màu ngẫu nhiên ngay',
       colorChanged: (label) => `Đã đổi sang màu ${label}.`,
       languageTitle: 'Ngôn ngữ',
@@ -256,7 +277,7 @@ export const translations = {
       closeMenu: 'Close navigation menu'
     },
     header: {
-      toggleTheme: 'Toggle light/dark theme',
+      toggleTheme: 'Change theme mode (light / dark / system)',
       toggleLanguage: 'Switch language',
       search: 'Search menu'
     },
@@ -306,6 +327,27 @@ export const translations = {
       prevYear: 'Previous year',
       nextYear: 'Next year',
       legendMine: 'My events'
+    },
+    yearProgress: {
+      tabEvents: 'Events',
+      tabYear: 'Year progress',
+      subtitle: 'How much of this year has passed? Progress resets to 0% when the new year begins.',
+      solar: 'Solar',
+      lunar: 'Lunar',
+      yearLabel: (label) => `Year ${label}`,
+      done: 'elapsed',
+      passed: 'Elapsed',
+      left: 'Remaining',
+      days: (n) => `${n} days`,
+      today: 'Today',
+      dayOf: (n, total) => `Day ${n}/${total}`,
+      weekOf: (n, total) => `Week ${n}/${total}`,
+      perDay: (v) => `Each day is ${v}% of the whole year.`,
+      months: 'Months',
+      milestones: 'Milestones',
+      reached: 'Reached',
+      newYear: (label) => `Welcome to ${label}! The bar has reset to 0% for a fresh start.`,
+      lastDay: 'Today is the last day of the year — the new year is almost here!'
     },
     events: {
       newTitle: 'Add event',
@@ -420,10 +462,10 @@ export const translations = {
       dark: 'Dark',
       system: 'System',
       colorTitle: 'Theme color',
-      colorSubtitle: 'Pick one of 10 primary colors',
+      colorSubtitle: 'Pick one of 19 Material Design colors',
       dailyRotationTitle: 'Randomize color daily',
       dailyRotationOn: (label) => `Today: ${label}`,
-      dailyRotationOff: 'Automatically cycles through 10 colors each day',
+      dailyRotationOff: 'Automatically cycles through 19 colors each day',
       randomColorNow: 'Shuffle color now',
       colorChanged: (label) => `Switched to ${label}.`,
       languageTitle: 'Language',

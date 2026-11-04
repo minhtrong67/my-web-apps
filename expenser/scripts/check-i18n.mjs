@@ -24,7 +24,7 @@ for (const f of files) {
 }
 // keys built from template strings
 ['sm', 'md', 'lg'].forEach((k) => used.add(`settings.font.${k}`));
-['blue', 'teal', 'green', 'amber', 'orange', 'rose', 'purple', 'indigo', 'custom'].forEach((k) => used.add(`settings.colors.${k}`));
+['red', 'pink', 'purple', 'deepPurple', 'indigo', 'blue', 'lightBlue', 'cyan', 'teal', 'green', 'lightGreen', 'lime', 'yellow', 'amber', 'orange', 'deepOrange', 'brown', 'grey', 'blueGrey', 'customShort', 'custom'].forEach((k) => used.add(`settings.colors.${k}`));
 ['today', 'week', 'month', 'year', 'all'].forEach((k) => used.add(`stats.range.${k}`));
 
 let problems = 0;

@@ -4,8 +4,8 @@ import { useSettings, THEME_MODES } from '../../contexts/SettingsContext';
 import { useI18n } from '../../i18n';
 
 export default function Topbar({ title, scrolled, onSearchClick, onMenuClick }) {
-  const { t, lang } = useI18n();
-  const { settings, cycleThemeMode, toggleLanguage } = useSettings();
+  const { t } = useI18n();
+  const { settings, cycleThemeMode } = useSettings();
   const currentMode = THEME_MODES.find((m) => m.id === settings.themeMode) || THEME_MODES[2];
 
   return (
@@ -26,15 +26,6 @@ export default function Topbar({ title, scrolled, onSearchClick, onMenuClick }) 
         <kbd className="rounded-xs bg-surface-container-highest px-1.5 py-0.5 text-label-sm">Ctrl K</kbd>
       </button>
       <IconButton icon="search" label={t('common.search')} onClick={onSearchClick} className="sm:hidden" />
-      <button
-        onClick={toggleLanguage}
-        aria-label={t('topbar.switchLanguage')}
-        title={t('topbar.switchLanguage')}
-        className="state-layer morph flex h-10 min-w-10 items-center justify-center gap-1 rounded-full px-3 text-label-lg text-on-surface-variant"
-      >
-        <Icon name="translate" size={18} />
-        {lang.toUpperCase()}
-      </button>
       <IconButton
         icon={currentMode.icon}
         label={`${t('topbar.themeMode')}: ${t(currentMode.labelKey)}`}
