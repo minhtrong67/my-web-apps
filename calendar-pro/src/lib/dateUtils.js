@@ -1,4 +1,5 @@
 import { lunarToSolar, solarToLunar } from './lunar'
+import { isRuleHoliday, ruleDate } from './holidayRules'
 
 /** Nhãn thứ trong tuần, thứ tự Thứ Hai -> Chủ Nhật (chuẩn lịch Việt Nam) */
 export const WEEKDAYS_SHORT = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
@@ -53,11 +54,20 @@ function lunarDateInYear(day, month, lunarYear) {
 /**
  * Tìm lần diễn ra kế tiếp (kể từ hôm nay) của một ngày lễ / sự kiện, trả về Date.
  * - Dương lịch: lặp lại hằng năm cùng ngày/tháng.
+ * - Theo quy tắc (Phục sinh, thứ N của tháng): xem lib/holidayRules.js.
  * - Âm lịch: quy đổi từng năm âm; ngày lễ có `isEve` (Giao thừa) là TỐI NGÀY TRƯỚC mùng 1 → trả về 23:59:59 của ngày đó
  *   (đồng hồ đếm ngược chạy đúng đến giao thừa, và ngày hiển thị là 29/30 tháng Chạp chứ không trùng với Tết).
  */
 export function getNextOccurrence(holiday, from = new Date()) {
   const today = startOfDay(from)
+  if (isRuleHoliday(holiday)) {
+    // Phục sinh, Lễ Tạ ơn...: ngày thay đổi theo từng năm
+    for (let y = today.getFullYear(); y <= today.getFullYear() + 1; y++) {
+      const d = ruleDate(holiday, y)
+      if (startOfDay(d) >= today) return d
+    }
+    return null
+  }
   if (holiday.type === 'solar') {
     const year = today.getFullYear()
     let candidate = new Date(year, holiday.month - 1, holiday.day)

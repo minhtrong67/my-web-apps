@@ -3,7 +3,7 @@ import {Copy,Download,ExternalLink,Globe,Plus,SearchX} from 'lucide-react'
 import {useT} from '../i18n'
 import {useData,hostOf} from '../data'
 import {useLocal,useSession,V0W} from '../hooks'
-import {Acts,Btn,CardSkeleton,CatChip,Confirm,Cookie,Empty,Fab,PageHead,useToast} from '../ui'
+import {Acts,Btn,CardSkeleton,CatChip,Confirm,Cookie,Empty,Fab,ItemCard,PageHead,useToast} from '../ui'
 import Toolbar,{Chips} from '../components/Toolbar'
 import {WebsiteDialog} from '../components/forms'
 import SEED from '../seed-websites.json'
@@ -14,18 +14,13 @@ const Favicon=({url,name})=>{const [bad,setBad]=useState(false),host=hostOf(url)
   {bad?(name||host)[0]:<img src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`} alt="" width="28" height="28" loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={()=>setBad(true)} className="size-7 object-contain"/>}</span>}
 
 const Item=memo(function Item({w,cat,view,i,onEdit,onDelete}){
- const {t}=useT(),toast=useToast(),list=view==='list',host=hostOf(w.url),href=/^https?:\/\//i.test(w.url)?w.url:undefined
+ const {t}=useT(),toast=useToast(),host=hostOf(w.url),href=/^https?:\/\//i.test(w.url)?w.url:undefined
  const copy=async()=>{try{await navigator.clipboard.writeText(w.url);toast(t('web.copied'))}catch{toast(t('web.copyfail'),'error')}}
- return <article style={{animationDelay:`${Math.min(i,8)*28}ms`}} className={`card card-item card-hover anim-up min-w-0 p-4 sm:p-5 ${list?'flex flex-col gap-3 md:grid md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_auto] md:items-center md:gap-x-6':'flex flex-col gap-3'}`}>
-  <div className="flex min-w-0 items-center gap-3"><Favicon url={w.url} name={w.name}/>
-   <div className="min-w-0"><h3 className="line-clamp-2 break-words font-semibold leading-snug">{w.name}</h3>
-    <a href={href} target="_blank" rel="noopener noreferrer" className="block truncate text-xs text-primary hover:underline">{host}</a></div></div>
-  <div className="flex min-w-0 flex-col items-start gap-2"><CatChip cat={cat}/>
-   {w.desc&&<p className="line-clamp-2 whitespace-pre-line break-words text-sm text-muted-foreground">{w.desc}</p>}</div>
-  <div className={`mt-auto flex items-center gap-1 pt-1 ${list?'md:mt-0 md:pt-0':''}`}>
-   <a href={href} target="_blank" rel="noopener noreferrer" className={`btn btn-soft btn-sm !min-w-0 !shrink !px-3 ${list?'flex-1 md:flex-none':'flex-1'}`}><ExternalLink className="size-4 shrink-0"/><span className="truncate">{t('item.open')}</span></a>
-   <button type="button" aria-label={t('item.copy')} title={t('item.copy')} onClick={copy} className="icon-btn"><Copy className="size-4"/></button>
-   <Acts onEdit={()=>onEdit(w)} onDelete={()=>onDelete(w)}/></div></article>})
+ return <ItemCard view={view} i={i} lead={<Favicon url={w.url} name={w.name}/>} title={w.name}
+  sub={<a href={href} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} className="text-primary hover:underline">{host}</a>} badge={<CatChip cat={cat}/>}
+  desc={w.desc&&<p className="line-clamp-2 whitespace-pre-line break-words text-sm text-muted-foreground">{w.desc}</p>}
+  who={<a href={href} target="_blank" rel="noopener noreferrer" className="btn btn-soft btn-sm !px-4"><ExternalLink className="size-4 shrink-0"/>{t('item.open')}</a>}
+  actions={<><button type="button" aria-label={t('item.copy')} title={t('item.copy')} onClick={copy} className="icon-btn"><Copy className="size-4"/></button><Acts onEdit={()=>onEdit(w)} onDelete={()=>onDelete(w)}/></>}/>})
 
 export default function Websites({pending,setPending}){
  const {t}=useT(),toast=useToast(),{websites,wcats,webCat,removeWebsite,importRecords}=useData()

@@ -3,23 +3,19 @@ import {Copy,Eye,EyeOff,KeyRound,Plus,SearchX,TriangleAlert} from 'lucide-react'
 import {PROVIDERS,useT} from '../i18n'
 import {useData} from '../data'
 import {useLocal,useSession,V0K} from '../hooks'
-import {Acts,Btn,CardSkeleton,Confirm,Empty,Fab,PageHead,useToast} from '../ui'
+import {Acts,Btn,CardSkeleton,Confirm,Empty,Fab,ItemCard,Lead,PageHead,useToast} from '../ui'
 import Toolbar,{Chips} from '../components/Toolbar'
 import {KeyDialog} from '../components/forms'
 
 const mask=k=>k.length<=8?'•'.repeat(k.length):`${k.slice(0,4)}••••••••${k.slice(-4)}`
 
 const Item=memo(function Item({k,view,i,onEdit,onDelete,onCopy}){
- const {t}=useT(),[open,setOpen]=useState(false),list=view==='list'
+ const {t}=useT(),[open,setOpen]=useState(false)
  useEffect(()=>{if(!open)return;const id=setTimeout(()=>setOpen(false),20000);return()=>clearTimeout(id)},[open]) // tự ẩn sau 20 giây
- return <article style={{animationDelay:`${Math.min(i,8)*28}ms`}} className={`card card-item card-hover anim-up min-w-0 p-4 sm:p-5 ${list?'flex flex-col gap-3 md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_auto] md:items-center md:gap-x-6':'flex flex-col gap-3'}`}>
-  <div className="flex min-w-0 flex-col items-start gap-2"><h3 className="line-clamp-2 break-words font-semibold leading-snug">{k.name}</h3><span className="chip">{k.provider==='Other'?t('other'):k.provider}</span>
-   {k.note&&<p className="line-clamp-2 break-words text-sm text-muted-foreground">{k.note}</p>}</div>
-  <code className="block min-w-0 select-all break-all rounded-xl bg-muted px-3 py-2.5 font-mono text-[13px]">{open?k.key:mask(k.key)}</code>
-  <div className="mt-auto flex items-center gap-1 pt-1 md:mt-0 md:pt-0">
-   <Btn variant="soft" className="btn-sm flex-1 md:flex-none" icon={Copy} onClick={()=>onCopy(k)}>{t('copy')}</Btn>
-   <button type="button" aria-label={t(open?'hide':'reveal')} title={t(open?'hide':'reveal')} aria-pressed={open} onClick={()=>setOpen(!open)} className="icon-btn">{open?<EyeOff className="size-4"/>:<Eye className="size-4"/>}</button>
-   <Acts onEdit={()=>onEdit(k)} onDelete={()=>onDelete(k)}/></div></article>})
+ return <ItemCard view={view} i={i} lead={<Lead icon={KeyRound}/>} title={k.name} sub={k.note||null} badge={<span className="chip">{k.provider==='Other'?t('other'):k.provider}</span>}
+  desc={<code className="block min-w-0 select-all truncate rounded-lg bg-muted px-3 py-2 font-mono text-[13px]">{open?k.key:mask(k.key)}</code>}
+  who={<Btn variant="soft" className="btn-sm" icon={Copy} onClick={()=>onCopy(k)}>{t('copy')}</Btn>}
+  actions={<><button type="button" aria-label={t(open?'hide':'reveal')} title={t(open?'hide':'reveal')} aria-pressed={open} onClick={()=>setOpen(!open)} className="icon-btn">{open?<EyeOff className="size-4"/>:<Eye className="size-4"/>}</button><Acts onEdit={()=>onEdit(k)} onDelete={()=>onDelete(k)}/></>}/>})
 
 // Mini module quản lý API key (nằm trong module Prompt)
 export default function ApiKeys({pending,setPending}){

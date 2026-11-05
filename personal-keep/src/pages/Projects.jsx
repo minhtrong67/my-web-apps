@@ -1,36 +1,31 @@
 import {memo,useDeferredValue,useEffect,useMemo,useState} from 'react'
-import {CalendarDays,Check,FolderKanban,Layers,ListChecks,Plus,RefreshCw,SearchX,Sparkles,Trash2,UserRound,X} from 'lucide-react'
+import {Check,FolderKanban,Layers,ListChecks,Plus,RefreshCw,SearchX,Sparkles,Trash2,UserRound,X} from 'lucide-react'
 import {useT,STATUS_KEYS,CAT_KEYS,catKey,toolKey,locale} from '../i18n'
 import {useData} from '../data'
 import {useLocal,useSession,V0P} from '../hooks'
-import {Acts,Btn,CardSkeleton,Checkbox,Confirm,Dialog,Dropdown,Empty,Fab,PageHead,useToast} from '../ui'
+import {Acts,Btn,CardSkeleton,Checkbox,ChipRow,ItemCard,Lead,Confirm,Dialog,Dropdown,Empty,Fab,PageHead,useToast} from '../ui'
 import Toolbar,{Chips} from '../components/Toolbar'
 import {ProjectDialog} from '../components/forms'
 
 const ST={active:'bg-primary-container text-on-primary-container',paused:'bg-warn-container text-on-warn-container',done:'bg-ok-container text-on-ok-container',cancelled:'bg-muted text-muted-foreground'}
-const Tag=({icon:I,tone,children})=><span className={`inline-flex max-w-full items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${tone}`}><I className="size-3.5 shrink-0"/><span className="truncate">{children}</span></span>
+const Tag=({icon:I,tone,children})=><span className={`inline-flex max-w-full min-w-0 items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${tone}`}><I className="size-3.5 shrink-0"/><span className="truncate">{children}</span></span>
 
 const Item=memo(function Item({p,accMap,view,i,onEdit,onDelete,selMode,checked,onToggle}){
  const {t,lang}=useT(),accs=(p.userIds||[]).map(x=>accMap[x]).filter(Boolean),first=accs[0],list=view==='list'
- const tools=p.tools||[],tags=p.tags||[]
  const created=p.createdAt?.toDate&&t('item.created',{d:p.createdAt.toDate().toLocaleDateString(locale(lang))})
- const head=<div className="flex items-start justify-between gap-3">{selMode&&<Checkbox checked={checked} onChange={onToggle} label={p.name} className="mt-0.5"/>}<div className="min-w-0 flex-1">
-   <h3 className="line-clamp-2 break-words font-semibold leading-snug">{p.name}</h3>
-   {created&&<p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><CalendarDays className="size-3.5 shrink-0"/>{created}</p>}</div>
-  <span className={`badge ${ST[p.status]||ST.active}`}><i className="size-1.5 rounded-full bg-current"/>{t('status.'+p.status)}</span></div>
- const meta=<div className="flex flex-wrap gap-1.5"><Tag icon={Layers} tone="bg-secondary text-secondary-foreground border-transparent">{t('cat.'+catKey(p.category))}</Tag>
-  {tools.slice(0,3).map(x=><Tag key={x} icon={Sparkles} tone="text-foreground">{toolKey(x)==='Other'?t('other'):x}</Tag>)}
-  {tools.length>3&&<span className="chip">+{tools.length-3}</span>}</div>
- const desc=p.desc&&<p className="line-clamp-2 whitespace-pre-line break-words text-sm text-muted-foreground">{p.desc}</p>
- const hash=!!tags.length&&<div className="flex flex-wrap gap-1.5">{tags.slice(0,6).map(x=><span key={x} className="chip bg-primary/10 text-primary">#{x}</span>)}{tags.length>6&&<span className="chip">+{tags.length-6}</span>}</div>
- const who=<div className="flex min-w-0 flex-1 items-center gap-2.5">{first
-  ?<><span className="flex shrink-0 -space-x-2">{accs.slice(0,3).map(a=><span key={a.id} title={a.name||a.email} className="avatar">{(a.name||a.email)[0]}</span>)}</span>
+ const chips=[<Tag key="c" icon={Layers} tone="bg-secondary text-secondary-foreground border-transparent">{t('cat.'+catKey(p.category))}</Tag>,
+  ...(p.tools||[]).map(x=><Tag key={'t'+x} icon={Sparkles} tone="text-foreground">{toolKey(x)==='Other'?t('other'):x}</Tag>),
+  ...(p.tags||[]).map(x=><span key={'#'+x} className="chip bg-primary/10 text-primary">#{x}</span>)]
+ const who=first
+  ?<div className="flex min-w-0 items-center gap-2.5"><span className="flex shrink-0 -space-x-2">{accs.slice(0,3).map(a=><span key={a.id} title={a.name||a.email} className="avatar">{(a.name||a.email)[0]}</span>)}</span>
     <div className="min-w-0"><p className="truncate text-sm font-medium leading-tight">{first.name||first.email}{accs.length>1&&<span className="ml-1 font-normal text-muted-foreground">+{accs.length-1}</span>}</p>
-     {first.name&&<p className="truncate text-xs text-muted-foreground">{first.email}</p>}</div></>
-  :<><span className="grid size-8 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground"><UserRound className="size-4"/></span><p className="truncate text-sm text-muted-foreground">{t('item.noacc')}</p></>}</div>
- return <article style={{animationDelay:`${Math.min(i,8)*28}ms`}} onClick={selMode?onToggle:undefined} className={`card card-item card-hover anim-up min-w-0 p-4 sm:p-5 ${selMode?'cursor-pointer':''} ${checked?'ring-2 ring-primary':''} ${list?'flex flex-col gap-3 md:grid md:grid-cols-[minmax(0,1fr)_15rem_auto] md:items-center md:gap-x-6':'flex flex-col gap-3'}`}>
-  <div className="flex min-w-0 flex-col gap-3">{head}{meta}{desc}{hash}</div>
-  <div className={`mt-auto flex items-center gap-2 border-t border-border pt-3 ${list?'md:contents':''}`}>{who}{!selMode&&<Acts onEdit={()=>onEdit(p)} onDelete={()=>onDelete(p)}/>}</div></article>})
+     {first.name&&<p className="truncate text-xs text-muted-foreground">{first.email}</p>}</div></div>
+  :<div className="flex items-center gap-2.5"><span className="grid size-8 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground"><UserRound className="size-4"/></span><p className="truncate text-sm text-muted-foreground">{t('item.noacc')}</p></div>
+ return <ItemCard view={view} i={i} selected={checked} onClick={selMode?onToggle:undefined}
+  select={selMode&&<Checkbox checked={checked} onChange={onToggle} label={p.name}/>} lead={<Lead icon={FolderKanban}/>} title={p.name} sub={created}
+  badge={<span className={`badge ${ST[p.status]||ST.active}`}><i className="size-1.5 rounded-full bg-current"/>{t('status.'+p.status)}</span>}
+  desc={p.desc&&<p className="line-clamp-2 whitespace-pre-line break-words text-sm text-muted-foreground">{p.desc}</p>}
+  meta={<ChipRow items={chips} max={list?1:3}/>} who={who} actions={!selMode&&<Acts onEdit={()=>onEdit(p)} onDelete={()=>onDelete(p)}/>}/>})
 
 function BulkStatus({n,busy,onClose,onApply}){
  const {t}=useT(),[st,setSt]=useState('active')

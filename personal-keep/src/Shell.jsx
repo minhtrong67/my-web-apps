@@ -1,16 +1,18 @@
 import {lazy,Suspense,useEffect,useMemo,useRef,useState} from 'react'
-import {Cog,Menu,Monitor,Moon,Plus,Search,Sun,X} from 'lucide-react'
+import {Cog,LogOut,Menu,Monitor,Moon,Plus,Search,Sun,X} from 'lucide-react'
+import {signOut} from 'firebase/auth'
+import {auth} from './firebase'
 import {useT} from './i18n'
 import {V0A,V0P,V0R,V0W,useSettings} from './hooks'
 import {DataProvider,useData} from './data'
 import {MODS,MOD_KEYS,normRoute} from './routes'
-import {ErrorBoundary,Logo,ScrollTop,Skeleton} from './ui'
+import {Confirm,ErrorBoundary,Logo,ScrollTop,Skeleton,UserAvatar} from './ui'
 import Projects from './pages/Projects'
 import Accounts from './pages/Accounts'
 // thử nạp lại module 1 lần khi lỗi mạng / dev server vừa tối ưu lại thư viện
 const lazyPage=f=>lazy(()=>f().catch(()=>new Promise(r=>setTimeout(r,500)).then(f)))
-const Stats=lazyPage(()=>import('./pages/Stats')),Websites=lazyPage(()=>import('./pages/Websites')),WebStats=lazyPage(()=>import('./pages/WebStats')),Categories=lazyPage(()=>import('./pages/Categories'))
-const Prompts=lazyPage(()=>import('./pages/Prompts')),ApiKeys=lazyPage(()=>import('./pages/ApiKeys')),PromptStats=lazyPage(()=>import('./pages/PromptStats')),Settings=lazyPage(()=>import('./pages/Settings'))
+const ProjectOverview=lazyPage(()=>import('./pages/ProjectOverview')),Websites=lazyPage(()=>import('./pages/Websites')),WebOverview=lazyPage(()=>import('./pages/WebOverview')),Categories=lazyPage(()=>import('./pages/Categories'))
+const Prompts=lazyPage(()=>import('./pages/Prompts')),ApiKeys=lazyPage(()=>import('./pages/ApiKeys')),PromptOverview=lazyPage(()=>import('./pages/PromptOverview')),Settings=lazyPage(()=>import('./pages/Settings'))
 
 const NAV=[...MOD_KEYS.map(k=>[k,MODS[k].icon,'mod.'+k]),['settings',Cog,'nav.settings']]
 const MODES=[['system',Monitor],['light',Sun],['dark',Moon]]
@@ -30,11 +32,15 @@ function Palette({items,onClose}){
     className={`flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm ${k===i?'bg-secondary text-secondary-foreground':''}`}><I className="size-5 shrink-0"/><span className="flex-1 truncate">{x.label}</span><span className="text-xs opacity-70">{x.hint}</span></button>})}
     {!list.length&&<p className="p-4 text-sm text-muted-foreground">{t('pal.none')}</p>}</div></div></div>}
 
-function SideNav({mod,go,user,rail}){
+function SideNav({mod,go,user,rail,onLogout}){
  const {t}=useT(),lbl=rail?'hidden lg:inline':'',pad=rail?'md:justify-center md:px-0 lg:justify-start lg:px-5':''
  return <div className="flex h-full flex-col"><div className={`flex h-20 items-center gap-3 px-6 ${rail?'md:justify-center md:px-0 lg:justify-start lg:px-6':''}`}><Logo className="size-10"/><span className={`text-lg font-semibold tracking-tight ${lbl}`}>Personal Keep</span></div>
   <nav className="flex-1 space-y-1 px-3 py-2">{NAV.map(([k,I,l])=><button type="button" key={k} title={t(l)} onClick={()=>go(k)} aria-current={mod===k?'page':undefined} className={`nav-item ${pad} ${mod===k?'nav-active':''}`}><I className="size-6 shrink-0"/><span className={lbl}>{t(l)}</span></button>)}</nav>
-  <div className={`p-5 ${rail?'hidden lg:block':''}`}><p className="truncate text-xs text-muted-foreground">{user.email}</p></div></div>}
+  {/* thông tin người dùng ở cuối sidebar: ảnh, họ tên, email và nút đăng xuất */}
+  <div className={`m-3 flex items-center gap-3 rounded-2xl bg-card p-2 ${rail?'md:flex-col md:gap-2 lg:flex-row lg:gap-2.5':'gap-2.5'}`}>
+   <UserAvatar user={user}/>
+   <div className={`min-w-0 flex-1 ${rail?'md:hidden lg:block':''}`}><p className="truncate text-sm font-semibold leading-tight">{user.displayName||user.email?.split('@')[0]}</p><p className="truncate text-[11px] text-muted-foreground">{user.email}</p></div>
+   <button type="button" aria-label={t('st.logout')} title={t('st.logout')} onClick={onLogout} className="icon-btn icon-btn-danger"><LogOut className="size-5"/></button></div></div>}
 
 // Tab con của module đang mở (Dự án / Tài khoản / Thống kê ...), cuộn ngang được trên mobile
 function SubTabs({mod,sub,go}){
@@ -44,7 +50,7 @@ function SubTabs({mod,sub,go}){
 
 function Shell({user}){
  const {t}=useT(),{s,set}=useSettings(),{projects,accounts,websites,prompts}=useData()
- const [[mod,sub],setRoute]=useState(()=>normRoute(s.home).split('/')),[nonce,setNonce]=useState(0),[drawer,setDrawer]=useState(false),[pal,setPal]=useState(false),[pending,setPending]=useState(null)
+ const [[mod,sub],setRoute]=useState(()=>normRoute(s.home).split('/')),[nonce,setNonce]=useState(0),[drawer,setDrawer]=useState(false),[askOut,setAskOut]=useState(false),[outBusy,setOutBusy]=useState(false),[pal,setPal]=useState(false),[pending,setPending]=useState(null)
  const go=(m,sb,reload)=>{setRoute([m,sb||(m==='settings'?'':MODS[m].subs[0][0])]);setDrawer(false);reload&&setNonce(n=>n+1);scrollTo({top:0,behavior:'instant'})}
  const mi=Math.max(0,MODES.findIndex(m=>m[0]===s.mode)),ModeIcon=MODES[mi][1],nextMode=()=>set({mode:MODES[(mi+1)%3][0]})
  // phím tắt: Ctrl+K tìm nhanh, N thêm mới ở trang hiện tại, / tới ô tìm kiếm (bỏ qua khi đang gõ hoặc đang mở dialog)
@@ -69,7 +75,7 @@ function Shell({user}){
  const iconBtn="icon-btn",P={pending,setPending},title=mod==='settings'?t('nav.settings'):t('mod.'+mod)
  const route=`${mod}/${sub}`
  return <div className="md:pl-[5.5rem] lg:pl-72">
-  <aside className="fixed inset-y-0 left-0 z-30 hidden bg-sidebar text-sidebar-foreground md:block md:w-[5.5rem] lg:w-72"><SideNav rail mod={mod} go={go} user={user}/></aside>
+  <aside className="fixed inset-y-0 left-0 z-30 hidden bg-sidebar text-sidebar-foreground md:block md:w-[5.5rem] lg:w-72"><SideNav rail mod={mod} go={go} user={user} onLogout={()=>setAskOut(true)}/></aside>
   <header className="sticky top-0 z-30 bg-background/90 backdrop-blur"><div className="mx-auto flex h-16 max-w-[1520px] items-center gap-1 px-3 sm:px-5 lg:px-8">
    <button type="button" aria-label={t('menu.open')} title={t('menu.open')} onClick={()=>setDrawer(true)} className={`${iconBtn} md:hidden`}><Menu className="size-6"/></button>
    <span className="ml-1 flex-1 text-xl font-medium tracking-tight md:ml-0 lg:hidden">{title}</span><span className="hidden flex-1 lg:block"/>
@@ -78,10 +84,10 @@ function Shell({user}){
    <button type="button" onClick={nextMode} aria-label={t('theme.now',{mode:t('theme.'+s.mode)})} title={t('theme.now',{mode:t('theme.'+s.mode)})} className={iconBtn}><ModeIcon className="size-5"/></button></div></header>
   <main className="mx-auto max-w-[1520px] px-4 pb-[calc(8rem+env(safe-area-inset-bottom))] pt-3 sm:px-5 md:pb-12 md:pt-4 lg:px-8">
    {mod!=='settings'&&<SubTabs mod={mod} sub={sub} go={go}/>}
-   <div key={`${route}-${nonce}`} className="anim-fade"><ErrorBoundary title={t('err.title')} retry={t('err.retry')} reload={t('err.reload')}><Suspense fallback={<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"><Skeleton n={6} className="h-44"/></div>}>
-    {route==='projects/list'&&<Projects {...P}/>}{route==='projects/accounts'&&<Accounts {...P}/>}{route==='projects/stats'&&<Stats/>}
-    {route==='websites/list'&&<Websites {...P}/>}{route==='websites/categories'&&<Categories kind="website" {...P}/>}{route==='websites/stats'&&<WebStats/>}
-    {route==='prompts/list'&&<Prompts {...P}/>}{route==='prompts/categories'&&<Categories kind="prompt" {...P}/>}{route==='prompts/keys'&&<ApiKeys {...P}/>}{route==='prompts/stats'&&<PromptStats/>}
+   <div key={`${route}-${nonce}`} className="anim-fade"><ErrorBoundary title={t('err.title')} retry={t('err.retry')} reload={t('err.reload')} hint={t('err.hint')}><Suspense fallback={<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"><Skeleton n={6} className="h-44"/></div>}>
+    {route==='projects/list'&&<Projects {...P}/>}{route==='projects/accounts'&&<Accounts {...P}/>}{route==='projects/stats'&&<ProjectOverview/>}
+    {route==='websites/list'&&<Websites {...P}/>}{route==='websites/categories'&&<Categories kind="website" {...P}/>}{route==='websites/stats'&&<WebOverview/>}
+    {route==='prompts/list'&&<Prompts {...P}/>}{route==='prompts/categories'&&<Categories kind="prompt" {...P}/>}{route==='prompts/keys'&&<ApiKeys {...P}/>}{route==='prompts/stats'&&<PromptOverview/>}
     {mod==='settings'&&<Settings user={user}/>}</Suspense></ErrorBoundary></div></main>
   <ScrollTop/>
   {/* Navigation bar M3 Expressive: chỉ báo hình viên thuốc 64x32 bật lên có độ nảy */}
@@ -91,7 +97,8 @@ function Shell({user}){
   <div className={`fixed inset-0 z-50 md:hidden ${drawer?'':'pointer-events-none'}`}>
    <div onClick={()=>setDrawer(false)} className={`absolute inset-0 bg-black/55 backdrop-blur-[3px] transition-opacity duration-300 ${drawer?'opacity-100':'opacity-0'}`}/>
    <aside inert={drawer?undefined:''} className={`absolute inset-y-0 left-0 w-80 max-w-[88%] rounded-r-2xl bg-sidebar text-sidebar-foreground shadow-xl transition-transform duration-[400ms] [transition-timing-function:var(--ease-emph)] ${drawer?'translate-x-0':'-translate-x-full'}`}>
-    <button type="button" aria-label={t('close')} title={t('close')} onClick={()=>setDrawer(false)} className={`${iconBtn} absolute right-3 top-5`}><X className="size-5"/></button><SideNav mod={mod} go={go} user={user}/></aside></div>
-  {pal&&<Palette items={items} onClose={()=>setPal(false)}/>}</div>}
+    <button type="button" aria-label={t('close')} title={t('close')} onClick={()=>setDrawer(false)} className={`${iconBtn} absolute right-3 top-5`}><X className="size-5"/></button><SideNav mod={mod} go={go} user={user} onLogout={()=>{setDrawer(false);setAskOut(true)}}/></aside></div>
+  {pal&&<Palette items={items} onClose={()=>setPal(false)}/>}
+  {askOut&&<Confirm danger={false} icon={LogOut} title={t('st.logout')} message={t('c.logout')} confirmLabel={t('st.logout')} busy={outBusy} onClose={()=>setAskOut(false)} onConfirm={async()=>{setOutBusy(true);try{await signOut(auth)}catch(e){console.error(e);setOutBusy(false)}}}/>}</div>}
 
 export default function Authed({user}){return <DataProvider uid={user.uid}><Shell user={user}/></DataProvider>}

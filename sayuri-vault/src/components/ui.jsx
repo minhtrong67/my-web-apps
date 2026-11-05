@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { KeyRound, Tag, Network, Tags, User, AtSign, Sparkles, Film, House, Settings, Search, Plus, Pencil, Trash2, Download, Upload, CloudUpload,
   FileText, FileSpreadsheet, FileDown, Sun, Moon, Monitor, Check, X, Eye, EyeOff, LogIn, LogOut, ChevronsLeft, ChevronsRight, ChevronDown,
   LayoutGrid, List, SlidersHorizontal, ArrowUp, ArrowDown, ArrowUpDown, FilterX, CloudOff, Lock, LockOpen, ShieldCheck, Info, CircleCheck,
-  CircleAlert, TriangleAlert, Languages, Palette, Type, Heart, Bot, ArrowLeft, ChevronUp, Database, Circle } from 'lucide-react'
+  CircleAlert, TriangleAlert, Languages, Palette, Type, Heart, Bot, ArrowLeft, ChevronUp, Database, Circle, FileJson, ExternalLink, Copy, Table } from 'lucide-react'
 import { useData } from '../data'
 import { STYLE } from '../config/modules'
 import { useT } from '../i18n'
@@ -14,7 +14,7 @@ const MAP = { key: KeyRound, tag: Tag, account_tree: Network, sell: Tags, person
   view_list: List, filter_list: SlidersHorizontal, arrow_upward: ArrowUp, arrow_downward: ArrowDown, sort: ArrowUpDown, filter_alt_off: FilterX,
   cloud_off: CloudOff, lock: Lock, lock_open: LockOpen, enhanced_encryption: ShieldCheck, info: Info, success: CircleCheck, error: CircleAlert,
   warning: TriangleAlert, language: Languages, palette: Palette, type: Type, heart: Heart, bot: Bot, back: ArrowLeft, up: ChevronUp, apps: LayoutGrid,
-  user: User, database: Database, sparkles: Sparkles }
+  user: User, database: Database, sparkles: Sparkles, json: FileJson, open: ExternalLink, copy: Copy, table: Table }
 
 export const Icon = ({ name, size = 20 }) => { const C = MAP[name] || Circle; return <C size={size} strokeWidth={2} className="lu" aria-hidden="true" /> }
 

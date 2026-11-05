@@ -126,17 +126,60 @@ export const HOLIDAY_THEMES = {
       { e: '🌸', top: '40%', right: '30%', size: 1.4, delay: 1.2 }
     ]
   },
-  lotus: {
-    name: 'lotus',
-    bg: 'linear-gradient(145deg, #5a2457 0%, #a9467f 55%, #f2a7b9 140%)',
-    glow: 'rgba(169, 70, 127, 0.45)',
-    strong: '#5a2457',
-    accent: '#ffe9f0',
+  children: {
+    name: 'children',
+    bg: 'linear-gradient(145deg, #ff3d81 0%, #ff8a3d 38%, #7c4dff 100%)',
+    glow: 'rgba(255, 90, 120, 0.5)',
+    strong: '#c2185b',
+    accent: '#fff3a0',
+    pattern: dots('rgba(255,255,255,0.55)', 0.4),
+    emojis: [
+      { e: '🎈', top: '6%', right: '9%', size: 2.4, delay: 0 },
+      { e: '🧸', bottom: '8%', right: '7%', size: 2.6, delay: 0.6 },
+      { e: '🌈', top: '40%', right: '30%', size: 1.5, delay: 1.2 },
+      { e: '🎠', bottom: '10%', right: '34%', size: 1.5, delay: 1.8 }
+    ]
+  },
+  hungkings: {
+    name: 'hungkings',
+    bg: 'linear-gradient(145deg, #3d0a0a 0%, #861b1b 52%, #c88a2e 135%)',
+    glow: 'rgba(134, 27, 27, 0.55)',
+    strong: '#5a0f0f',
+    accent: '#f5d58a',
+    pattern: dots('rgba(245,213,138,0.5)', 0.3),
+    emojis: [
+      { e: '🐉', top: '6%', right: '8%', size: 2.5, delay: 0 },
+      { e: '🏔️', bottom: '8%', right: '7%', size: 2.5, delay: 0.7 },
+      { e: '🌾', top: '40%', right: '30%', size: 1.4, delay: 1.3 },
+      { e: '✨', bottom: '10%', right: '36%', size: 1.2, delay: 1.9 }
+    ]
+  },
+  teachers: {
+    name: 'teachers',
+    bg: 'linear-gradient(145deg, #0b3b2c 0%, #17694e 52%, #e0a526 140%)',
+    glow: 'rgba(23, 105, 78, 0.5)',
+    strong: '#0b3b2c',
+    accent: '#ffe08a',
     pattern: dots('rgba(255,255,255,0.4)', 0.3),
     emojis: [
-      { e: '🌸', top: '8%', right: '9%', size: 2.2, delay: 0 },
-      { e: '🕯️', bottom: '8%', right: '8%', size: 2.3, delay: 0.7 },
-      { e: '🙏', top: '40%', right: '30%', size: 1.4, delay: 1.3 }
+      { e: '📚', top: '6%', right: '8%', size: 2.3, delay: 0 },
+      { e: '🌻', bottom: '8%', right: '7%', size: 2.6, delay: 0.6 },
+      { e: '✏️', top: '40%', right: '30%', size: 1.4, delay: 1.2 },
+      { e: '🍎', bottom: '10%', right: '34%', size: 1.4, delay: 1.8 }
+    ]
+  },
+  labor: {
+    name: 'labor',
+    bg: 'linear-gradient(145deg, #10233b 0%, #1f4e79 52%, #f28c28 140%)',
+    glow: 'rgba(31, 78, 121, 0.5)',
+    strong: '#10233b',
+    accent: '#ffd08a',
+    pattern: dots('rgba(255,208,138,0.45)', 0.3),
+    emojis: [
+      { e: '⚙️', top: '6%', right: '8%', size: 2.3, delay: 0 },
+      { e: '🛠️', bottom: '8%', right: '7%', size: 2.5, delay: 0.6 },
+      { e: '👷', top: '40%', right: '30%', size: 1.5, delay: 1.2 },
+      { e: '🔧', bottom: '10%', right: '34%', size: 1.3, delay: 1.8 }
     ]
   }
 }
@@ -146,6 +189,8 @@ const THEME_OF_HOLIDAY = {
   'giang-sinh': 'christmas',
   halloween: 'halloween',
   'tet-nguyen-dan': 'tet',
+  'mung-2-tet': 'tet',
+  'mung-3-tet': 'tet',
   'giao-thua': 'tet',
   'ong-cong-ong-tao': 'tet',
   'tet-duong': 'newyear',
@@ -155,8 +200,10 @@ const THEME_OF_HOLIDAY = {
   'giai-phong': 'vietnam',
   'phu-nu-vn': 'women',
   'phu-nu-vietnam': 'women',
-  'vu-lan': 'lotus',
-  'phat-dan': 'lotus'
+  'quoc-te-thieu-nhi': 'children',
+  'gio-to-hung-vuong': 'hungkings',
+  'nha-giao': 'teachers',
+  'quoc-te-lao-dong': 'labor'
 }
 
 export function getHolidayTheme(holidayId) {

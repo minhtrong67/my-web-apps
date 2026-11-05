@@ -3,21 +3,19 @@ import {Copy,MessageSquareText,Pencil,Plus,SearchX,X} from 'lucide-react'
 import {useT} from '../i18n'
 import {useData} from '../data'
 import {useLocal,useSession,V0R} from '../hooks'
-import {Acts,Btn,CardSkeleton,CatChip,Confirm,Dialog,Empty,Fab,PageHead,useToast} from '../ui'
+import {Acts,Btn,CardSkeleton,CatChip,ChipRow,Confirm,Dialog,Empty,Fab,ItemCard,Lead,PageHead,useToast} from '../ui'
 import Toolbar,{Chips} from '../components/Toolbar'
 import {PromptDialog} from '../components/forms'
 
 const copyText=async(text,ok,fail,toast)=>{try{await navigator.clipboard.writeText(text);toast(ok)}catch{toast(fail,'error')}}
 
 const Item=memo(function Item({p,cat,view,i,onView,onEdit,onDelete,onCopy}){
- const {t}=useT(),list=view==='list',tags=p.tags||[]
- return <article style={{animationDelay:`${Math.min(i,8)*28}ms`}} onClick={()=>onView(p)} className={`card card-item card-hover anim-up min-w-0 cursor-pointer p-4 sm:p-5 ${list?'flex flex-col gap-3 md:grid md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto] md:items-center md:gap-x-6':'flex flex-col gap-3'}`}>
-  <div className="flex min-w-0 flex-col gap-2.5"><div className="flex items-start justify-between gap-3"><h3 className="line-clamp-2 break-words font-semibold leading-snug">{p.title}</h3><CatChip cat={cat}/></div>
-   <p className="line-clamp-3 whitespace-pre-line break-words text-sm text-muted-foreground">{p.content}</p></div>
-  <div className="flex min-w-0 flex-wrap items-center gap-1.5">{tags.slice(0,5).map(x=><span key={x} className="chip bg-primary/10 text-primary">#{x}</span>)}{tags.length>5&&<span className="chip">+{tags.length-5}</span>}
-   <span className="text-xs text-muted-foreground">{t('item.chars',{n:p.content.length.toLocaleString()})}</span></div>
-  <div onClick={e=>e.stopPropagation()} className={`mt-auto flex items-center gap-1 pt-1 ${list?'md:mt-0 md:pt-0':''}`}>
-   <Btn variant="soft" className={`btn-sm ${list?'flex-1 md:flex-none':'flex-1'}`} icon={Copy} onClick={()=>onCopy(p)}>{t('copy')}</Btn><Acts onEdit={()=>onEdit(p)} onDelete={()=>onDelete(p)}/></div></article>})
+ const {t}=useT(),tags=p.tags||[]
+ return <ItemCard view={view} i={i} onClick={()=>onView(p)} lead={<Lead icon={MessageSquareText}/>} title={p.title} sub={t('item.chars',{n:p.content.length.toLocaleString()})} badge={<CatChip cat={cat}/>}
+  desc={<p className="line-clamp-2 whitespace-pre-line break-words text-sm text-muted-foreground">{p.content}</p>}
+  meta={tags.length?<ChipRow max={3} items={tags.map(x=><span key={x} className="chip bg-primary/10 text-primary">#{x}</span>)}/>:null}
+  who={<Btn variant="soft" className="btn-sm" icon={Copy} onClick={e=>{e.stopPropagation();onCopy(p)}}>{t('copy')}</Btn>}
+  actions={<Acts onEdit={()=>onEdit(p)} onDelete={()=>onDelete(p)}/>}/>})
 
 function ViewDialog({p,cat,onClose,onEdit,onCopy}){
  const {t}=useT()

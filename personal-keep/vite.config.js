@@ -16,5 +16,5 @@ export default defineConfig({
  plugins:[react(),tailwindcss(),VitePWA({registerType:'autoUpdate',workbox:{navigateFallbackDenylist:[/^\/landing\.html/],globIgnores:['**/excel-*.js','**/report-*.js','**/html2canvas*.js','**/index.es-*.js','**/purify*.js'],runtimeCaching:[{urlPattern:/^https:\/\/fonts\.(googleapis|gstatic)\.com\//,handler:'CacheFirst',options:{cacheName:'gfonts',expiration:{maxEntries:30,maxAgeSeconds:31536000},cacheableResponse:{statuses:[0,200]}}},{urlPattern:({url})=>/\/assets\/(excel|report|html2canvas|index\.es|purify)/.test(url.pathname),handler:'StaleWhileRevalidate',options:{cacheName:'export-libs'}}]},
  includeAssets:['favicon.svg','favicon-32.png','favicon-48.png','apple-touch-icon.png'],
  manifest:{name:'Personal Keep',short_name:'Personal Keep',description:'Nơi lưu giữ dự án, tài khoản và trang web hữu ích của bạn',
-  theme_color:'#fcf8ff',background_color:'#fcf8ff',display:'standalone',orientation:'portrait',start_url:'/',
+  theme_color:'#fbf8ff',background_color:'#fbf8ff',display:'standalone',orientation:'portrait',start_url:'/',
   icons:[{src:'pwa-192.png',sizes:'192x192',type:'image/png'},{src:'pwa-512.png',sizes:'512x512',type:'image/png'},{src:'maskable-512.png',sizes:'512x512',type:'image/png',purpose:'maskable'}]}})]})

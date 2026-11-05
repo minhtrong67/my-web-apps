@@ -11,7 +11,7 @@
 <meta name="robots" content="noindex, nofollow"/>
 <meta name="application-name" content="Personal Keep"/>
 <meta name="color-scheme" content="light dark"/>
-<meta name="theme-color" content="#fcf8ff" id="tc"/>
+<meta name="theme-color" content="#fbf8ff" id="tc"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Personal Keep"/>
@@ -32,8 +32,8 @@
 <link rel="dns-prefetch" href="https://apis.google.com"/>
 <style>
 /* Nền khớp giao diện sáng/tối ngay từ khung hình đầu, trước cả khi CSS/JS tải xong (tránh nháy trắng) */
-html{background:#fcf8ff;color-scheme:light}
-html.dark{background:#131318;color-scheme:dark}
+html{background:#fbf8ff;color-scheme:light}
+html.dark{background:#121318;color-scheme:dark}
 body{margin:0;background:inherit}
 .splash{display:grid;place-items:center;min-height:100vh;min-height:100dvh;background:inherit}
 .splash-logo{width:64px;height:64px;animation:splash-p 1.2s ease-in-out infinite alternate}
@@ -44,7 +44,7 @@ body{margin:0;background:inherit}
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
 <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
-<script>try{var S={"indigo":["#fcf8ff","#131318"],"violet":["#fef7ff","#141218"],"sky":["#f6f9fe","#101417"],"teal":["#f4fbf8","#0e1513"],"emerald":["#f5fbf5","#0f1511"],"amber":["#fff8f4","#18120c"],"orange":["#fff8f6","#1a120e"],"rose":["#fff8f7","#1a1112"]},s=JSON.parse(localStorage.getItem('settings')||'{}'),d=s.mode==='dark'||((s.mode||'system')==='system'&&matchMedia('(prefers-color-scheme: dark)').matches),r=document.documentElement,a=S[s.accent]?s.accent:'indigo',c=S[a][d?1:0];r.classList.toggle('dark',d);r.dataset.accent=a;r.style.background=c;if(s.lang)r.lang=s.lang;if(s.fs)r.style.fontSize=s.fs+'px';document.getElementById('tc').setAttribute('content',c)}catch(e){}</script>
+<script>try{var S={"red":["#fff8f7","#1a1110"],"pink":["#fff8f7","#191112"],"purple":["#fff7fa","#171216"],"deeppurple":["#fef7ff","#151218"],"indigo":["#fbf8ff","#121318"],"blue":["#f8f9ff","#111418"],"lightblue":["#f7f9ff","#101417"],"cyan":["#f5fafc","#0e1416"],"teal":["#f4fbf8","#0e1513"],"green":["#f7fbf1","#10140f"],"lightgreen":["#f9faef","#12140e"],"lime":["#fcfaec","#13140c"],"yellow":["#fff9eb","#15130c"],"amber":["#fff8f2","#17130b"],"orange":["#fff8f5","#19120c"],"deeporange":["#fff8f6","#1a110f"],"brown":["#fff8f6","#19120f"],"grey":["#fbf8fa","#131315"],"bluegrey":["#f6fafd","#0f1417"]},O={violet:'deeppurple',sky:'lightblue',emerald:'green',rose:'pink'},s=JSON.parse(localStorage.getItem('settings')||'{}'),d=s.mode==='dark'||((s.mode||'system')==='system'&&matchMedia('(prefers-color-scheme: dark)').matches),r=document.documentElement,a=S[s.accent]?s.accent:O[s.accent]||'indigo',c=S[a][d?1:0],f=+s.fs||16;r.classList.toggle('dark',d);r.dataset.accent=a;r.style.background=c;if(s.lang)r.lang=s.lang;r.style.fontSize=(f<=15?14:f<=17?16:18)+'px';document.getElementById('tc').setAttribute('content',c)}catch(e){}</script>
 </head>
 <body><div id="root"><div class="splash"><img class="splash-logo" src="/favicon.svg" width="64" height="64" alt="Personal Keep"/></div></div><script type="module" src="/src/main.jsx"></script></body>
 </html>

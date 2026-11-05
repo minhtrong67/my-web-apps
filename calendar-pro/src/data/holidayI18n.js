@@ -89,6 +89,18 @@ export const HOLIDAY_EN = {
     customs: ['Dress up as witches, vampires, skeletons or favorite characters', 'Carve jack-o’-lanterns and decorate with cobwebs, bats and ghosts', 'Children go trick-or-treating for candy', 'Costume parties and horror movies with friends'],
     fact: 'Jack-o’-lanterns were first carved from turnips in Ireland; pumpkins replaced them in America because they were easier to find and carve.'
   },
+  easter: {
+    name: 'Easter', desc: 'Celebrates the resurrection of Jesus, the most important Christian holy day.',
+    meaning: ['Easter commemorates the resurrection of Jesus after the crucifixion and is regarded as the most important Christian holy day — theologically even more central than Christmas.', 'Unlike Christmas, Easter has no fixed date: Western churches celebrate it on the first Sunday after the first full moon on or after the spring equinox (March 21), so it falls between March 22 and April 25. Orthodox churches use a different calendar and usually celebrate on another date.'],
+    customs: ['Attend Mass, especially the Easter Vigil', 'Decorate and hunt for Easter eggs — the egg symbolizes new life', 'The Easter Bunny brings candy and chocolate to children', 'Family gathers for a shared meal on Sunday'],
+    fact: 'Easter is preceded by Lent, 40 days of preparation, and Holy Week, which includes Good Friday.'
+  },
+  thanksgiving: {
+    name: 'Thanksgiving', desc: 'An American holiday of gratitude and family gatherings.',
+    meaning: ['Thanksgiving is a major American holiday for expressing gratitude for the harvest and the blessings of the year. Since 1941, US law places it on the fourth Thursday of November. Canada also has a Thanksgiving, in October.', 'It is often linked to the 1621 harvest feast at Plymouth. In Vietnam it is mainly observed by the American community, international students, and restaurants and cafés.'],
+    customs: ['Family feast with roast turkey, sweet potatoes, cranberry sauce and pumpkin pie', 'Each person shares something they are grateful for', 'Watch the Thanksgiving parade and football games', 'The next day is Black Friday, the start of the holiday shopping season'],
+    fact: 'Every year the US President “pardons” a turkey in a short White House ceremony.'
+  },
   'giang-sinh': {
     name: 'Christmas', desc: 'The celebration of the birth of Jesus, enjoyed across Vietnam.',
     meaning: ['Christmas celebrates the birth of Jesus in Christianity, on December 25. Christmas Eve, December 24, is a sacred night with midnight Mass in churches.', 'In Vietnam it is not an official holiday, yet it has become a shared festive occasion: streets glow with lights and people gather, exchange gifts and share affection regardless of religion.'],
@@ -101,10 +113,21 @@ export const HOLIDAY_EN = {
     customs: ['Giao Thua offerings outdoors and indoors', 'Watch fireworks, visit a pagoda and pick “lộc” (good-luck twigs)', 'Exchange first greetings and give lucky money to children', 'Keep words gentle and avoid arguments to keep the year harmonious']
   },
   'tet-nguyen-dan': {
-    name: 'Lunar New Year (Tết)', desc: 'The biggest traditional festival of the Vietnamese.',
+    name: 'Lunar New Year (Day 1)', desc: 'Day 1, “Dad’s Tet” — the first day of the lunar new year.',
     meaning: ['Tết Nguyên Đán — the first day of the first lunar month — is the largest traditional festival of Vietnam, marking the new year and the beginning of spring. “Nguyên” means beginning and “Đán” means early morning: the first morning of the year.', 'Tết is a time for reunion, remembering ancestors, visiting relatives, leaving worries behind and hoping for a better year.'],
-    customs: ['Clean the house, display peach/apricot blossoms and kumquat trees, and arrange the five-fruit tray', 'Make bánh chưng and bánh tét and cook traditional dishes', 'Ancestor offerings, first-footing, lucky money and New Year greetings to elders and relatives', 'Avoid sweeping the house or quarrelling in the first days'],
+    customs: ['Clean the house, display peach/apricot blossoms and kumquat trees, and arrange the five-fruit tray', 'Make bánh chưng and bánh tét and cook traditional dishes', 'Ancestor offerings, first-footing, lucky money and New Year greetings to elders and relatives', 'Day 1 is “Dad’s Tet”: greet grandparents, parents and relatives on the father’s side', 'Avoid sweeping the house or quarrelling in the first days'],
     fact: 'Bánh chưng represents the earth and bánh giầy the sky, linked to the legend of Lang Lieu in the Hung Kings era.'
+  },
+  'mung-2-tet': {
+    name: 'Lunar New Year (Day 2)', desc: 'Day 2, “Mom’s Tet” — visiting the mother’s side of the family.',
+    meaning: ['A folk saying goes: “Day one is for Dad, day two for Mom, day three for the teacher.” Day 2 of Tet is for the mother’s side: visiting maternal grandparents, uncles, aunts and relatives to wish them a happy new year.', 'It is also when married daughters and sons-in-law visit the maternal home. The mood is still festive but calmer than day 1, leaving more time to chat and gather.'],
+    customs: ['Visit maternal grandparents, uncles, aunts and relatives', 'Bring bánh chưng, fruit and lucky-money envelopes as gifts', 'Share the first family meal of the year at the maternal home', 'Keep observing the early-year taboos: no sweeping, no unlucky words'],
+    fact: 'The saying reminds younger generations to thank their parents and teachers from the very first days of spring.'
+  },
+  'mung-3-tet': {
+    name: 'Lunar New Year (Day 3)', desc: 'Day 3, “Teacher’s Tet” — students visit and greet their teachers.',
+    meaning: ['Day 3 of Tet is “Teacher’s Tet”: students and alumni visit and greet their teachers, expressing the Vietnamese tradition of respecting teachers.', 'For many families it is also among the last days of the reunion holiday: some places hold a ritual to see off the ancestors on the afternoon of day 3 or 4, and life gradually returns to normal.'],
+    customs: ['Students and alumni visit and greet their teachers', 'In some places, a ritual to see off the ancestors (burning votive paper) on day 3 or 4', 'Visit pagodas and enjoy spring outings with family and friends', 'Prepare to return to work and study after the Tet break']
   },
   'tet-nguyen-tieu': {
     name: 'Full Moon of the 1st Month', desc: 'The first full moon of the new year, an important Buddhist day.',

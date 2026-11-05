@@ -35,8 +35,12 @@ export function getStoredTheme() {
   return VALID_THEMES.includes(v) ? v : 'system'
 }
 
+// Id cũ (bản trước có 10 màu) → id mới tương ứng trong bộ 19 màu Material.
+const LEGACY_COLOR_IDS = { violet: 'deep-purple' }
+
 export function getStoredThemeColor() {
-  const v = read(COLOR_KEY)
+  const raw = read(COLOR_KEY)
+  const v = LEGACY_COLOR_IDS[raw] || raw
   return PALETTES.some((p) => p.id === v) ? v : DEFAULT_THEME_COLOR
 }
 

@@ -6,6 +6,7 @@
 export const HOLIDAY_ICON_MAP = {
   Baby: 'child_care',
   CakeSlice: 'cake',
+  Egg: 'egg',
   Flag: 'flag',
   Flame: 'local_fire_department',
   Flower: 'local_florist',
@@ -23,7 +24,8 @@ export const HOLIDAY_ICON_MAP = {
   Shield: 'shield',
   Sparkles: 'auto_awesome',
   Sun: 'wb_sunny',
-  TreePine: 'park'
+  TreePine: 'park',
+  Turkey: 'dinner_dining'
 }
 
 export function holidayIconName(key) {

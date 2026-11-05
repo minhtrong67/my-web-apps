@@ -3,21 +3,17 @@ import {Plus,SearchX,Users} from 'lucide-react'
 import {useT} from '../i18n'
 import {useData} from '../data'
 import {useLocal,useSession,V0A} from '../hooks'
-import {Acts,Btn,CardSkeleton,Confirm,Empty,Fab,PageHead,useToast} from '../ui'
+import {Acts,Btn,CardSkeleton,ChipRow,Confirm,Empty,Fab,ItemCard,PageHead,useToast} from '../ui'
 import Toolbar,{Chips} from '../components/Toolbar'
 import {AccountDialog} from '../components/forms'
 
 const Item=memo(function Item({a,projects,view,i,onEdit,onDelete}){
- const {t}=useT(),projs=(projects||[]).filter(p=>p.userIds?.includes(a.id)),style={animationDelay:`${Math.min(i,10)*30}ms`}
- const head=<div className="flex min-w-0 items-center gap-3"><span className="avatar !size-11 !text-base !ring-0">{(a.name||a.email)[0]}</span>
-  <div className="min-w-0"><h3 className="truncate font-semibold">{a.name||a.email}</h3>{a.name&&<p className="truncate text-xs text-muted-foreground ">{a.email}</p>}</div></div>
- const chips=<div className="flex flex-wrap items-center gap-1.5">{projs.slice(0,3).map(p=><span key={p.id} className="chip max-w-40">{p.name}</span>)}
-  {projs.length>3&&<span className="chip">+{projs.length-3}</span>}{!projs.length&&<span className="text-xs text-muted-foreground ">{t('item.noproj')}</span>}</div>
- const list=view==='list'
- return <article style={style} className={`card card-item card-hover anim-up min-w-0 p-4 sm:p-5 ${list?'flex flex-col gap-3 md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_auto] md:items-center md:gap-x-6':'flex flex-col gap-3'}`}>
-  <div className="flex min-w-0 flex-col gap-3">{head}{a.note&&<p className="line-clamp-2 break-words text-sm text-muted-foreground">{a.note}</p>}</div>
-  <div className="min-w-0">{chips}</div>
-  <div className={`mt-auto flex items-center gap-2 border-t border-border pt-3 ${list?'md:contents':''}`}><span className={`flex-1 text-xs text-muted-foreground ${list?'md:hidden':''}`}>{t('item.nprojects',{n:projs.length})}</span><Acts onEdit={()=>onEdit(a)} onDelete={()=>onDelete(a)}/></div></article>})
+ const {t}=useT(),projs=(projects||[]).filter(p=>p.userIds?.includes(a.id))
+ return <ItemCard view={view} i={i} lead={<span className="avatar !size-11 !text-base !ring-0">{(a.name||a.email)[0]}</span>} title={a.name||a.email} sub={a.name?a.email:null}
+  badge={<span className="badge bg-secondary text-secondary-foreground">{t('item.nprojects',{n:projs.length})}</span>}
+  desc={a.note&&<p className="line-clamp-2 break-words text-sm text-muted-foreground">{a.note}</p>}
+  meta={projs.length?<ChipRow max={2} items={projs.map(p=><span key={p.id} className="chip max-w-36">{p.name}</span>)}/>:<span className="text-xs text-muted-foreground">{t('item.noproj')}</span>}
+  actions={<Acts onEdit={()=>onEdit(a)} onDelete={()=>onDelete(a)}/>}/>})
 
 export default function Accounts({pending,setPending}){
  const {t}=useT(),toast=useToast(),{projects,accounts,removeAccount}=useData()

@@ -11,7 +11,7 @@ npm run dev
 2. Mở app → Tổng quan → **Nạp dữ liệu từ CSV** để đẩy 274 bản ghi (`src/seed.json`) vào 8 collection (chỉ nạp collection còn trống).
 3. Thêm mục mới: thêm 1 object vào `src/config/modules.js` + 1 dòng trong `STYLE` (cùng file).
 
-Xuất CSV/Excel/PDF, nhập CSV dùng đúng tên cột của file CSV gốc.
+Nhập/xuất dữ liệu (Cài đặt → Dữ liệu) chỉ hỗ trợ **CSV** và **JSON**; cột/khoá dùng đúng tên trường của file CSV gốc.
 ## Đăng nhập Google
 - Firebase Console → Authentication → Sign-in method → bật **Google**. Khi deploy, thêm domain vào Authorized domains.
 - Sửa `REPLACE_WITH_YOUR_EMAIL@gmail.com` trong `firestore.rules` thành email của bạn rồi deploy rules (đây là lớp bảo vệ thật sự).

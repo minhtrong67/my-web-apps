@@ -9,13 +9,26 @@ import { useLS } from '../useLS'
 import { useT, fl } from '../i18n'
 import { HIDDEN } from '../config/modules'
 
-function Cell({ f, v }) {
+// Field URL: không hiện đường dẫn, chỉ có nút mở tab mới + nút sao chép
+function Url({ v, onCopy, compact }) {
+  const t = useT()
+  const c = compact ? 'ic' : 'b s'
+  return (
+    <span className="urlb">
+      <a className={c} href={v} target="_blank" rel="noopener noreferrer" data-tip={compact ? t('open') : v}><Icon name="open" size={compact ? 18 : 15} />{!compact && t('open')}</a>
+      <button className={c} data-tip={compact ? t('copy_url') : undefined} onClick={(e) => onCopy(e.currentTarget)}><Icon name="copy" size={compact ? 18 : 15} />{!compact && t('copy_url')}</button>
+    </span>
+  )
+}
+
+function Cell({ f, v, onCopy, compact }) {
   if (f.type === 'password') return <span>••••••••</span>
-  if (f.type === 'url') return <a href={v} target="_blank" rel="noopener noreferrer">{String(v).replace(/^https?:\/\/(www\.)?/, '').slice(0, 52)}</a>
+  if (f.type === 'url') return <Url v={v} onCopy={onCopy} compact={compact} />
+  if (f.type === 'select' || f.type === 'reference') return <span className="chip">{v}</span>
   return v
 }
 
-function Rec({ m, r, i, fl: flash, onEdit, onDel, onCopy }) {
+export function Rec({ m, r, i, fl: flash, onEdit, onDel, onCopy }) {
   const t = useT()
   const [title, ...rest] = m.fields
   const chips = rest.filter((f) => (f.type === 'select' || f.type === 'reference') && r[f.key])
@@ -28,18 +41,55 @@ function Rec({ m, r, i, fl: flash, onEdit, onDel, onCopy }) {
       {rows.length > 0 && (
         <dl>
           {rows.map((f) => (
-            <div key={f.key} className={cls(f.key)} onClick={(e) => !e.target.closest('a') && onCopy(r, f, e.currentTarget)}>
-              <dt>{fl(f.label)}</dt><dd className={f.mono ? 'mono' : ''}><Cell f={f} v={r[f.key]} /></dd>
+            <div key={f.key} className={`${cls(f.key)}${f.type === 'url' ? ' u' : ''}`} onClick={f.type === 'url' ? undefined : (e) => onCopy(r, f, e.currentTarget)}>
+              <dt>{fl(f.label)}</dt>
+              <dd className={f.mono ? 'mono' : ''}><Cell f={f} v={r[f.key]} onCopy={(el) => onCopy(r, f, el)} /></dd>
             </div>
           ))}
         </dl>
       )}
       {r.note && <p className="note">{r.note}</p>}
       <div className="ra">
-        <button className="ic" data-tip={t('edit')} onClick={() => onEdit(r)}><Icon name="edit" /></button>
-        <button className="ic d" data-tip={t('delete')} onClick={() => onDel(r)}><Icon name="delete" /></button>
+        <button className="b s" onClick={() => onEdit(r)}><Icon name="edit" size={16} />{t('edit')}</button>
+        <button className="b s eo" onClick={() => onDel(r)}><Icon name="delete" size={16} />{t('delete')}</button>
       </div>
     </article>
+  )
+}
+
+export function DataTable({ m, rows, sort, onSort, fl: flash, onEdit, onDel, onCopy }) {
+  const t = useT()
+  return (
+    <div className="card tbl">
+      <table>
+        <thead><tr>
+          <th className="n">#</th>
+          {m.fields.map((f) => (
+            <th key={f.key} className={sort.f === f.key ? 'on' : ''} onClick={f.type === 'password' ? undefined : () => onSort(f.key)}>
+              {fl(f.label)}{sort.f === f.key && <Icon name={sort.d > 0 ? 'arrow_upward' : 'arrow_downward'} size={14} />}
+            </th>
+          ))}
+          <th className="act" />
+        </tr></thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={r.id} style={{ '--i': i }}>
+              <td className="n">{i + 1}</td>
+              {m.fields.map((f) => (
+                <td key={f.key} className={`${flash === `${r.id}:${f.key}` ? 'flash' : ''}${f.type === 'url' ? ' u' : ''}${f.mono ? ' mono' : ''}`}
+                  onClick={f.type === 'url' ? undefined : (e) => onCopy(r, f, e.currentTarget)}>
+                  {r[f.key] ? <div className="clamp"><Cell f={f} v={r[f.key]} onCopy={(el) => onCopy(r, f, el)} compact /></div> : null}
+                </td>
+              ))}
+              <td className="act">
+                <button className="ic" data-tip={t('edit')} onClick={() => onEdit(r)}><Icon name="edit" /></button>
+                <button className="ic d" data-tip={t('delete')} onClick={() => onDel(r)}><Icon name="delete" /></button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
@@ -52,9 +102,10 @@ export default function ResourcePage({ m }) {
   const [form, setForm] = useState(null)
   const [del, setDel] = useState(null)
   const [fop, setFop] = useState(false)
-  const [fl_, setFl] = useState('')
+  const [flash, setFlash] = useState('')
   const fcount = Object.values(p.flt).filter(Boolean).length
   const hidden = HIDDEN.includes(m.key)
+  const grid = p.view === 'grid'
 
   const rows = useMemo(() => {
     const k = q.trim().toLowerCase(), fe = Object.entries(p.flt).filter(([, v]) => v)
@@ -72,15 +123,17 @@ export default function ResourcePage({ m }) {
     if (!v) return
     if (f.type === 'password') { v = await reveal(v); if (v == null) return }
     await navigator.clipboard.writeText(v)
-    setFl(`${r.id}:${f.key}`); setTimeout(() => setFl(''), 1200); flashTip(el, t('copied'))
+    setFlash(`${r.id}:${f.key}`); setTimeout(() => setFlash(''), 1200); flashTip(el, t('copied'))
   }
   const edit = async (r) => {
     if (!r) return setForm({})
     const x = await revealRow(m, r)
     if (x) setForm({ row: x })
   }
+  const onSort = (k) => setP({ sort: p.sort.f === k ? { f: k, d: -p.sort.d } : { f: k, d: 1 } })
   const sorts = [{ v: 'createdAt', l: t('newest') }, ...m.fields.filter((f) => f.type !== 'password').map((f) => ({ v: f.key, l: fl(f.label) }))]
   const setFlt = (k) => (v) => setP({ flt: { ...p.flt, [k]: v } })
+  const shown = rows.slice(0, lim)
 
   return (
     <div className="page">
@@ -92,8 +145,8 @@ export default function ResourcePage({ m }) {
           <label className="search"><Icon name="search" />
             <input type="search" placeholder={t('search_ph')} value={q} onChange={(e) => { setQ(e.target.value); setLim(48) }} /></label>
           <span className="seg">
-            {[['grid', 'grid_view', 'view_grid'], ['list', 'view_list', 'view_list']].map(([v, i, k]) =>
-              <button key={v} data-tip={t(k)} className={p.view === v ? 'on' : ''} onClick={() => setP({ view: v })}><Icon name={i} /></button>)}
+            {[['grid', 'grid_view', 'view_grid'], ['table', 'table', 'view_list']].map(([v, i, k]) =>
+              <button key={v} data-tip={t(k)} className={(grid ? 'grid' : 'table') === v ? 'on' : ''} onClick={() => setP({ view: v })}><Icon name={i} /></button>)}
           </span>
           <Select icon="sort" value={p.sort.f} options={sorts} onChange={(v) => setP({ sort: { f: v, d: v === 'createdAt' ? -1 : 1 } })} />
           <button className="ic fill" data-tip={t('reverse')} onClick={() => setP({ sort: { ...p.sort, d: -p.sort.d } })}><Icon name={p.sort.d > 0 ? 'arrow_upward' : 'arrow_downward'} /></button>
@@ -114,16 +167,16 @@ export default function ResourcePage({ m }) {
         </div>
       )}
 
-      {!ready[m.key] ? <div className={`recs ${p.view}`}>{[1, 2, 3, 4, 5, 6].map((i) => <div key={i} className="rec sk" />)}</div>
+      {!ready[m.key] ? <div className="recs">{[1, 2, 3, 4, 5, 6].map((i) => <div key={i} className="rec sk" />)}</div>
         : !rows.length ? (
           <div className="card empty"><Icon name={m.icon} size={44} />
             <b>{q || fcount ? t('no_match') : t('no_rec')}</b>
             <span>{q || fcount ? t('try_other') : t('add_hint')}</span></div>
         ) : (
           <>
-            <div className={`recs ${p.view}`}>
-              {rows.slice(0, lim).map((r, i) => <Rec key={r.id} m={m} r={r} i={i} fl={fl_} onEdit={edit} onDel={setDel} onCopy={copy} />)}
-            </div>
+            {grid
+              ? <div className="recs grid">{shown.map((r, i) => <Rec key={r.id} m={m} r={r} i={i} fl={flash} onEdit={edit} onDel={setDel} onCopy={copy} />)}</div>
+              : <DataTable m={m} rows={shown} sort={p.sort} onSort={onSort} fl={flash} onEdit={edit} onDel={setDel} onCopy={copy} />}
             <p className="foot">{t(q || fcount ? 'count_match' : 'count', { n: rows.length })} · {t('copy_hint')}
               {rows.length > lim && <button className="b n" onClick={() => setLim(lim + 48)}><Icon name="down" />{t('more', { n: rows.length - lim })}</button>}</p>
           </>

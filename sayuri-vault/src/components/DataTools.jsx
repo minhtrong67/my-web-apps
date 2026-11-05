@@ -3,8 +3,9 @@ import { MODULES } from '../config/modules'
 import { Icon, Modal, hue } from './ui'
 import { useData } from '../data'
 import { useT } from '../i18n'
+import { exportCSV, exportJSON, parseFile, normalize } from '../utils/io'
 
-// Nhập / xuất dữ liệu cho từng mục (nằm trong Cài đặt)
+// Nhập / xuất dữ liệu cho từng mục (CSV và JSON), nằm trong Cài đặt
 export default function DataTools() {
   const { data, plan, upsert, revealRow, toast } = useData()
   const t = useT()
@@ -18,8 +19,7 @@ export default function DataTools() {
     const m = target.current
     if (!f || !m) return
     try {
-      const x = await import('../utils/importExport')
-      const { valid, invalid } = x.normalizeImportedRows(await x.parseImportFile(f), m.fields)
+      const { valid, invalid } = normalize(await parseFile(f), m.fields)
       setMode('skip'); setImp({ m, valid, invalid, ...plan(m, valid) })
     } catch (err) { toast(err.message, 'error') }
   }
@@ -33,21 +33,18 @@ export default function DataTools() {
   }
   const exportAs = async (m, type) => {
     let rows = [...(data[m.key] || [])].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-    if (type === 'csv' && m.fields.some((f) => f.type === 'password')) {
+    if (m.fields.some((f) => f.type === 'password')) {
       const out = []
       for (const r of rows) { const x = await revealRow(m, r); if (!x) return; out.push(x) }
       rows = out; toast(t('csv_warn'), 'warning')
     }
-    const x = await import('../utils/importExport')
     const name = `${m.key}_${new Date().toISOString().slice(0, 10)}`
-    if (type === 'csv') x.exportToCSV(rows, m.fields, name)
-    else if (type === 'xlsx') x.exportToExcel(rows, m.fields, name)
-    else x.exportToPDF(rows, m.fields, name, m.pluralLabel, m.color)
+    type === 'csv' ? exportCSV(rows, m.fields, name) : exportJSON(rows, m.fields, name)
   }
 
   return (
     <>
-      <input ref={file} type="file" accept=".csv,text/csv" hidden onChange={onFile} />
+      <input ref={file} type="file" accept=".csv,.json,text/csv,application/json" hidden onChange={onFile} />
       {MODULES.map((m) => {
         const n = data[m.key]?.length || 0
         return (
@@ -56,8 +53,8 @@ export default function DataTools() {
             <div className="dn"><b>{m.label}</b><small>{t('count', { n })}</small></div>
             <div className="dbtns">
               <button className="b s p" onClick={() => { target.current = m; file.current.click() }}><Icon name="upload_file" size={16} />{t('import_csv')}</button>
-              {[['csv', 'CSV', 'csv'], ['xlsx', 'Excel', 'table_view'], ['pdf', 'PDF', 'picture_as_pdf']].map(([k, l, i]) =>
-                <button key={k} className="b s" disabled={!n} onClick={() => exportAs(m, k)}><Icon name={i} size={16} />{l}</button>)}
+              <button className="b s" disabled={!n} onClick={() => exportAs(m, 'csv')}><Icon name="csv" size={16} />{t('export_csv')}</button>
+              <button className="b s" disabled={!n} onClick={() => exportAs(m, 'json')}><Icon name="json" size={16} />{t('export_json')}</button>
             </div>
           </div>
         )

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Icon } from './ui'
 
 // Dropdown tuỳ chỉnh (hỗ trợ sáng/tối, giới hạn chiều cao + cuộn). free = ô nhập có gợi ý.
@@ -6,6 +7,7 @@ export default function Select({ value, onChange, options, free, placeholder, ic
   const [open, setOpen] = useState(false)
   const [pos, setPos] = useState({})
   const [hi, setHi] = useState(-1)
+  const [host, setHost] = useState(null)
   const box = useRef(), list = useRef()
   const opts = options.map((o) => (typeof o === 'string' ? { v: o, l: o } : o))
   const shown = free ? opts.filter((o) => o.l.toLowerCase().includes((value || '').toLowerCase())) : opts
@@ -16,6 +18,7 @@ export default function Select({ value, onChange, options, free, placeholder, ic
     const need = Math.min(260, shown.length * 42 + 12), below = innerHeight - r.bottom
     const up = below < need + 16 && r.top > below
     setPos({ left: r.left, minWidth: Math.max(r.width, 180), ...(up ? { bottom: innerHeight - r.top + 6 } : { top: r.bottom + 6 }) })
+    setHost(box.current.closest('dialog') || document.body) // trong dialog phải portal vào chính dialog (top layer)
     setHi(shown.findIndex((o) => o.v === value)); setOpen(true)
   }
   useEffect(() => {
@@ -45,7 +48,7 @@ export default function Select({ value, onChange, options, free, placeholder, ic
         : <button type="button" className="sel" onClick={() => (open ? setOpen(false) : show())} aria-haspopup="listbox" aria-expanded={open}>
             {icon && <Icon name={icon} size={18} />}<span>{cur?.l ?? placeholder}</span><Icon name="down" size={18} />
           </button>}
-      {open && shown.length > 0 && (
+      {open && shown.length > 0 && host && createPortal(
         <ul ref={list} className="opts" style={pos} role="listbox">
           {shown.map((o, i) => (
             <li key={o.v} role="option" aria-selected={o.v === value} className={i === hi ? 'hi' : ''}
@@ -53,8 +56,7 @@ export default function Select({ value, onChange, options, free, placeholder, ic
               <span>{o.l}</span>{o.v === value && <Icon name="check" size={16} />}
             </li>
           ))}
-        </ul>
-      )}
+        </ul>, host)}
     </div>
   )
 }

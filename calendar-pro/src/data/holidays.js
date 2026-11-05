@@ -1,9 +1,11 @@
 import { getLunarInfo } from '../lib/dateUtils'
+import { isRuleHoliday, ruleDate } from '../lib/holidayRules'
 
 /**
  * Danh sách các ngày lễ, ngày kỷ niệm nổi bật ở Việt Nam
  * type: 'solar' (theo dương lịch, lặp lại hàng năm cùng ngày/tháng)
  *       'lunar' (theo âm lịch, lặp lại hàng năm cùng ngày/tháng âm lịch)
+ *       'easter' | 'nth-weekday' (ngày thay đổi theo từng năm — xem lib/holidayRules.js; `rule` là mô tả quy tắc để hiển thị)
  * category: 'quoc-le' | 'truyen-thong' | 'ky-niem' | 'quoc-te' | 'ton-giao'
  */
 export const HOLIDAYS = [
@@ -24,11 +26,15 @@ export const HOLIDAYS = [
   { id: 'nha-giao', name: 'Ngày Nhà giáo Việt Nam', type: 'solar', day: 20, month: 11, category: 'ky-niem', icon: 'GraduationCap', desc: 'Tôn vinh các thầy cô giáo Việt Nam.' },
   { id: 'qdnd', name: 'Thành lập Quân đội Nhân dân Việt Nam', type: 'solar', day: 22, month: 12, category: 'ky-niem', icon: 'Shield', desc: 'Kỷ niệm ngày thành lập Quân đội Nhân dân Việt Nam.' },
   { id: 'halloween', name: 'Lễ hội Halloween', type: 'solar', day: 31, month: 10, category: 'quoc-te', icon: 'Ghost', desc: 'Đêm hội hóa trang rùng rợn với đèn bí ngô, kẹo ngọt và những câu chuyện ma.' },
+  { id: 'easter', name: 'Lễ Phục sinh (Easter)', type: 'easter', category: 'quoc-te', icon: 'Egg', desc: 'Lễ mừng Chúa Giêsu phục sinh, ngày lễ quan trọng nhất của Kitô giáo.', rule: { vi: 'Chủ nhật sau lần trăng tròn đầu tiên của mùa xuân (thay đổi hằng năm)', en: 'Sunday after the first full moon of spring (changes every year)' } },
+  { id: 'thanksgiving', name: 'Lễ Tạ ơn (Thanksgiving)', type: 'nth-weekday', month: 11, weekday: 4, nth: 4, category: 'quoc-te', icon: 'Turkey', desc: 'Ngày lễ tri ân và sum họp gia đình của người Mỹ.', rule: { vi: 'Thứ Năm thứ 4 của tháng 11', en: '4th Thursday of November' } },
   { id: 'giang-sinh', name: 'Lễ Giáng Sinh', type: 'solar', day: 25, month: 12, category: 'quoc-te', icon: 'TreePine', desc: 'Lễ hội mừng Chúa Giáng Sinh, phổ biến khắp Việt Nam.' },
 
   // ==== Âm lịch ====
   { id: 'giao-thua', name: 'Giao thừa', type: 'lunar', day: 1, month: 1, isEve: true, category: 'truyen-thong', icon: 'Sparkles', desc: 'Thời khắc chuyển giao giữa năm cũ và năm mới âm lịch.' },
-  { id: 'tet-nguyen-dan', name: 'Tết Nguyên Đán', type: 'lunar', day: 1, month: 1, category: 'quoc-le', icon: 'PartyPopper', desc: 'Tết cổ truyền lớn nhất trong năm của người Việt.' },
+  { id: 'tet-nguyen-dan', name: 'Tết Nguyên Đán (Mùng 1)', type: 'lunar', day: 1, month: 1, category: 'quoc-le', icon: 'PartyPopper', desc: 'Mùng một Tết cha — ngày đầu tiên của năm mới âm lịch.' },
+  { id: 'mung-2-tet', name: 'Mùng 2 Tết', type: 'lunar', day: 2, month: 1, category: 'quoc-le', icon: 'Home', desc: 'Mùng hai Tết mẹ — về thăm nhà ngoại, chúc Tết họ hàng bên mẹ.' },
+  { id: 'mung-3-tet', name: 'Mùng 3 Tết', type: 'lunar', day: 3, month: 1, category: 'quoc-le', icon: 'GraduationCap', desc: 'Mùng ba Tết thầy — học trò thăm hỏi, chúc Tết thầy cô.' },
   { id: 'tet-nguyen-tieu', name: 'Tết Nguyên Tiêu (Rằm tháng Giêng)', type: 'lunar', day: 15, month: 1, category: 'ton-giao', icon: 'Moon', desc: 'Rằm đầu tiên của năm mới, ngày lễ Phật quan trọng.' },
   { id: 'han-thuc', name: 'Tết Hàn Thực', type: 'lunar', day: 3, month: 3, category: 'truyen-thong', icon: 'CakeSlice', desc: 'Ngày Tết bánh trôi bánh chay truyền thống.' },
   { id: 'gio-to-hung-vuong', name: 'Giỗ Tổ Hùng Vương', type: 'lunar', day: 10, month: 3, category: 'quoc-le', icon: 'Landmark', desc: 'Tưởng nhớ công lao dựng nước của các Vua Hùng, ngày nghỉ lễ chính thức.' },
@@ -71,6 +77,10 @@ export function getHolidaysOnDate(date, lunarInfo) {
     tomorrow = getLunarInfo(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1))
   }
   return HOLIDAYS.filter((h) => {
+    if (isRuleHoliday(h)) {
+      const d = ruleDate(h, date.getFullYear())
+      return d.getMonth() === date.getMonth() && d.getDate() === date.getDate()
+    }
     if (h.type === 'solar') return h.day === date.getDate() && h.month === date.getMonth() + 1
     if (h.isEve) return !!tomorrow && tomorrow.lunarDay === h.day && tomorrow.lunarMonth === h.month && !tomorrow.isLeap
     return h.day === lunarInfo.lunarDay && h.month === lunarInfo.lunarMonth && !lunarInfo.isLeap

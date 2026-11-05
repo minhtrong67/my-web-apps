@@ -192,6 +192,32 @@ export const HOLIDAY_DETAILS = {
     ],
     fact: 'Đèn jack-o\'-lantern ban đầu được khắc từ củ cải ở Ireland; khi sang Mỹ, người ta chuyển sang dùng bí ngô vì dễ kiếm và dễ khắc hơn.'
   },
+  easter: {
+    meaning: [
+      'Lễ Phục sinh kỷ niệm việc Chúa Giêsu sống lại sau khi chịu đóng đinh, được xem là ngày lễ quan trọng nhất của Kitô giáo – quan trọng hơn cả Giáng Sinh về mặt đức tin.',
+      'Khác với Giáng Sinh, Phục sinh không cố định ngày: các Giáo hội phương Tây tổ chức vào Chủ nhật đầu tiên sau lần trăng tròn đầu tiên kể từ ngày xuân phân (21/3), nên ngày này dao động từ 22/3 đến 25/4. Chính thống giáo dùng lịch khác nên thường tổ chức vào ngày khác.'
+    ],
+    customs: [
+      'Dự thánh lễ, đặc biệt là thánh lễ đêm Vọng Phục sinh',
+      'Trang trí và tìm trứng Phục sinh – quả trứng tượng trưng cho sự sống mới',
+      'Chú thỏ Phục sinh (Easter Bunny) mang kẹo, sô-cô-la cho trẻ em',
+      'Sum họp gia đình bên bữa ăn chung vào Chủ nhật'
+    ],
+    fact: 'Trước Lễ Phục sinh là Mùa Chay kéo dài 40 ngày, và tuần cuối là Tuần Thánh với Thứ Sáu Tuần Thánh tưởng niệm Chúa chịu nạn.'
+  },
+  thanksgiving: {
+    meaning: [
+      'Lễ Tạ ơn (Thanksgiving) là ngày lễ lớn của Hoa Kỳ để bày tỏ lòng biết ơn về mùa màng và những điều tốt đẹp trong năm. Từ năm 1941, Quốc hội Mỹ quy định ngày lễ rơi vào Thứ Năm thứ tư của tháng 11. Canada cũng có lễ Tạ ơn nhưng vào tháng 10.',
+      'Ngày lễ thường được gắn với bữa tiệc mùa thu hoạch năm 1621 ở Plymouth. Ở Việt Nam, lễ Tạ ơn chủ yếu được cộng đồng người Mỹ, du học sinh và các nhà hàng, quán cà phê đón nhận.'
+    ],
+    customs: [
+      'Sum họp gia đình quanh bữa tiệc gà tây nướng, khoai lang, sốt nam việt quất và bánh bí ngô',
+      'Mỗi người lần lượt nói về điều mình biết ơn trong năm',
+      'Xem diễu hành Thanksgiving và các trận bóng bầu dục',
+      'Hôm sau là Black Friday – ngày mở màn mùa mua sắm cuối năm'
+    ],
+    fact: 'Mỗi năm, Tổng thống Mỹ "ân xá" một con gà tây trong một buổi lễ ngắn ở Nhà Trắng.'
+  },
   'giang-sinh': {
     meaning: [
       'Giáng Sinh (Noel) là lễ mừng ngày Chúa Giêsu giáng sinh của Kitô giáo, diễn ra vào 25/12 hằng năm. Đêm 24/12 – đêm Vọng Giáng Sinh – là thời khắc linh thiêng với thánh lễ nửa đêm ở các nhà thờ.',
@@ -226,9 +252,35 @@ export const HOLIDAY_DETAILS = {
       'Dọn dẹp nhà cửa, cắm hoa đào, hoa mai, cây quất; bày mâm ngũ quả',
       'Gói bánh chưng, bánh tét; nấu các món truyền thống ngày Tết',
       'Cúng tổ tiên, xông đất, mừng tuổi (lì xì), chúc Tết ông bà, cha mẹ, họ hàng',
+      'Mùng một là "Tết cha": con cháu chúc Tết ông bà, cha mẹ và họ hàng bên nội',
       'Kiêng quét nhà, kiêng cãi vã trong những ngày đầu năm'
     ],
     fact: 'Bánh chưng tượng trưng cho đất, bánh giầy tượng trưng cho trời – gắn với truyền thuyết Lang Liêu thời Hùng Vương.'
+  },
+  'mung-2-tet': {
+    meaning: [
+      'Theo câu nói dân gian "Mùng một Tết cha, mùng hai Tết mẹ, mùng ba Tết thầy", mùng 2 Tết là ngày dành cho bên ngoại: con cháu đi chúc Tết, thăm ông bà ngoại, cậu dì và họ hàng bên mẹ.',
+      'Đây cũng là dịp con gái, con rể về thăm nhà ngoại. Không khí vẫn rộn ràng nhưng thư thả hơn mùng 1, mọi người có thêm thời gian trò chuyện và sum họp.'
+    ],
+    customs: [
+      'Về chúc Tết ông bà ngoại, cậu, dì và họ hàng bên mẹ',
+      'Mang bánh chưng, trái cây và phong bao lì xì làm quà',
+      'Cả nhà quây quần bên mâm cơm đầu năm ở nhà ngoại',
+      'Tiếp tục giữ các kiêng kỵ đầu năm: không quét nhà, tránh nói lời không may'
+    ],
+    fact: 'Câu "Mùng một Tết cha, mùng hai Tết mẹ, mùng ba Tết thầy" nhắc con cháu nhớ ơn cha mẹ và thầy cô ngay từ những ngày đầu xuân.'
+  },
+  'mung-3-tet': {
+    meaning: [
+      'Mùng 3 Tết là "Tết thầy": học trò, cựu học sinh đến thăm hỏi và chúc Tết thầy cô, thể hiện truyền thống tôn sư trọng đạo của người Việt.',
+      'Với nhiều gia đình, đây cũng là những ngày cuối của kỳ Tết đoàn viên: một số nơi làm lễ cúng tiễn ông bà vào chiều mùng 3 hoặc mùng 4, rồi dần trở lại nhịp sống thường ngày.'
+    ],
+    customs: [
+      'Học trò, cựu học sinh đến thăm, chúc Tết thầy cô',
+      'Một số nơi làm lễ cúng tiễn ông bà (hóa vàng) vào chiều mùng 3 hoặc mùng 4',
+      'Đi chùa, du xuân cùng gia đình và bạn bè',
+      'Chuẩn bị trở lại công việc, học tập sau kỳ nghỉ Tết'
+    ]
   },
   'tet-nguyen-tieu': {
     meaning: [

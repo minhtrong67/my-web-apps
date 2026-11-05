@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#5B3CC4" />
-  <meta name="description" content="Bộ sưu tập ứng dụng web của minhtrong67 — Material 3 Expressive, PWA, tiếng Việt & English." />
+  <meta name="description" content="Bộ sưu tập 8 ứng dụng web của minhtrong67 — công cụ hằng ngày với Material 3 Expressive, PWA, tiếng Việt và English." />
   <meta name="author" content="minhtrong67" />
   <meta property="og:title" content="minhtrong67 — Web Apps" />
-  <meta property="og:description" content="Bảy sản phẩm web: quản lý chi tiêu, thói quen, tâm trạng, lịch âm, mật khẩu Wi‑Fi và hơn thế." />
+  <meta property="og:description" content="Tám sản phẩm web cho tài chính, thói quen, tâm trạng, lịch Việt, dữ liệu cá nhân, Wi‑Fi và hơn thế." />
   <meta property="og:type" content="website" />
   <title>minhtrong67 · Web Apps</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -465,7 +465,7 @@
       <div class="hero-copy reveal">
         <span class="blob a"></span><span class="blob b"></span>
         <span class="kicker" data-i18n="hero.kicker">Studio ứng dụng web</span>
-        <h1 data-i18n="hero.title">Bảy sản phẩm, một ngôn ngữ thiết kế sống động.</h1>
+        <h1 data-i18n="hero.title">Tám sản phẩm, một ngôn ngữ thiết kế sống động.</h1>
         <p class="lede" data-i18n="hero.lede">Landing này giới thiệu các web app tôi xây: Material 3 Expressive, PWA cài được, song ngữ Việt–Anh, đồng bộ khi cần và luôn ưu tiên thao tác một tay trên điện thoại.</p>
         <div class="hero-actions">
           <a class="pill-btn filled" href="#products" data-i18n="hero.cta">Xem sản phẩm</a>
@@ -478,7 +478,7 @@
           <h2 data-i18n="hero.asideTitle">Công cụ hằng ngày, không phải demo.</h2>
         </div>
         <div class="stat-grid">
-          <div class="stat"><b>7</b><span data-i18n="stat.apps">ứng dụng</span></div>
+          <div class="stat"><b>8</b><span data-i18n="stat.apps">ứng dụng</span></div>
           <div class="stat"><b>PWA</b><span data-i18n="stat.pwa">cài như app thật</span></div>
           <div class="stat"><b>VI / EN</b><span data-i18n="stat.lang">đa ngôn ngữ</span></div>
           <div class="stat"><b>M3</b><span data-i18n="stat.m3">Expressive UI</span></div>
@@ -490,7 +490,7 @@
       <div class="section-head">
         <span class="kicker" data-i18n="products.kicker">Sản phẩm</span>
         <h2 data-i18n="products.title">Chọn một app, dùng luôn cho việc thật.</h2>
-        <p data-i18n="products.sub">URL live sẽ được gắn sau. Nút mở app đang để trống có chủ đích.</p>
+        <p data-i18n="products.sub">Tám app độc lập, mỗi app giải quyết một việc cụ thể. Mở mã nguồn để xem chi tiết và cách chạy.</p>
       </div>
       <div class="bento" id="productGrid"></div>
     </section>
@@ -544,7 +544,7 @@
 
   <footer>
     <span>© <span id="year"></span> minhtrong67</span>
-    <span data-i18n="footer.note">URL sản phẩm đang để trống — sẽ điền khi bạn cung cấp.</span>
+    <span data-i18n="footer.note">Mã nguồn mở theo từng dự án — chọn một app để khám phá.</span>
   </footer>
 
   <button class="fab-top" id="toTop" type="button" aria-label="Lên đầu trang">
@@ -561,17 +561,16 @@
   </div>
 
   <script>
-    /**
-     * Điền URL live tại đây khi có. Chuỗi rỗng = nút "Mở ứng dụng" bị vô hiệu.
-     */
+    /** Liên kết về mã nguồn từng sản phẩm trong monorepo. */
     const PRODUCT_URLS = {
-      "streak-logger": "",
-      "expenser": "",
-      "wifi-vault": "",
-      "moody": "",
-      "calendar-pro": "",
-      "project-tracker": "",
-      "ba-list": "",
+      "streak-logger": "https://github.com/minhtrong67/my-web-apps/tree/main/streak-logger",
+      "expenser": "https://github.com/minhtrong67/my-web-apps/tree/main/expenser",
+      "wifi-vault": "https://github.com/minhtrong67/my-web-apps/tree/main/wifi-vault",
+      "moody": "https://github.com/minhtrong67/my-web-apps/tree/main/moody",
+      "calendar-pro": "https://github.com/minhtrong67/my-web-apps/tree/main/calendar-pro",
+      "personal-keep": "https://github.com/minhtrong67/my-web-apps/tree/main/personal-keep",
+      "sayuri-vault": "https://github.com/minhtrong67/my-web-apps/tree/main/sayuri-vault",
+      "ba-list": "https://github.com/minhtrong67/my-web-apps/tree/main/ba-list",
     };
 
     const ICONS = {
@@ -611,9 +610,14 @@
         en: { name: "Calendar Pro", tag: "Lunar calendar", desc: "Vietnamese solar/lunar calendar and almanac: Can Chi, lucky hours, holiday countdown, fasting days.", feats: ["Ho Ngoc Duc lunar math", "Holiday & fasting reminders", "Ctrl/⌘ K command palette"] },
       },
       {
-        id: "project-tracker", span: "half", accent: "#6366F1",
-        vi: { name: "Project Tracker", tag: "Năng suất", desc: "Khi vibe code nhiều repo, mỗi repo một Google account — app này nối dự án với tài khoản, trạng thái và hashtag công nghệ.", feats: ["Dự án × tài khoản Google", "Thống kê cột + tròn", "Nhập/xuất CSV JSON XLSX PDF"] },
-        en: { name: "Project Tracker", tag: "Productivity", desc: "Map vibe-coded projects to the Google account that owns them, with status, tags and stats.", feats: ["Projects × Google accounts", "Bar + pie statistics", "CSV JSON XLSX PDF import/export"] },
+        id: "personal-keep", span: "half", accent: "#6366F1",
+        vi: { name: "Personal Keep", tag: "Năng suất", desc: "Một nơi để lưu dự án, tài khoản Google, website, prompt và API key cá nhân — có tìm kiếm, thống kê và sao lưu.", feats: ["Dự án × tài khoản Google", "Website, prompt và API key", "Nhập/xuất CSV, JSON, Excel, PDF"] },
+        en: { name: "Personal Keep", tag: "Productivity", desc: "A personal space for projects, Google accounts, websites, prompts and API keys — with search, stats and backups.", feats: ["Projects × Google accounts", "Websites, prompts and API keys", "CSV, JSON, Excel and PDF export"] },
+      },
+      {
+        id: "sayuri-vault", span: "half", accent: "#E11D48",
+        vi: { name: "Sayuri Vault", tag: "Kho dữ liệu", desc: "Kho dữ liệu cá nhân theo module với tìm kiếm, phân loại, nhập/xuất và bảo vệ mật khẩu bằng mã hóa AES-GCM trong trình duyệt.", feats: ["Card, grid/list và bộ lọc", "Nhập CSV, xuất CSV/Excel/PDF", "AES-GCM cho mật khẩu trong trình duyệt"] },
+        en: { name: "Sayuri Vault", tag: "Personal vault", desc: "A modular personal data vault with search, categories, import/export and browser-side AES-GCM password protection.", feats: ["Cards, grid/list and filters", "CSV import, CSV/Excel/PDF export", "Browser-side AES-GCM for passwords"] },
       },
       {
         id: "ba-list", span: "half", accent: "#128CFF",
@@ -628,7 +632,8 @@
       "wifi-vault": ICONS.wifi,
       "moody": ICONS.heart,
       "calendar-pro": ICONS.cal,
-      "project-tracker": ICONS.layers,
+      "personal-keep": ICONS.layers,
+      "sayuri-vault": ICONS.layers,
       "ba-list": ICONS.users,
     };
 
@@ -636,7 +641,7 @@
       vi: {
         "nav.products": "Sản phẩm", "nav.craft": "Phong cách", "nav.about": "Giới thiệu",
         "hero.kicker": "Studio ứng dụng web",
-        "hero.title": "Bảy sản phẩm, một ngôn ngữ thiết kế sống động.",
+        "hero.title": "Tám sản phẩm, một ngôn ngữ thiết kế sống động.",
         "hero.lede": "Landing này giới thiệu các web app tôi xây: Material 3 Expressive, PWA cài được, song ngữ Việt–Anh, đồng bộ khi cần và luôn ưu tiên thao tác một tay trên điện thoại.",
         "hero.cta": "Xem sản phẩm", "hero.about": "Về tác giả",
         "hero.asideKicker": "Bộ sưu tập 2025–2026",
@@ -644,8 +649,8 @@
         "stat.apps": "ứng dụng", "stat.pwa": "cài như app thật", "stat.lang": "đa ngôn ngữ", "stat.m3": "Expressive UI",
         "products.kicker": "Sản phẩm",
         "products.title": "Chọn một app, dùng luôn cho việc thật.",
-        "products.sub": "URL live sẽ được gắn sau. Nút mở app đang để trống có chủ đích.",
-        "open": "Mở ứng dụng", "soon": "URL sẽ cập nhật",
+        "products.sub": "Tám app độc lập, mỗi app giải quyết một việc cụ thể. Mở mã nguồn để xem chi tiết và cách chạy.",
+        "open": "Xem mã nguồn", "soon": "Đang cập nhật",
         "craft.kicker": "Material 3 Expressive",
         "craft.title": "Hình khối táo bạo, chuyển động lò xo, màu có vai trò.",
         "craft.sub": "Cùng một hệ: góc bo lớn, nút morph khi nhấn, cookie mark, theme sáng/tối và token màu động.",
@@ -655,12 +660,12 @@
         "about.title": "minhtrong67",
         "about.body": "Tôi thiết kế và lập trình các web app nhỏ nhưng hoàn chỉnh: có landing, cài đặt giao diện, i18n, PWA và đường xuất dữ liệu. Mỗi sản phẩm giải một việc cụ thể — không phải bộ toolkit chung chung.",
         "stack.title": "Công nghệ hay dùng",
-        "footer.note": "URL sản phẩm đang để trống — sẽ điền khi bạn cung cấp.",
+        "footer.note": "Mã nguồn mở theo từng dự án — chọn một app để khám phá.",
       },
       en: {
         "nav.products": "Products", "nav.craft": "Craft", "nav.about": "About",
         "hero.kicker": "Web app studio",
-        "hero.title": "Seven products, one lively design language.",
+        "hero.title": "Eight products, one lively design language.",
         "hero.lede": "A home for the web apps I build: Material 3 Expressive, installable PWAs, Vietnamese & English, synced when it matters, one-handed on a phone.",
         "hero.cta": "See products", "hero.about": "About",
         "hero.asideKicker": "Collection 2025–2026",
@@ -668,8 +673,8 @@
         "stat.apps": "apps", "stat.pwa": "install like native", "stat.lang": "bilingual", "stat.m3": "Expressive UI",
         "products.kicker": "Products",
         "products.title": "Pick an app and put it to real work.",
-        "products.sub": "Live URLs are intentionally blank until you send them.",
-        "open": "Open app", "soon": "URL coming soon",
+        "products.sub": "Eight independent apps, each solving one concrete job. Open the source to explore the details.",
+        "open": "View source", "soon": "Coming soon",
         "craft.kicker": "Material 3 Expressive",
         "craft.title": "Bold shape, spring motion, role-based color.",
         "craft.sub": "Shared system: large radii, morphing pills, cookie marks, light/dark and dynamic color.",
@@ -679,7 +684,7 @@
         "about.title": "minhtrong67",
         "about.body": "I design and ship small but complete web apps: landing, appearance settings, i18n, PWA and a way out of the data. Each product solves one job — not a generic toolkit.",
         "stack.title": "Usual stack",
-        "footer.note": "Product URLs are empty on purpose — fill them in when you have them.",
+        "footer.note": "Open source, one focused project at a time — pick an app to explore.",
       },
     };
 

@@ -5,15 +5,14 @@ import {auth} from '../firebase'
 import {FONTS,useT} from '../i18n'
 import {MODS,ROUTES,normRoute} from '../routes'
 import {useData} from '../data'
-import {ACCENTS,useInstall,useSettings} from '../hooks'
+import {useInstall,useSettings} from '../hooks'
+import {ACCENTS,normAccent,normFs} from '../accents'
 import {dl} from '../io'
 import {normalize,rec,useTransfer} from '../transfer'
 import {useFormats} from '../components/Toolbar'
-import {Btn,Confirm,Cookie,Credit,Dropdown,ExportMenu,Segmented,useToast} from '../ui'
+import {Accordion,Btn,Confirm,Cookie,Credit,Dropdown,ExportMenu,Segmented,useToast} from '../ui'
 import SEED from '../seed-websites.json'
 
-// màu primary (tông 40) của từng bảng màu M3 Expressive, khớp theme.css
-const SWATCH={indigo:'#4f52ba',violet:'#6a4ab3',sky:'#006591',teal:'#006b5f',emerald:'#006c49',amber:'#855300',orange:'#9d4300',rose:'#a43947'}
 const Section=({icon:I,title,desc,children})=><section className="card p-5 md:p-6"><div className="mb-4 flex items-start gap-3"><Cookie className="size-11 text-secondary"><I className="size-5 text-secondary-foreground"/></Cookie>
  <div className="pt-0.5"><h2 className="text-lg font-medium leading-tight">{title}</h2>{desc&&<p className="mt-1 text-sm text-muted-foreground">{desc}</p>}</div></div>{children}</section>
 const Row=({label,children})=><div className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"><span className="text-sm font-medium">{label}</span>{children}</div>
@@ -27,7 +26,7 @@ function Transfer({type}){
    <Btn variant="outline" icon={Upload} disabled={busy} onClick={()=>fileRef.current.click()}>{t('import')}</Btn><ExportMenu formats={formats} onPick={exportAs} busy={busy}/></div></div>}
 
 export default function Settings({user}){
- const {t}=useT(),toast=useToast(),{s,set,reset}=useSettings(),inst=useInstall(),data=useData(),{projects,accounts,websites,prompts,wcats,pcats,accMap,webCat,promptCat,importRecords}=data
+ const {t}=useT(),toast=useToast(),{s,set,reset}=useSettings(),acc=normAccent(s.accent),cur=ACCENTS.find(a=>a.key===acc),fontKey=FONTS[s.font]?s.font:'system',inst=useInstall(),data=useData(),{projects,accounts,websites,prompts,wcats,pcats,accMap,webCat,promptCat,importRecords}=data
  const [busy,setBusy]=useState(false),[ask,setAsk]=useState(false),[out,setOut]=useState(false),[seeding,setSeeding]=useState(false),fileRef=useRef()
  const ready=projects&&accounts&&websites&&prompts&&wcats&&pcats
  const exportBackup=()=>{if(!ready)return
@@ -52,10 +51,15 @@ export default function Settings({user}){
    <div className="divide-y divide-border ">
     <Row label={t('st.theme')}><Segmented label="theme" value={s.mode} onChange={mode=>set({mode})} options={modes}/></Row>
     <Row label={t('st.lang')}><Segmented label="language" value={s.lang} onChange={l=>set({lang:l})} options={[['vi','Tiếng Việt'],['en','English']]}/></Row>
-    <Row label={t('st.accent')}><div className="flex flex-wrap gap-2">{ACCENTS.map(c=><button key={c} type="button" title={t('accent.'+c)} aria-label={t('accent.'+c)} aria-pressed={s.accent===c} onClick={()=>set({accent:c})} style={{background:SWATCH[c]}}
-     className={`grid size-10 place-items-center text-white transition-[border-radius,transform,box-shadow] duration-300 [transition-timing-function:var(--ease-spring)] active:scale-90 ${s.accent===c?'rounded-[14px] ring-2 ring-foreground ring-offset-2 ring-offset-card':'rounded-full'}`}>{s.accent===c&&<Check className="size-5"/>}</button>)}</div></Row>
-    <div className="py-3"><Row label={`${t('st.fontsize')}: ${s.fs}px`}><input type="range" aria-label={t('st.fontsize')} min="14" max="20" step="1" value={s.fs} style={{'--p':`${(s.fs-14)/6*100}%`}} onChange={e=>set({fs:+e.target.value})} className="slider w-48"/></Row><p className="mt-2 text-sm text-muted-foreground ">{t('st.preview')}</p></div>
-    <Row label={t('st.font')}><Dropdown compact className="w-56" placeholder="" value={s.font} onChange={font=>set({font})} options={Object.entries(FONTS).map(([k,f])=>[k,f.label||t('st.font.system')])}/></Row>
+    <Row label={t('st.fontsize')}><Segmented label="font size" value={normFs(s.fs)} onChange={fs=>set({fs})} options={[[14,t('fs.s')],[16,t('fs.m')],[18,t('fs.l')]]}/></Row>
+    <Accordion title={t('st.accent')} summary={<><span className="size-4 shrink-0 rounded-full" style={{background:cur.c}}/><span className="truncate">{cur[s.lang==='en'?'en':'vi']}</span></>}>
+     <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">{ACCENTS.map(a=>{const on=a.key===acc;return <button key={a.key} type="button" aria-pressed={on} title={a[s.lang==='en'?'en':'vi']} onClick={()=>set({accent:a.key})}
+      className={`flex flex-col items-center gap-2 rounded-2xl p-2 transition-[background-color,box-shadow,transform] duration-300 [transition-timing-function:var(--ease-spring)] hover:bg-accent active:scale-95 last:col-span-2 ${on?'bg-secondary ring-2 ring-primary':''}`}>
+       <span className="grid h-12 w-full place-items-center rounded-xl" style={{background:a.bg}}><span className="grid size-8 place-items-center text-white transition-[border-radius] duration-300 [transition-timing-function:var(--ease-spring)]" style={{background:a.c,borderRadius:on?'32%':'9999px'}}>{on&&<Check className="size-4"/>}</span></span>
+       <span className="max-w-full truncate text-xs font-medium">{a[s.lang==='en'?'en':'vi']}</span></button>})}</div></Accordion>
+    <Accordion title={t('st.font')} summary={<span className="truncate" style={{fontFamily:FONTS[fontKey].css}}>{FONTS[fontKey].label||t('st.font.system')}</span>}>
+     <Dropdown label={t('st.font')} placeholder="" value={fontKey} onChange={font=>set({font})} options={Object.entries(FONTS).map(([k,f])=>[k,f.label||t('st.font.system')])}/>
+     <p className="-mt-2 rounded-xl bg-muted p-4 text-sm leading-relaxed">{t('st.font.preview')}</p></Accordion>
     <Row label={t('st.home')}><Dropdown compact className="w-64" placeholder="" value={normRoute(s.home)} onChange={home=>set({home})} options={ROUTES.map(r=>{const [m,sb]=r.split('/');return [r,m==='settings'?t('nav.settings'):`${t('mod.'+m)} › ${t(MODS[m].subs.find(x=>x[0]===sb)[1])}`]})}/></Row></div></Section>
   <Section icon={Database} title={t('st.data')} desc={t('st.data.desc')}>
    <input ref={fileRef} type="file" hidden accept=".json" onChange={e=>{const f=e.target.files[0];e.target.value='';f&&importBackup(f)}}/>
@@ -70,4 +74,4 @@ export default function Settings({user}){
   <Section icon={Info} title={t('st.about')}><p className="text-sm text-muted-foreground">Personal Keep · {t('st.version')} {__APP_VERSION__}</p><Credit className="mt-2"/>
    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-secondary p-4 text-secondary-foreground"><p className="min-w-0 flex-1 text-sm">{t('st.landing.desc')}</p>
     <a href="/landing.html" target="_blank" rel="noopener noreferrer" className="btn btn-primary"><ExternalLink className="size-4"/>{t('st.landing')}</a></div></Section>
-  {ask&&<Confirm danger={false} title={t('st.reset')} message={t('st.reset.desc')} confirmLabel={t('st.reset')} onClose={()=>setAsk(false)} onConfirm={()=>{reset();setAsk(false)}}/>}</div>}
+  {ask&&<Confirm danger={false} icon={RotateCcw} title={t('st.reset')} message={t('st.reset.desc')} confirmLabel={t('st.reset')} onClose={()=>setAsk(false)} onConfirm={()=>{reset();setAsk(false)}}/>}</div>}

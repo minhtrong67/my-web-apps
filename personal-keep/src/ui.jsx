@@ -176,5 +176,46 @@ export class ErrorBoundary extends Component{
  componentDidCatch(err){console.error(err);if(/dynamically imported module|Importing a module script|Loading chunk|Failed to fetch/i.test(String(err?.message))&&!sessionStorage.getItem('chunk-reload')){sessionStorage.setItem('chunk-reload','1');location.reload()}}
  render(){const {err}=this.state;if(!err)return this.props.children
   return <div role="alert" className="anim-fade mx-auto max-w-xl rounded-2xl bg-error-container p-6 text-on-error-container"><div className="flex items-center gap-3"><TriangleAlert className="size-6 shrink-0"/><h2 className="text-lg font-semibold">{this.props.title}</h2></div>
-   <p className="mt-3 break-words rounded-xl bg-black/5 p-3 font-mono text-xs dark:bg-white/10">{String(err?.message||err)}</p>
+   <p className="mt-3 break-words rounded-xl bg-black/5 p-3 font-mono text-xs dark:bg-white/10">{String(err?.message||err)}</p>{this.props.hint&&<p className="mt-3 text-sm">{this.props.hint}</p>}
    <div className="mt-4 flex flex-wrap gap-2"><Btn variant="neutral" onClick={()=>this.setState({err:null})}>{this.props.retry}</Btn><Btn onClick={()=>location.reload()}>{this.props.reload}</Btn></div></div>}}
+
+// Thẻ item thống nhất cho mọi danh sách (dự án, tài khoản, trang web, prompt, API key).
+// grid: dọc 4 vùng (đầu / mô tả / nhãn / chân) luôn cao bằng nhau; list: trên laptop trở lên thành một hàng với các cột cố định thẳng hàng.
+export function ItemCard({view,i=0,selected,onClick,select,lead,title,sub,badge,desc,meta,who,actions}){
+ const list=view==='list',ORD=['','lg:order-1','lg:order-2','lg:order-3','lg:order-4','lg:order-5','lg:order-6'],o=n=>list?ORD[n]:''
+ return <article onClick={onClick} style={{animationDelay:`${Math.min(i,8)*28}ms`}} className={`card card-item card-hover anim-up flex min-w-0 flex-col ${onClick?'cursor-pointer':''} ${selected?'ring-2 ring-primary':''} ${list?'gap-3 p-4 lg:grid lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1.2fr)_minmax(0,1fr)_7.5rem_minmax(0,1.2fr)_auto] lg:items-center lg:gap-x-5 lg:px-5 lg:py-3':'gap-4 p-5'}`}>
+  <div className={`flex items-start gap-3 ${list?'lg:contents':''}`}>
+   <div className={`flex min-w-0 flex-1 items-center gap-3 ${o(1)}`}>{select}{lead}<div className="min-w-0"><h3 className={`font-semibold leading-snug ${list?'truncate':'line-clamp-2 break-words'}`} title={typeof title==='string'?title:undefined}>{title}</h3>{sub&&<p className="truncate text-xs text-muted-foreground">{sub}</p>}</div></div>
+   <div className={`shrink-0 ${list?'lg:order-4 lg:justify-self-start':''}`}>{badge}</div></div>
+  <div className={`min-w-0 ${list?'lg:order-2':desc?'min-h-10':'hidden'}`}>{desc}</div>
+  <div className={`min-w-0 ${o(3)}`}>{meta}</div>
+  <div className={`mt-auto flex items-center gap-2 border-t border-border pt-3 ${list?'lg:contents lg:border-0 lg:pt-0':''}`}>
+   <div className={`min-w-0 flex-1 ${o(5)}`}>{who}</div><div className={`flex shrink-0 items-center gap-0.5 ${o(6)}`} onClick={e=>e.stopPropagation()}>{actions}</div></div></article>}
+// Hàng chip một dòng, không xuống dòng; phần dư gộp thành +n để thẻ luôn gọn
+export const ChipRow=({items,max=3})=>items.length?<div className="flex flex-nowrap items-center gap-1.5 overflow-hidden [&>*]:min-w-0">{items.slice(0,max)}{items.length>max&&<span className="chip !min-w-fit shrink-0">+{items.length-max}</span>}</div>:null
+export const Lead=({icon:I,className=''})=><span className={`grid size-11 shrink-0 place-items-center rounded-xl bg-primary-container text-on-primary-container ${className}`}><I className="size-5"/></span>
+
+// Ảnh đại diện Google; không có ảnh hoặc ảnh lỗi thì hiện chữ cái đầu
+export function UserAvatar({user,className='size-10'}){
+ const [bad,setBad]=useState(false),n=(user.displayName||user.email||'?')[0]
+ return user.photoURL&&!bad?<img src={user.photoURL} alt="" referrerPolicy="no-referrer" onError={()=>setBad(true)} className={`${className} shrink-0 rounded-full object-cover`}/>
+  :<span className={`${className} grid shrink-0 place-items-center rounded-full bg-primary-container text-sm font-semibold uppercase text-on-primary-container`}>{n}</span>}
+
+// Hiệu ứng gợn sóng (ripple) khi bấm nút / chip / mục điều hướng: một listener duy nhất cho cả app
+export function Ripple(){
+ useEffect(()=>{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return
+  const f=e=>{const el=e.target instanceof Element&&e.target.closest('.btn,.icon-btn,.fchip,.nav-item,.menu-item');if(!el||el.disabled||el.getAttribute('aria-disabled')==='true')return
+   const r=el.getBoundingClientRect(),d=Math.max(r.width,r.height)*2.2,s=document.createElement('span');s.className='ripple'
+   s.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;el.appendChild(s);s.addEventListener('animationend',()=>s.remove(),{once:true})}
+  addEventListener('pointerdown',f,{passive:true});return()=>removeEventListener('pointerdown',f)},[])
+ return null}
+
+// Accordion đóng / mở mượt cho các mục nhiều lựa chọn (màu chủ đề, phông chữ...). summary hiện giá trị đang chọn khi đang thu gọn.
+export function Accordion({title,summary,defaultOpen=false,children}){
+ const [open,setOpen]=useState(defaultOpen),id=useId()
+ return <div className="py-1.5"><button type="button" aria-expanded={open} aria-controls={id} onClick={()=>setOpen(!open)} className="-mx-3 flex w-[calc(100%+1.5rem)] items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-accent">
+   <span className="text-sm font-medium">{title}</span>
+   <span className={`ml-auto flex min-w-0 items-center gap-2 text-sm text-muted-foreground transition-opacity duration-300 ${open?'opacity-0':''}`}>{summary}</span>
+   <ChevronDown className={`size-5 shrink-0 text-muted-foreground transition-transform duration-300 [transition-timing-function:var(--ease-spring)] ${open?'rotate-180':''}`}/></button>
+  <div id={id} className={`grid transition-[grid-template-rows,opacity] duration-500 [transition-timing-function:var(--ease-emph)] ${open?'grid-rows-[1fr] opacity-100':'grid-rows-[0fr] opacity-0'}`}>
+   <div className="min-h-0 overflow-hidden" inert={open?undefined:''}><div className="pb-2 pt-3">{children}</div></div></div></div>}

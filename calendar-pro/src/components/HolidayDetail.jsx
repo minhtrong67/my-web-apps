@@ -37,8 +37,13 @@ export default function HolidayDetail({ holiday, nextDate, onEdit, onDelete }) {
   const badgeStyle = theme ? { background: theme.bg } : undefined
   const badgeClass = theme ? 'text-white' : 'bg-primary-container text-on-primary-container'
 
+  // Loại lịch + quy tắc: "Theo dương lịch — 25/12" · "Theo âm lịch — 1/1" · "Theo quy tắc — Thứ Năm thứ 4 của tháng 11"
+  const calendarText = holiday.rule
+    ? `${t('holidayDetail.byRule')} — ${holiday.rule[lang] ?? holiday.rule.vi}`
+    : `${holiday.type === 'solar' ? t('holidayDetail.bySolar') : t('holidayDetail.byLunar')} — ${holiday.day}/${holiday.month}`
+
   function addToCalendar() {
-    const item = { id: holiday.id, name, description: desc || undefined, type: holiday.type, day: holiday.day, month: holiday.month, isEve: holiday.isEve }
+    const item = { id: holiday.id, name, description: desc || undefined, type: holiday.type, day: holiday.day, month: holiday.month, weekday: holiday.weekday, nth: holiday.nth, isEve: holiday.isEve }
     downloadText(`${holiday.id}.ics`, buildIcs([item]))
     notify(t('holidayDetail.icsDone'), { type: 'success' })
   }
@@ -113,7 +118,7 @@ export default function HolidayDetail({ holiday, nextDate, onEdit, onDelete }) {
         <ListItem
           icon="sell"
           overline={t('holidayDetail.calendarType')}
-          text={`${holiday.type === 'solar' ? t('holidayDetail.bySolar') : t('holidayDetail.byLunar')} — ${holiday.day}/${holiday.month}`}
+          text={calendarText}
         />
       </div>
 

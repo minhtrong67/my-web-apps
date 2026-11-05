@@ -4,18 +4,27 @@
 import { writeFileSync, readFileSync } from 'node:fs'
 import { argbFromHex, hexFromArgb, Hct, SchemeTonalSpot, MaterialDynamicColors as M } from '@material/material-color-utilities'
 
-// Màu mặc định là teal. Thứ tự = thứ tự hiển thị trong Cài đặt.
+// 19 màu chủ đề của Material Design (sắc độ 500). Thứ tự = thứ tự hiển thị trong Cài đặt. Màu mặc định là teal.
 const SEEDS = [
-  { id: 'teal', seed: '#009688' },
-  { id: 'green', seed: '#43A047' },
-  { id: 'cyan', seed: '#00ACC1' },
-  { id: 'blue', seed: '#1E88E5' },
-  { id: 'indigo', seed: '#3F51B5' },
-  { id: 'violet', seed: '#6750A4' },
+  { id: 'red', seed: '#F44336' },
   { id: 'pink', seed: '#E91E63' },
-  { id: 'red', seed: '#E53935' },
-  { id: 'orange', seed: '#FB8C00' },
-  { id: 'yellow', seed: '#FDD835' }
+  { id: 'purple', seed: '#9C27B0' },
+  { id: 'deep-purple', seed: '#673AB7' },
+  { id: 'indigo', seed: '#3F51B5' },
+  { id: 'blue', seed: '#2196F3' },
+  { id: 'light-blue', seed: '#03A9F4' },
+  { id: 'cyan', seed: '#00BCD4' },
+  { id: 'teal', seed: '#009688' },
+  { id: 'green', seed: '#4CAF50' },
+  { id: 'light-green', seed: '#8BC34A' },
+  { id: 'lime', seed: '#CDDC39' },
+  { id: 'yellow', seed: '#FFEB3B' },
+  { id: 'amber', seed: '#FFC107' },
+  { id: 'orange', seed: '#FF9800' },
+  { id: 'deep-orange', seed: '#FF5722' },
+  { id: 'brown', seed: '#795548' },
+  { id: 'grey', seed: '#9E9E9E' },
+  { id: 'blue-grey', seed: '#607D8B' }
 ]
 
 // Chỉ các vai trò app thực sự dùng (xem src/index.css).
@@ -38,6 +47,8 @@ const make = (hex, dark) => {
 
 const palettes = SEEDS.map(({ id, seed }) => ({ id, seed, light: make(seed, false), dark: make(seed, true) }))
 
+const DEFAULT = palettes.find((p) => p.id === 'teal')
+
 writeFileSync(
   new URL('../src/lib/palettes.js', import.meta.url),
   `// TỰ SINH bởi scripts/gen-theme.mjs — đừng sửa tay. Bảng màu Material 3 (TonalSpot) cho từng màu chủ đề.\nexport const PALETTES = ${JSON.stringify(palettes, null, 1)}\n`
@@ -47,7 +58,7 @@ writeFileSync(
 const css = (p) => Object.entries(p).map(([k, v]) => `  --md-${k}: ${v};`).join('\n')
 const file = new URL('../src/styles/theme.css', import.meta.url)
 let t = readFileSync(file, 'utf8')
-t = t.replace(/(:root \{\n)[\s\S]*?(\n\n  \/\* ---- Shape scale)/, `$1${css(palettes[0].light)}$2`)
-t = t.replace(/(\.dark \{\n)[\s\S]*?(\n\})/, `$1${css(palettes[0].dark)}$2`)
+t = t.replace(/(:root \{\n)[\s\S]*?(\n\n  \/\* ---- Shape scale)/, `$1${css(DEFAULT.light)}$2`)
+t = t.replace(/(\.dark \{\n)[\s\S]*?(\n\})/, `$1${css(DEFAULT.dark)}$2`)
 writeFileSync(file, t)
 console.log('OK', palettes.length, 'palettes')

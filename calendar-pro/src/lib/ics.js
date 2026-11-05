@@ -1,10 +1,11 @@
 import { lunarToSolar } from './lunar'
 import { getNextOccurrence } from './dateUtils'
+import { isRuleHoliday, ruleDate } from './holidayRules'
 
 /**
  * Xuất lịch iCalendar (.ics) để thêm ngày lễ / sự kiện vào Google Calendar, Apple Calendar, Outlook...
  * - Sự kiện dương lịch: 1 VEVENT cả ngày + RRULE lặp hằng năm.
- * - Sự kiện âm lịch: lịch chuẩn không có lặp theo âm lịch → sinh sẵn các lần diễn ra trong YEARS_AHEAD năm tới.
+ * - Sự kiện âm lịch hoặc theo quy tắc (Phục sinh, thứ N của tháng): lịch chuẩn không lặp được theo các kiểu này → sinh sẵn các lần diễn ra trong YEARS_AHEAD năm tới.
  */
 const YEARS_AHEAD = 10
 
@@ -53,8 +54,19 @@ export function lunarOccurrences(item, from = new Date(), years = YEARS_AHEAD) {
   return out
 }
 
+/** Các ngày diễn ra của sự kiện theo quy tắc (Phục sinh, thứ N của tháng) từ năm hiện tại trở đi */
+export function ruleOccurrences(item, from = new Date(), years = YEARS_AHEAD) {
+  const today = new Date(from.getFullYear(), from.getMonth(), from.getDate())
+  const out = []
+  for (let y = from.getFullYear(); y <= from.getFullYear() + years; y++) {
+    const d = ruleDate(item, y)
+    if (d >= today) out.push(d)
+  }
+  return out
+}
+
 /**
- * @param {Array<{id:string,name:string,description?:string,type:'solar'|'lunar',day:number,month:number,isEve?:boolean}>} items
+ * @param {Array<{id:string,name:string,description?:string,type:'solar'|'lunar'|'easter'|'nth-weekday',day?:number,month?:number,weekday?:number,nth?:number,isEve?:boolean}>} items
  * @returns {string} nội dung file .ics (CRLF)
  */
 export function buildIcs(items, now = new Date()) {
@@ -69,7 +81,9 @@ export function buildIcs(items, now = new Date()) {
     lines.push('TRANSP:TRANSPARENT', 'END:VEVENT')
   }
   for (const item of items) {
-    if (item.type === 'solar') {
+    if (isRuleHoliday(item)) {
+      ruleOccurrences(item, now).forEach((date) => event(`${item.id}-${ymd(date)}`, item, date))
+    } else if (item.type === 'solar') {
       // Lần diễn ra kế tiếp làm mốc bắt đầu, lặp hằng năm (29/2 chỉ rơi vào năm nhuận — thư viện lịch tự bỏ qua năm không có)
       const start = getNextOccurrence(item, now)
       if (start) event(item.id, item, start, 'FREQ=YEARLY')

@@ -1,0 +1,10 @@
+// 19 màu chủ đề theo bảng màu Material Design. c = màu primary (tông 40), bg = primary container, dùng để vẽ ô chọn màu.
+// Bảng màu đầy đủ (sáng / tối) nằm trong theme.css, sinh bằng @material/material-color-utilities.
+export const ACCENTS=[{"key":"red","en":"Red","vi":"Đỏ","c":"#a43c31","bg":"#ffdad5"},{"key":"pink","en":"Pink","vi":"Hồng","c":"#a33952","bg":"#ffd9de"},{"key":"purple","en":"Purple","vi":"Tím","c":"#8b3f96","bg":"#ffd6fe"},{"key":"deeppurple","en":"Deep Purple","vi":"Tím đậm","c":"#6d49b1","bg":"#ebddff"},{"key":"indigo","en":"Indigo","vi":"Chàm","c":"#4355bb","bg":"#dee0ff"},{"key":"blue","en":"Blue","vi":"Xanh dương","c":"#0061a4","bg":"#d1e4ff"},{"key":"lightblue","en":"Light Blue","vi":"Xanh dương nhạt","c":"#006493","bg":"#cae6ff"},{"key":"cyan","en":"Cyan","vi":"Xanh lơ","c":"#006876","bg":"#a1efff"},{"key":"teal","en":"Teal","vi":"Xanh ngọc","c":"#006a60","bg":"#45fce6"},{"key":"green","en":"Green","vi":"Xanh lá","c":"#0e6e20","bg":"#9df898"},{"key":"lightgreen","en":"Light Green","vi":"Xanh lá nhạt","c":"#3e6a00","bg":"#bcf37d"},{"key":"lime","en":"Lime","vi":"Chanh","c":"#5b6300","bg":"#deec60"},{"key":"yellow","en":"Yellow","vi":"Vàng","c":"#695f00","bg":"#f7e54e"},{"key":"amber","en":"Amber","vi":"Hổ phách","c":"#785900","bg":"#ffdf9e"},{"key":"orange","en":"Orange","vi":"Cam","c":"#8b5000","bg":"#ffdcbe"},{"key":"deeporange","en":"Deep Orange","vi":"Cam đậm","c":"#a23e20","bg":"#ffdbd1"},{"key":"brown","en":"Brown","vi":"Nâu","c":"#84523f","bg":"#ffdbcf"},{"key":"grey","en":"Grey","vi":"Xám","c":"#5e5e60","bg":"#e4e2e4"},{"key":"bluegrey","en":"Blue Grey","vi":"Xám xanh","c":"#426372","bg":"#c5e8f9"}]
+export const ACCENT_KEYS=ACCENTS.map(a=>a.key)
+// khoá cũ (8 màu ở bản trước) -> màu Material gần nhất, để cài đặt đã lưu vẫn hợp lệ
+export const OLD_ACCENT={violet:'deeppurple',sky:'lightblue',emerald:'green',rose:'pink'}
+export const normAccent=k=>ACCENT_KEYS.includes(k)?k:OLD_ACCENT[k]||'indigo'
+// cỡ chữ: nhỏ / vừa / lớn (giá trị px lưu trong cài đặt, tự quy về mức gần nhất)
+export const FONT_SIZES=[['s',14],['m',16],['l',18]]
+export const normFs=n=>{n=+n||16;return n<=15?14:n<=17?16:18}
