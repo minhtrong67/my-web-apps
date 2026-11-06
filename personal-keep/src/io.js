@@ -1,6 +1,5 @@
 // Màu theo theme hiện tại (CSS variable dạng hex) để file xuất khớp màu chủ đề của app
 const token=(n,d)=>{const v=getComputedStyle(document.documentElement).getPropertyValue(n).trim();return /^#[0-9a-f]{6}$/i.test(v)?v:d}
-const argb=h=>'FF'+h.slice(1).toUpperCase()
 export const dl=(blob,name)=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))
 // CSV có BOM UTF-8 để Excel hiển thị đúng tiếng Việt
@@ -17,23 +16,6 @@ export function parseCSV(t){
  if(f||row.length){row.push(f);rows.push(row)}
  const [h,...b]=rows.filter(r=>r.some(x=>x.trim()))
  return b.map(r=>Object.fromEntries(h.map((k,i)=>[k.trim(),r[i]??''])))}
-const loadX=async()=>{const m=await import('exceljs/dist/exceljs.min.js');return m.default||m}
-export async function toXLSX(cols,rows,sheet){
- const X=await loadX(),wb=new X.Workbook();wb.creator='Personal Keep'
- const ws=wb.addWorksheet(sheet.slice(0,31),{views:[{state:'frozen',ySplit:1}]})
- ws.columns=cols.map(c=>({header:c[1],key:c[0],width:c[2]||20}));rows.forEach(r=>ws.addRow(r))
- const fill=a=>({type:'pattern',pattern:'solid',fgColor:{argb:a}})
- ws.getRow(1).height=26
- ws.eachRow((r,i)=>r.eachCell(c=>{
-  if(i===1){c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill=fill(argb(token('--md-primary','#4f52ba')));c.alignment={vertical:'middle'}}
-  else{c.alignment={vertical:'top',wrapText:true};c.border={bottom:{style:'thin',color:{argb:'FFE5E5E5'}}};if(i%2===0)c.fill=fill('FFF4F2F7')}}))
- ws.autoFilter={from:{row:1,column:1},to:{row:1,column:cols.length}}
- return new Blob([await wb.xlsx.writeBuffer()],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}
-export async function fromXLSX(buf){
- const X=await loadX(),wb=new X.Workbook();await wb.xlsx.load(buf);const ws=wb.worksheets[0],h=[],out=[]
- ws.getRow(1).eachCell((c,i)=>{h[i]=String(c.text).trim()})
- ws.eachRow((r,n)=>{if(n>1){const o={};h.forEach((k,i)=>{if(k)o[k]=String(r.getCell(i).text??'')});if(Object.values(o).some(Boolean))out.push(o)}})
- return out}
 // PNG/PDF: render bằng trình duyệt nên không lỗi font tiếng Việt
 const toImg=async(node,bg)=>(await import('html-to-image')).toPng(node,{pixelRatio:2,backgroundColor:bg,cacheBust:true})
 async function toPDF(img,name,bg){

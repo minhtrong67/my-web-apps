@@ -22,7 +22,7 @@ function Transfer({type}){
  const {busy,exportAs,importFile}=useTransfer(type,items),fileRef=useRef(),formats=useFormats()
  return <div className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0">
   <div><p className="text-sm font-medium">{t('nav.'+type)}</p><p className="text-xs text-muted-foreground ">{items?t(type+'.count',{n:items.length}):'…'}</p></div>
-  <div className="flex gap-2"><input ref={fileRef} type="file" hidden accept=".csv,.json,.xlsx" onChange={e=>{const f=e.target.files[0];e.target.value='';f&&importFile(f)}}/>
+  <div className="flex gap-2"><input ref={fileRef} type="file" hidden accept=".csv,.json" onChange={e=>{const f=e.target.files[0];e.target.value='';f&&importFile(f)}}/>
    <Btn variant="outline" icon={Upload} disabled={busy} onClick={()=>fileRef.current.click()}>{t('import')}</Btn><ExportMenu formats={formats} onPick={exportAs} busy={busy}/></div></div>}
 
 export default function Settings({user}){
@@ -53,10 +53,10 @@ export default function Settings({user}){
     <Row label={t('st.lang')}><Segmented label="language" value={s.lang} onChange={l=>set({lang:l})} options={[['vi','Tiếng Việt'],['en','English']]}/></Row>
     <Row label={t('st.fontsize')}><Segmented label="font size" value={normFs(s.fs)} onChange={fs=>set({fs})} options={[[14,t('fs.s')],[16,t('fs.m')],[18,t('fs.l')]]}/></Row>
     <Accordion title={t('st.accent')} summary={<><span className="size-4 shrink-0 rounded-full" style={{background:cur.c}}/><span className="truncate">{cur[s.lang==='en'?'en':'vi']}</span></>}>
-     <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">{ACCENTS.map(a=>{const on=a.key===acc;return <button key={a.key} type="button" aria-pressed={on} title={a[s.lang==='en'?'en':'vi']} onClick={()=>set({accent:a.key})}
-      className={`flex flex-col items-center gap-2 rounded-2xl p-2 transition-[background-color,box-shadow,transform] duration-300 [transition-timing-function:var(--ease-spring)] hover:bg-accent active:scale-95 last:col-span-2 ${on?'bg-secondary ring-2 ring-primary':''}`}>
+     <div className="grid grid-cols-5 gap-1.5 sm:gap-2">{ACCENTS.map(a=>{const on=a.key===acc;return <button key={a.key} type="button" aria-pressed={on} title={a[s.lang==='en'?'en':'vi']} onClick={()=>set({accent:a.key})}
+      className={`flex flex-col items-center gap-2 rounded-2xl p-2 transition-[background-color,box-shadow,transform] duration-300 [transition-timing-function:var(--ease-spring)] hover:bg-accent active:scale-95 ${on?'bg-secondary ring-2 ring-primary':''}`}>
        <span className="grid h-12 w-full place-items-center rounded-xl" style={{background:a.bg}}><span className="grid size-8 place-items-center text-white transition-[border-radius] duration-300 [transition-timing-function:var(--ease-spring)]" style={{background:a.c,borderRadius:on?'32%':'9999px'}}>{on&&<Check className="size-4"/>}</span></span>
-       <span className="max-w-full truncate text-xs font-medium">{a[s.lang==='en'?'en':'vi']}</span></button>})}</div></Accordion>
+       <span className="max-w-full break-words text-center text-[11px] font-medium leading-tight sm:text-xs">{a[s.lang==='en'?'en':'vi']}</span></button>})}</div></Accordion>
     <Accordion title={t('st.font')} summary={<span className="truncate" style={{fontFamily:FONTS[fontKey].css}}>{FONTS[fontKey].label||t('st.font.system')}</span>}>
      <Dropdown label={t('st.font')} placeholder="" value={fontKey} onChange={font=>set({font})} options={Object.entries(FONTS).map(([k,f])=>[k,f.label||t('st.font.system')])}/>
      <p className="-mt-2 rounded-xl bg-muted p-4 text-sm leading-relaxed">{t('st.font.preview')}</p></Accordion>

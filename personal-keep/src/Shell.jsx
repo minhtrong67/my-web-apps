@@ -1,9 +1,9 @@
 import {lazy,Suspense,useEffect,useMemo,useRef,useState} from 'react'
-import {Cog,LogOut,Menu,Monitor,Moon,Plus,Search,Sun,X} from 'lucide-react'
+import {Cog,LogOut,Menu,Monitor,Moon,PanelLeftClose,PanelLeftOpen,Plus,Search,Sun,X} from 'lucide-react'
 import {signOut} from 'firebase/auth'
 import {auth} from './firebase'
 import {useT} from './i18n'
-import {V0A,V0P,V0R,V0W,useSettings} from './hooks'
+import {V0A,V0P,V0R,V0W,useLocal,useSettings} from './hooks'
 import {DataProvider,useData} from './data'
 import {MODS,MOD_KEYS,normRoute} from './routes'
 import {Confirm,ErrorBoundary,Logo,ScrollTop,Skeleton,UserAvatar} from './ui'
@@ -32,14 +32,17 @@ function Palette({items,onClose}){
     className={`flex h-12 w-full items-center gap-3 rounded-lg px-3 text-left text-sm ${k===i?'bg-secondary text-secondary-foreground':''}`}><I className="size-5 shrink-0"/><span className="flex-1 truncate">{x.label}</span><span className="text-xs opacity-70">{x.hint}</span></button>})}
     {!list.length&&<p className="p-4 text-sm text-muted-foreground">{t('pal.none')}</p>}</div></div></div>}
 
-function SideNav({mod,go,user,rail,onLogout}){
- const {t}=useT(),lbl=rail?'hidden lg:inline':'',pad=rail?'md:justify-center md:px-0 lg:justify-start lg:px-5':''
- return <div className="flex h-full flex-col"><div className={`flex h-20 items-center gap-3 px-6 ${rail?'md:justify-center md:px-0 lg:justify-start lg:px-6':''}`}><Logo className="size-10"/><span className={`text-lg font-semibold tracking-tight ${lbl}`}>Personal Keep</span></div>
-  <nav className="flex-1 space-y-1 px-3 py-2">{NAV.map(([k,I,l])=><button type="button" key={k} title={t(l)} onClick={()=>go(k)} aria-current={mod===k?'page':undefined} className={`nav-item ${pad} ${mod===k?'nav-active':''}`}><I className="size-6 shrink-0"/><span className={lbl}>{t(l)}</span></button>)}</nav>
+// collapsed = thanh bên thu nhỏ (chỉ icon). onToggle chỉ có ở sidebar desktop; menu trượt trên mobile luôn mở rộng.
+function SideNav({mod,go,user,collapsed:c,onToggle,onLogout}){
+ const {t}=useT()
+ return <div className="flex h-full flex-col">
+  <div className={`flex items-center ${c?'flex-col gap-2 pt-5':'h-20 gap-3 px-5'}`}><Logo className="size-10"/>{!c&&<span className="min-w-0 flex-1 truncate text-lg font-semibold tracking-tight">Personal Keep</span>}
+   {onToggle&&<button type="button" aria-label={t(c?'sb.expand':'sb.collapse')} title={t(c?'sb.expand':'sb.collapse')} aria-expanded={!c} onClick={onToggle} className="icon-btn">{c?<PanelLeftOpen className="size-5"/>:<PanelLeftClose className="size-5"/>}</button>}</div>
+  <nav className={`flex-1 space-y-1 px-3 ${c?'pt-3':'py-2'}`}>{NAV.map(([k,I,l])=><button type="button" key={k} title={c?t(l):undefined} aria-label={t(l)} onClick={()=>go(k)} aria-current={mod===k?'page':undefined} className={`nav-item ${c?'mx-auto !w-14 justify-center !px-0':''} ${mod===k?'nav-active':''}`}><I className="size-6 shrink-0"/>{!c&&<span className="truncate">{t(l)}</span>}</button>)}</nav>
   {/* thông tin người dùng ở cuối sidebar: ảnh, họ tên, email và nút đăng xuất */}
-  <div className={`m-3 flex items-center gap-3 rounded-2xl bg-card p-2 ${rail?'md:flex-col md:gap-2 lg:flex-row lg:gap-2.5':'gap-2.5'}`}>
+  <div className={`m-3 flex rounded-2xl bg-card p-2 ${c?'flex-col items-center gap-2':'items-center gap-2.5'}`}>
    <UserAvatar user={user}/>
-   <div className={`min-w-0 flex-1 ${rail?'md:hidden lg:block':''}`}><p className="truncate text-sm font-semibold leading-tight">{user.displayName||user.email?.split('@')[0]}</p><p className="truncate text-[11px] text-muted-foreground">{user.email}</p></div>
+   {!c&&<div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold leading-tight">{user.displayName||user.email?.split('@')[0]}</p><p className="truncate text-[11px] text-muted-foreground">{user.email}</p></div>}
    <button type="button" aria-label={t('st.logout')} title={t('st.logout')} onClick={onLogout} className="icon-btn icon-btn-danger"><LogOut className="size-5"/></button></div></div>}
 
 // Tab con của module đang mở (Dự án / Tài khoản / Thống kê ...), cuộn ngang được trên mobile
@@ -50,7 +53,7 @@ function SubTabs({mod,sub,go}){
 
 function Shell({user}){
  const {t}=useT(),{s,set}=useSettings(),{projects,accounts,websites,prompts}=useData()
- const [[mod,sub],setRoute]=useState(()=>normRoute(s.home).split('/')),[nonce,setNonce]=useState(0),[drawer,setDrawer]=useState(false),[askOut,setAskOut]=useState(false),[outBusy,setOutBusy]=useState(false),[pal,setPal]=useState(false),[pending,setPending]=useState(null)
+ const [[mod,sub],setRoute]=useState(()=>normRoute(s.home).split('/')),[nonce,setNonce]=useState(0),[drawer,setDrawer]=useState(false),[side,setSide]=useLocal('sidebar-collapsed',null),[askOut,setAskOut]=useState(false),[outBusy,setOutBusy]=useState(false),[pal,setPal]=useState(false),[pending,setPending]=useState(null)
  const go=(m,sb,reload)=>{setRoute([m,sb||(m==='settings'?'':MODS[m].subs[0][0])]);setDrawer(false);reload&&setNonce(n=>n+1);scrollTo({top:0,behavior:'instant'})}
  const mi=Math.max(0,MODES.findIndex(m=>m[0]===s.mode)),ModeIcon=MODES[mi][1],nextMode=()=>set({mode:MODES[(mi+1)%3][0]})
  // phím tắt: Ctrl+K tìm nhanh, N thêm mới ở trang hiện tại, / tới ô tìm kiếm (bỏ qua khi đang gõ hoặc đang mở dialog)
@@ -74,8 +77,9 @@ function Shell({user}){
   ...(prompts||[]).map(p=>({label:p.title,hint:t('nav.prompts'),icon:MODS.prompts.icon,run:page('prompts','list','f:prompts',V0R,p.title)}))]},[t,projects,accounts,websites,prompts,s.mode])
  const iconBtn="icon-btn",P={pending,setPending},title=mod==='settings'?t('nav.settings'):t('mod.'+mod)
  const route=`${mod}/${sub}`
- return <div className="md:pl-[5.5rem] lg:pl-72">
-  <aside className="fixed inset-y-0 left-0 z-30 hidden bg-sidebar text-sidebar-foreground md:block md:w-[5.5rem] lg:w-72"><SideNav rail mod={mod} go={go} user={user} onLogout={()=>setAskOut(true)}/></aside>
+ const rail=side===null?innerWidth<1024:side // mặc định: laptop trở lên mở rộng, máy tính bảng thu nhỏ
+ return <div className={`transition-[padding-left] duration-300 [transition-timing-function:var(--ease-emph)] ${rail?'md:pl-[5.5rem]':'md:pl-72'}`}>
+  <aside className={`fixed inset-y-0 left-0 z-30 hidden overflow-hidden bg-sidebar text-sidebar-foreground transition-[width] duration-300 [transition-timing-function:var(--ease-emph)] md:block ${rail?'md:w-[5.5rem]':'md:w-72'}`}><SideNav collapsed={rail} onToggle={()=>setSide(!rail)} mod={mod} go={go} user={user} onLogout={()=>setAskOut(true)}/></aside>
   <header className="sticky top-0 z-30 bg-background/90 backdrop-blur"><div className="mx-auto flex h-16 max-w-[1520px] items-center gap-1 px-3 sm:px-5 lg:px-8">
    <button type="button" aria-label={t('menu.open')} title={t('menu.open')} onClick={()=>setDrawer(true)} className={`${iconBtn} md:hidden`}><Menu className="size-6"/></button>
    <span className="ml-1 flex-1 text-xl font-medium tracking-tight md:ml-0 lg:hidden">{title}</span><span className="hidden flex-1 lg:block"/>

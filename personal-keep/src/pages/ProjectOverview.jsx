@@ -22,8 +22,8 @@ export default function ProjectOverview(){
   <div className="grid min-w-0 gap-4 lg:grid-cols-2 lg:gap-5 2xl:grid-cols-3">
    <Card title={t('s.progress')}><div className="space-y-6"><Meter label={t('status.done')} value={by('done')} total={n} color="var(--chart-4)"/>
     <div className="space-y-4">{STATUS_KEYS.map((k,i)=><Progress key={k} label={t('status.'+k)} value={by(k)} total={n} color={col(i)}/>)}</div></div></Card>
-   <Card title={t('s.byCat')}>{cats.length?<PieChart data={cats}/>:<None/>}</Card>
-   <Card title={t('s.byTool')}>{tools.length?<PieChart data={tools}/>:<None/>}</Card>
-   <Card title={t('s.byAcc')}>{accs.length?<PieChart data={accs}/>:<None/>}</Card>
-   <Card title={t('s.tags')}>{tags.length?<PieChart data={tags} center={tally(list.flatMap(p=>p.tags||[])).length}/>:<None/>}</Card>
+   <Card title={t('s.byCat')}>{cats.length?<PieChart data={cats} caption={t('nav.projects')}/>:<None/>}</Card>
+   <Card title={t('s.byTool')}>{tools.length?<PieChart data={tools} caption={t('d.tools')}/>:<None/>}</Card>
+   <Card title={t('s.byAcc')}>{accs.length?<PieChart data={accs} caption={t('nav.accounts')}/>:<None/>}</Card>
+   <Card title={t('s.tags')}>{tags.length?<PieChart data={tags} caption={t('d.tags')} center={tally(list.flatMap(p=>p.tags||[])).length}/>:<None/>}</Card>
    <Card title={t('s.assigned')}><div className="space-y-6"><Meter label={t('s.assigned')} value={assigned} total={n} color="var(--chart-2)"/><Progress label={t('s.unassigned')} value={n-assigned} total={n} color="var(--chart-5)"/></div></Card></div></>}</StatsFrame>}

@@ -21,10 +21,10 @@ export default function Categories({kind,pending,setPending}){
    :<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
     {cats.map((c,i)=><article key={c.id} style={{animationDelay:`${Math.min(i,10)*30}ms`}} className="card card-hover anim-up flex items-center gap-3 p-4">
      <Cookie className={`cc-${c.color||'indigo'} size-12 text-[var(--cc)]`}><Tag className="size-5 text-white"/></Cookie>
-     <div className="min-w-0 flex-1"><h3 className="truncate font-semibold">{c.name}</h3><p className="text-xs text-muted-foreground">{t('item.nitems',{n:count[c.id]||0})}</p></div>
+     <div className="min-w-0 flex-1"><h3 className="break-words font-semibold">{c.name}</h3><p className="text-xs text-muted-foreground">{t('item.nitems',{n:count[c.id]||0})}</p></div>
      <Acts onEdit={()=>setDlg(c)} onDelete={()=>setAsk(c)}/></article>)}
     {uncat>0&&<article className="flex items-center gap-3 rounded-xl border border-dashed border-border p-4"><Cookie className="size-12 text-muted"><Tag className="size-5 text-muted-foreground"/></Cookie>
-     <div className="min-w-0 flex-1"><h3 className="truncate font-semibold text-muted-foreground">{t('uncat')}</h3><p className="text-xs text-muted-foreground">{t('item.nitems',{n:uncat})}</p></div></article>}</div>}
+     <div className="min-w-0 flex-1"><h3 className="break-words font-semibold text-muted-foreground">{t('uncat')}</h3><p className="text-xs text-muted-foreground">{t('item.nitems',{n:uncat})}</p></div></article>}</div>}
   <Fab onClick={()=>setDlg({})} label={t('dlg.addCategory')}/>
   {dlg&&<CategoryDialog kind={kind} init={dlg.id?dlg:null} onClose={()=>setDlg(null)}/>}
   {ask&&<Confirm title={t('c.title')} message={t('c.delCategory',{name:ask.name,n:count[ask.id]||0})} confirmLabel={t('delete')} busy={busy} onConfirm={del} onClose={()=>setAsk(null)}/>}</>}

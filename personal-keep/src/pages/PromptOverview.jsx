@@ -17,8 +17,8 @@ export default function PromptOverview(){
   <div className="grid grid-cols-2 gap-3 xl:grid-cols-4 lg:gap-4">
    <Stat icon={MessageSquareText} label={t('s.p.total')} value={n}/><Stat icon={Layers} label={t('s.p.cats')} value={pcats.length}/><Stat icon={KeyRound} label={t('s.p.keys')} value={apikeys.length}/><Stat icon={Ruler} label={t('s.p.avg')} value={avg.toLocaleString()}/></div>
   <div className="grid min-w-0 gap-4 lg:grid-cols-2 lg:gap-5 2xl:grid-cols-3">
-   <Card title={t('s.p.byCat')}>{byCat.length?<PieChart data={byCat}/>:<None/>}</Card>
-   <Card title={t('s.p.byProv')}>{prov.length?<PieChart data={prov}/>:<None/>}</Card>
+   <Card title={t('s.p.byCat')}>{byCat.length?<PieChart data={byCat} caption={t('nav.prompts')}/>:<None/>}</Card>
+   <Card title={t('s.p.byProv')}>{prov.length?<PieChart data={prov} caption={t('nav.keys')}/>:<None/>}</Card>
    <Card title={t('s.progress')}><div className="space-y-6"><Meter label={t('s.categorized')} value={categorized} total={n} color="var(--chart-4)"/><Meter label={t('s.tagged')} value={tagged} total={n} color="var(--chart-2)"/></div></Card>
-   <Card title={t('s.p.tags')}>{tags.length?<PieChart data={tags} center={allTags.length}/>:<None/>}</Card>
+   <Card title={t('s.p.tags')}>{tags.length?<PieChart data={tags} center={allTags.length} caption={t('d.tags')}/>:<None/>}</Card>
    <Card title={t('s.p.longest')} className="2xl:col-span-2">{longest.length?<div className="space-y-4">{longest.map(p=><Progress key={p.id} label={p.title} value={len(p)} total={max} hint={t('item.chars',{n:len(p).toLocaleString()})}/>)}</div>:<None/>}</Card></div></>}</StatsFrame>}

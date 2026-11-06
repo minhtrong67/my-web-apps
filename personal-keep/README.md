@@ -46,8 +46,12 @@
 
 ### Dùng chung
 - Tìm kiếm, lọc, sắp xếp, xem dạng lưới / danh sách; bộ lọc được nhớ trong phiên
-- **Nhập / xuất** CSV, JSON, Excel (và PDF, PNG cho báo cáo): nhập lại ghi đè dữ liệu trùng, không tạo bản sao. **API key không bao giờ được xuất**
-- Thẻ item thống nhất cho cả dạng lưới và danh sách (trên laptop trở lên, danh sách là các hàng có cột thẳng hàng); phần dư của nhãn được gộp thành `+n`
+- **Nhập / xuất dữ liệu** chỉ gồm **CSV** và **JSON** (báo cáo thống kê xuất được PNG / PDF): nhập lại ghi đè dữ liệu trùng, không tạo bản sao. **API key không bao giờ được xuất**
+- Dạng lưới: thẻ hiển thị đầy đủ nội dung (không cắt chữ), thông tin dạng "nhãn: giá trị", chỉ dùng badge cho trạng thái / danh mục. Dạng danh sách: **bảng dữ liệu (datatable)** có tiêu đề cột, hover hàng, cột thao tác
+- Bộ lọc dùng dropdown gọn (trạng thái, danh mục, sắp xếp...)
+- Sidebar **thu nhỏ / mở rộng** bằng một nút, ghi nhớ lựa chọn
+- Biểu đồ tròn xếp dọc, có số liệu ở giữa, chú thích đầy đủ, thanh % và dòng tóm tắt; di chuột lên chú thích để làm nổi phần tương ứng
+- Form kiểm tra dữ liệu chặt chẽ: ô lỗi tô đỏ, thông báo ngay dưới ô và toast cảnh báo
 - Command palette `Ctrl + K`, phím tắt `N` (thêm mới) và `/` (tìm kiếm), nút lên đầu trang cuộn mượt, tooltip tuỳ chỉnh cho mọi nút biểu tượng
 - Sidebar có khối người dùng ở cuối: ảnh, họ tên, email và nút đăng xuất (có xác nhận)
 - Hiệu ứng: ripple khi bấm, hình khối co lại khi nhấn, số đếm lên và thanh tiến độ / biểu đồ tròn chạy khi hiện, tôn trọng `prefers-reduced-motion`
@@ -111,7 +115,7 @@ Trước khi triển khai, hãy thay `https://personal-keep.vercel.app` bằng d
 - **Favicon không hiện**: favicon lấy qua dịch vụ của Google theo tên miền; khi offline hoặc tên miền không có favicon, thẻ tự dùng chữ cái đầu.
 
 ## Tech stack
-React 18 · Vite 6 · Tailwind CSS 4 · Firebase (Auth, Firestore) · Lucide Icons · ExcelJS · jsPDF · html-to-image · vite-plugin-pwa
+React 18 · Vite 6 · Tailwind CSS 4 · Firebase (Auth, Firestore) · Lucide Icons · jsPDF · html-to-image · vite-plugin-pwa
 
 ## Scripts
 ```bash
@@ -133,7 +137,7 @@ personal-keep/
 │   ├── Shell.jsx            # điều hướng theo module, tab con, Ctrl+K
 │   ├── routes.js            # khai báo module -> trang con
 │   ├── data.jsx             # Firestore realtime, CRUD, thao tác hàng loạt, nhập upsert
-│   ├── transfer.js · io.js  # chuẩn hoá và xuất / nhập CSV, JSON, XLSX, PDF, PNG
+│   ├── transfer.js · io.js  # chuẩn hoá và xuất / nhập CSV, JSON; xuất báo cáo PNG / PDF
 │   ├── ui.jsx               # Button, Dialog, Confirm, Dropdown, Toast, Tooltip, ScrollTop...
 │   ├── i18n.js · hooks.js   # từ điển vi / en, cài đặt, phông chữ, PWA
 │   ├── theme.css            # 19 bảng màu M3 Expressive (tự sinh)

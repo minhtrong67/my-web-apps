@@ -9,13 +9,27 @@ import {KeyDialog} from '../components/forms'
 
 const mask=k=>k.length<=8?'•'.repeat(k.length):`${k.slice(0,4)}••••••••${k.slice(-4)}`
 
-const Item=memo(function Item({k,view,i,onEdit,onDelete,onCopy}){
- const {t}=useT(),[open,setOpen]=useState(false)
- useEffect(()=>{if(!open)return;const id=setTimeout(()=>setOpen(false),20000);return()=>clearTimeout(id)},[open]) // tự ẩn sau 20 giây
- return <ItemCard view={view} i={i} lead={<Lead icon={KeyRound}/>} title={k.name} sub={k.note||null} badge={<span className="chip">{k.provider==='Other'?t('other'):k.provider}</span>}
-  desc={<code className="block min-w-0 select-all truncate rounded-lg bg-muted px-3 py-2 font-mono text-[13px]">{open?k.key:mask(k.key)}</code>}
-  who={<Btn variant="soft" className="btn-sm" icon={Copy} onClick={()=>onCopy(k)}>{t('copy')}</Btn>}
-  actions={<><button type="button" aria-label={t(open?'hide':'reveal')} title={t(open?'hide':'reveal')} aria-pressed={open} onClick={()=>setOpen(!open)} className="icon-btn">{open?<EyeOff className="size-4"/>:<Eye className="size-4"/>}</button><Acts onEdit={()=>onEdit(k)} onDelete={()=>onDelete(k)}/></>}/>})
+const provName=(k,t)=>k.provider==='Other'?t('other'):k.provider
+// ẩn / hiện key; tự ẩn lại sau 20 giây
+function useReveal(){const [open,setOpen]=useState(false);useEffect(()=>{if(!open)return;const id=setTimeout(()=>setOpen(false),20000);return()=>clearTimeout(id)},[open]);return [open,setOpen]}
+const RevealBtn=({open,setOpen})=>{const {t}=useT();return <button type="button" aria-label={t(open?'hide':'reveal')} title={t(open?'hide':'reveal')} aria-pressed={open} onClick={()=>setOpen(!open)} className="icon-btn">{open?<EyeOff className="size-4"/>:<Eye className="size-4"/>}</button>}
+
+const Item=memo(function Item({k,i,onEdit,onDelete,onCopy}){
+ const {t}=useT(),[open,setOpen]=useReveal()
+ return <ItemCard i={i} lead={<Lead icon={KeyRound}/>} title={k.name} sub={provName(k,t)}
+  who={<Btn variant="soft" className="btn-sm" icon={Copy} onClick={()=>onCopy(k)}>{t('copy')}</Btn>} actions={<><RevealBtn open={open} setOpen={setOpen}/><Acts onEdit={()=>onEdit(k)} onDelete={()=>onDelete(k)}/></>}>
+  <code className="block select-all break-all rounded-lg bg-muted px-3 py-2.5 font-mono text-[13px]">{open?k.key:mask(k.key)}</code>
+  {k.note&&<p className="whitespace-pre-line break-words text-sm text-muted-foreground">{k.note}</p>}</ItemCard>})
+
+function KeyRow({k,onEdit,onDelete,onCopy}){const {t}=useT(),[open,setOpen]=useReveal();return <tr className="border-t border-border transition-colors hover:bg-accent">
+ <td className="px-4 py-3 align-top font-semibold">{k.name}</td><td className="px-4 py-3 align-top">{provName(k,t)}</td>
+ <td className="px-4 py-3 align-top"><code className="break-all font-mono text-[13px]">{open?k.key:mask(k.key)}</code></td>
+ <td className="px-4 py-3 align-top text-muted-foreground">{k.note?<span className="whitespace-pre-line">{k.note}</span>:'-'}</td>
+ <td className="px-3 py-2 align-top"><div className="flex items-center justify-end gap-0.5 whitespace-nowrap"><button type="button" aria-label={t('copy')} title={t('copy')} onClick={()=>onCopy(k)} className="icon-btn"><Copy className="size-4"/></button><RevealBtn open={open} setOpen={setOpen}/><Acts onEdit={()=>onEdit(k)} onDelete={()=>onDelete(k)}/></div></td></tr>}
+function KeyTable({rows,onEdit,onDelete,onCopy}){const {t}=useT()
+ return <div className="card anim-fade overflow-x-auto p-0"><table className="w-full min-w-[780px] border-collapse text-left text-sm"><thead><tr className="bg-muted/60 text-xs font-semibold text-muted-foreground">
+  <th className="px-4 py-3">{t('d.name')}</th><th className="px-4 py-3">{t('d.provider')}</th><th className="min-w-64 px-4 py-3">{t('d.key')}</th><th className="px-4 py-3">{t('d.note')}</th><th className="w-px px-4 py-3"><span className="sr-only">{t('actions')}</span></th></tr></thead>
+  <tbody>{rows.map(k=><KeyRow key={k.id} k={k} onEdit={onEdit} onDelete={onDelete} onCopy={onCopy}/>)}</tbody></table></div>}
 
 // Mini module quản lý API key (nằm trong module Prompt)
 export default function ApiKeys({pending,setPending}){
@@ -33,7 +47,7 @@ export default function ApiKeys({pending,setPending}){
  const used=PROVIDERS.filter(p=>(apikeys||[]).some(k=>k.provider===p))
  const del=async()=>{setBusy(true);try{await removeKey(ask.id);setAsk(null)}catch(e){toast(e.message,'error')}setBusy(false)}
  const copy=async k=>{try{await navigator.clipboard.writeText(k.key);toast(t('keys.copied'))}catch{toast(t('web.copyfail'),'error')}}
- const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3 2xl:grid-cols-4':'flex flex-col gap-3'
+ const grid='grid items-stretch gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3'
  return <>
   <PageHead title={t('nav.keys')} sub={apikeys&&t('keys.count',{n:apikeys.length})} onAdd={()=>setDlg({})} addLabel={t('add')}/>
   <div className="mb-5 flex items-start gap-3 rounded-2xl bg-warn-container p-4 text-sm text-on-warn-container"><TriangleAlert className="mt-0.5 size-5 shrink-0"/><p>{t('keys.warn')}</p></div>
@@ -43,7 +57,8 @@ export default function ApiKeys({pending,setPending}){
   {shown===null?<div className={grid}><CardSkeleton n={3} lines={2}/></div>
    :!apikeys.length?<Empty icon={KeyRound} text={t('keys.empty')} action={<Btn icon={Plus} onClick={()=>setDlg({})}>{t('add')}</Btn>}/>
    :!shown.length?<Empty icon={SearchX} text={t('noresult')}/>
-   :<div className={grid}>{shown.map((k,i)=><Item key={k.id} k={k} i={i} view={view} onEdit={setDlg} onDelete={setAsk} onCopy={copy}/>)}</div>}
+   :view==='list'?<KeyTable rows={shown} onEdit={setDlg} onDelete={setAsk} onCopy={copy}/>
+   :<div className={grid}>{shown.map((k,i)=><Item key={k.id} k={k} i={i} onEdit={setDlg} onDelete={setAsk} onCopy={copy}/>)}</div>}
   <Fab onClick={()=>setDlg({})} label={t('dlg.addKey')}/>
   {dlg&&<KeyDialog init={dlg.id?dlg:null} onClose={()=>setDlg(null)}/>}
   {ask&&<Confirm title={t('c.title')} message={t('c.delKey',{name:ask.name})} confirmLabel={t('delete')} busy={busy} onConfirm={del} onClose={()=>setAsk(null)}/>}</>}

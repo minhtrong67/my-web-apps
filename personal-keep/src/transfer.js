@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import {DICT,STATUS_KEYS,CAT_KEYS,catKey,toolKey,useT,locale} from './i18n'
-import {dl,toCSV,parseCSV,toXLSX,fromXLSX,exportReport} from './io'
+import {dl,toCSV,parseCSV} from './io'
 import {useData,clean,normUrl,EMAIL_RE} from './data'
 import {useToast} from './ui'
 export const COLS={projects:[['name',28],['desc',40],['status',14],['category',16],['tags',24],['tools',24],['accounts',34],['created',14]],accounts:[['name',22],['email',32],['note',36],['count',12],['projects',36]],websites:[['name',28],['category',16],['desc',44],['url',52],['created',14]],prompts:[['title',30],['category',16],['tags',24],['content',80],['created',14]]}
@@ -41,7 +41,7 @@ export function normalize(type,rows){
 export async function readRows(file,type){
  const ext=file.name.split('.').pop().toLowerCase();let rows
  if(ext==='json'){const j=JSON.parse(await file.text());rows=Array.isArray(j)?j:j[type]||j.data||[]}
- else if(ext==='csv')rows=parseCSV(await file.text());else if(ext==='xlsx')rows=await fromXLSX(await file.arrayBuffer());else throw new Error('x.badfile')
+ else if(ext==='csv')rows=parseCSV(await file.text());else throw new Error('x.badfile')
  if(rows.length>400)throw new Error('x.max');return rows}
 export function useTransfer(type,items){
  const {t,lang}=useT(),toast=useToast(),d=useData(),{accMap,projects,webCat,promptCat,importRecords}=d,[busy,setBusy]=useState(false)
@@ -56,11 +56,8 @@ export function useTransfer(type,items){
    :type==='projects'
    ?{name:it.name,desc:it.desc||'',status:t('status.'+it.status),category:t('cat.'+catKey(it.category)),tags:(it.tags||[]).map(x=>'#'+x).join(' '),tools:(it.tools||[]).map(x=>toolKey(x)==='Other'?t('other'):x).join(', '),accounts:(it.userIds||[]).map(i=>accMap[i]?.email).filter(Boolean).join(', '),created:created(it)}
    :{name:it.name||'',email:it.email,note:it.note||'',count:projects.filter(p=>p.userIds?.includes(it.id)).length,projects:projects.filter(p=>p.userIds?.includes(it.id)).map(p=>p.name).join(', ')})
-  const title=t('nav.'+type)
   if(fmt==='csv')dl(new Blob([toCSV(cols,rows)],{type:'text/csv;charset=utf-8'}),name+'.csv')
   else if(fmt==='json')dl(new Blob([JSON.stringify({app:'Personal Keep',type,exportedAt:new Date().toISOString(),data:items.map(it=>rec[type](it,catArg(type,it,d)))},null,2)],{type:'application/json'}),name+'.json')
-  else if(fmt==='xlsx')dl(await toXLSX(cols,rows,title),name+'.xlsx')
-  else await exportReport(fmt,title,cols,rows,name)
   return t('x.exported')})
  const importFile=file=>run(async()=>{
   const {recs,skipped}=normalize(type,await readRows(file,type))

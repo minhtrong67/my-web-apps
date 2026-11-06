@@ -39,11 +39,19 @@ export function Tooltips(){
   setPos({left,top,o:above?'bottom':'top'})},[tip])
  return tip?createPortal(<div ref={box} role="tooltip" style={{left:pos?.left??0,top:pos?.top??0,visibility:pos?'visible':'hidden','--o':pos?.o}} className="anim-pop pointer-events-none fixed z-[95] max-w-64 rounded-lg bg-inverse-surface px-3 py-1.5 text-xs font-medium leading-snug text-inverse-on-surface shadow-lg">{tip.text}</div>,document.body):null}
 
+// Cuộn mượt về đầu trang bằng requestAnimationFrame: luôn mượt dù trình duyệt / hệ điều hành tắt hiệu ứng, tự dừng khi người dùng cuộn tay
+export function smoothTop(){
+ const from=scrollY;if(from<2)return;const root=document.documentElement,dur=Math.min(900,Math.max(450,from*.22)),t0=performance.now();let stop=false
+ const prev=root.style.scrollBehavior;root.style.scrollBehavior='auto'
+ const end=()=>{stop=true;root.style.scrollBehavior=prev;['wheel','touchstart','keydown'].forEach(e=>removeEventListener(e,end))}
+ ;['wheel','touchstart','keydown'].forEach(e=>addEventListener(e,end,{passive:true}))
+ const step=t=>{if(stop)return;const p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,4);scrollTo(0,from*(1-e));p<1?requestAnimationFrame(step):end()}
+ requestAnimationFrame(step)}
 // Nút lên đầu trang: chỉ hiện khi đã cuộn xa, cuộn mượt
 export function ScrollTop(){
  const {t}=useT(),[show,setShow]=useState(false)
  useEffect(()=>{const f=()=>setShow(scrollY>480);f();addEventListener('scroll',f,{passive:true});return()=>removeEventListener('scroll',f)},[])
- return show?<button type="button" aria-label={t('scrollTop')} title={t('scrollTop')} onClick={()=>scrollTo({top:0,behavior:'smooth'})} className="anim-pop fixed bottom-[calc(10rem+env(safe-area-inset-bottom))] right-4 z-20 grid size-12 place-items-center rounded-[16px] bg-secondary text-secondary-foreground shadow-lg transition-[border-radius,transform] duration-300 [transition-timing-function:var(--ease-spring)] hover:shadow-xl active:scale-90 active:rounded-[12px] md:bottom-6 md:right-6 md:size-14"><ArrowUp className="size-6"/></button>:null}
+ return show?<button type="button" aria-label={t('scrollTop')} title={t('scrollTop')} onClick={smoothTop} className="anim-pop fixed bottom-[calc(10rem+env(safe-area-inset-bottom))] right-4 z-20 grid size-12 place-items-center rounded-[16px] bg-secondary text-secondary-foreground shadow-lg transition-[border-radius,transform] duration-300 [transition-timing-function:var(--ease-spring)] hover:shadow-xl active:scale-90 active:rounded-[12px] md:bottom-6 md:right-6 md:size-14"><ArrowUp className="size-6"/></button>:null}
 
 // Checkbox M3 (có trạng thái chọn một phần)
 export const Checkbox=({checked,mixed,onChange,label,className=''})=><button type="button" role="checkbox" aria-checked={mixed?'mixed':!!checked} aria-label={label} title={label} onClick={e=>{e.stopPropagation();onChange(!checked)}} className={`check ${className}`}>{mixed?<Minus className="size-4"/>:checked&&<Check className="size-4"/>}</button>
@@ -53,7 +61,7 @@ export const CatChip=({cat})=>{const {t}=useT();return <span className={`cchip $
 export function Btn({variant='primary',icon:I,loading,disabled,children,className='',...p}){
  return <button type="button" disabled={loading||disabled} className={`btn btn-${variant} ${className}`} {...p}>
   {loading?<Loader2 className="size-4 animate-spin"/>:I&&<I className="size-4"/>}{children}</button>}
-export const Field=({label,children})=><label className="field"><span className="lbl">{label}</span>{children}</label>
+export const Field=({label,error,children})=><label className="field"><span className="lbl">{label}</span>{children}{error&&<span role="alert" className="mt-1 block px-4 text-xs text-destructive">{error}</span>}</label>
 export const Input=({invalid,className='',...p})=><input {...p} aria-invalid={!!invalid} className={`input ${invalid?'input-bad':''} ${className}`}/>
 export const Textarea=({invalid,className='',...p})=><textarea {...p} aria-invalid={!!invalid} className={`input ${invalid?'input-bad':''} ${className}`}/>
 export const Skeleton=({n=3,className='h-32'})=>Array.from({length:n},(_,i)=><div key={i} className={`skeleton ${className}`}/>)
@@ -83,9 +91,9 @@ export function Dialog({title,onClose,footer,full,children}){
 
 // Dropdown render qua portal + position:fixed nên không bao giờ làm dài/xê dịch form.
 // Desktop: popover bám theo ô chọn (tự lật lên nếu thiếu chỗ). Mobile: bottom sheet. multi: chọn nhiều.
-export function Dropdown({label,value,onChange,options,placeholder,multi,compact,className=''}){
+export function Dropdown({label,value,onChange,options,placeholder,multi,compact,allowEmpty,className=''}){
  const {t}=useT(),uid=useId(),[open,setOpen]=useState(false),[pos,setPos]=useState({}),[hi,setHi]=useState(0),btn=useRef(),box=useRef()
- const vals=multi?value:[value],sel=options.filter(o=>o[0]!==''&&vals.includes(o[0]))
+ const vals=multi?value:[value],sel=options.filter(o=>(allowEmpty||o[0]!=='')&&vals.includes(o[0]))
  const text=sel.length?sel[0][1]+(sel.length>1?` +${sel.length-1}`:''):''
  const close=useCallback(()=>{setOpen(false);btn.current?.focus({preventScroll:true})},[])
  const show=()=>{const r=btn.current.getBoundingClientRect(),sheet=matchMedia('(max-width:639px)').matches
@@ -179,20 +187,28 @@ export class ErrorBoundary extends Component{
    <p className="mt-3 break-words rounded-xl bg-black/5 p-3 font-mono text-xs dark:bg-white/10">{String(err?.message||err)}</p>{this.props.hint&&<p className="mt-3 text-sm">{this.props.hint}</p>}
    <div className="mt-4 flex flex-wrap gap-2"><Btn variant="neutral" onClick={()=>this.setState({err:null})}>{this.props.retry}</Btn><Btn onClick={()=>location.reload()}>{this.props.reload}</Btn></div></div>}}
 
-// Thẻ item thống nhất cho mọi danh sách (dự án, tài khoản, trang web, prompt, API key).
-// grid: dọc 4 vùng (đầu / mô tả / nhãn / chân) luôn cao bằng nhau; list: trên laptop trở lên thành một hàng với các cột cố định thẳng hàng.
-export function ItemCard({view,i=0,selected,onClick,select,lead,title,sub,badge,desc,meta,who,actions}){
- const list=view==='list',ORD=['','lg:order-1','lg:order-2','lg:order-3','lg:order-4','lg:order-5','lg:order-6'],o=n=>list?ORD[n]:''
- return <article onClick={onClick} style={{animationDelay:`${Math.min(i,8)*28}ms`}} className={`card card-item card-hover anim-up flex min-w-0 flex-col ${onClick?'cursor-pointer':''} ${selected?'ring-2 ring-primary':''} ${list?'gap-3 p-4 lg:grid lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1.2fr)_minmax(0,1fr)_7.5rem_minmax(0,1.2fr)_auto] lg:items-center lg:gap-x-5 lg:px-5 lg:py-3':'gap-4 p-5'}`}>
-  <div className={`flex items-start gap-3 ${list?'lg:contents':''}`}>
-   <div className={`flex min-w-0 flex-1 items-center gap-3 ${o(1)}`}>{select}{lead}<div className="min-w-0"><h3 className={`font-semibold leading-snug ${list?'truncate':'line-clamp-2 break-words'}`} title={typeof title==='string'?title:undefined}>{title}</h3>{sub&&<p className="truncate text-xs text-muted-foreground">{sub}</p>}</div></div>
-   <div className={`shrink-0 ${list?'lg:order-4 lg:justify-self-start':''}`}>{badge}</div></div>
-  <div className={`min-w-0 ${list?'lg:order-2':desc?'min-h-10':'hidden'}`}>{desc}</div>
-  <div className={`min-w-0 ${o(3)}`}>{meta}</div>
-  <div className={`mt-auto flex items-center gap-2 border-t border-border pt-3 ${list?'lg:contents lg:border-0 lg:pt-0':''}`}>
-   <div className={`min-w-0 flex-1 ${o(5)}`}>{who}</div><div className={`flex shrink-0 items-center gap-0.5 ${o(6)}`} onClick={e=>e.stopPropagation()}>{actions}</div></div></article>}
-// Hàng chip một dòng, không xuống dòng; phần dư gộp thành +n để thẻ luôn gọn
-export const ChipRow=({items,max=3})=>items.length?<div className="flex flex-nowrap items-center gap-1.5 overflow-hidden [&>*]:min-w-0">{items.slice(0,max)}{items.length>max&&<span className="chip !min-w-fit shrink-0">+{items.length-max}</span>}</div>:null
+// Thẻ item thống nhất cho dạng lưới: đầu thẻ (icon, tiêu đề, phụ đề, nhãn trạng thái) / nội dung đầy đủ / chân thẻ (người liên quan + thao tác).
+// Không cắt chữ: tiêu đề, mô tả, email... tự xuống dòng để đọc được đầy đủ.
+export function ItemCard({i=0,selected,onClick,select,lead,title,sub,badge,children,who,actions}){
+ return <article onClick={onClick} style={{animationDelay:`${Math.min(i,8)*28}ms`}} className={`card card-item card-hover anim-up flex min-w-0 flex-col gap-4 p-5 ${onClick?'cursor-pointer':''} ${selected?'ring-2 ring-primary':''}`}>
+  <div className="flex items-start gap-3">{select}{lead}<div className="min-w-0 flex-1"><h3 className="break-words font-semibold leading-snug">{title}</h3>{sub&&<div className="mt-0.5 break-words text-xs text-muted-foreground">{sub}</div>}</div>{badge&&<div className="shrink-0">{badge}</div>}</div>
+  {children}
+  <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-3"><div className="min-w-0 flex-1">{who}</div><div className="flex shrink-0 items-center gap-0.5" onClick={e=>e.stopPropagation()}>{actions}</div></div></article>}
+// Danh sách thông tin dạng "nhãn: giá trị" thay cho hàng loạt chip; giá trị rỗng thì không hiện
+export const Details=({children})=><dl className="space-y-1.5">{children}</dl>
+export const Detail=({label,children})=>children?<div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-x-3 text-sm"><dt className="text-muted-foreground">{label}</dt><dd className="min-w-0 break-words">{children}</dd></div>:null
+// Bảng dữ liệu cho chế độ xem danh sách: tiêu đề cột, hàng có hover, cột thao tác bên phải, chọn nhiều (tuỳ chọn). Cuộn ngang trên màn hình nhỏ.
+export function DataTable({columns,rows,actions,onRowClick,selectable,isSelected,onToggle,onToggleAll,allChecked,someChecked}){
+ const {t}=useT()
+ return <div className="card anim-fade overflow-x-auto p-0"><table className="w-full min-w-[780px] border-collapse text-left text-sm">
+  <thead><tr className="bg-muted/60 text-xs font-semibold text-muted-foreground">
+   {selectable&&<th className="w-12 px-4 py-3"><Checkbox checked={allChecked} mixed={someChecked&&!allChecked} onChange={onToggleAll} label={t('selectAll')}/></th>}
+   {columns.map(c=><th key={c.key} className={`px-4 py-3 font-semibold ${c.className||''}`}>{c.label}</th>)}
+   {actions&&<th className="w-px px-4 py-3 text-right"><span className="sr-only">{t('actions')}</span></th>}</tr></thead>
+  <tbody>{rows.map((r,i)=><tr key={r.id} onClick={onRowClick?()=>onRowClick(r):undefined} className={`border-t border-border transition-colors hover:bg-accent ${onRowClick||selectable?'cursor-pointer':''} ${isSelected?.(r)?'bg-secondary/60':''}`}>
+   {selectable&&<td className="px-4 py-3 align-top"><Checkbox checked={isSelected(r)} onChange={()=>onToggle(r)} label={t('select')}/></td>}
+   {columns.map(c=><td key={c.key} className={`px-4 py-3 align-top ${c.nowrap?'whitespace-nowrap':'break-words'} ${c.className||''}`}>{c.render(r,i)}</td>)}
+   {actions&&<td className="px-3 py-2 align-top" onClick={e=>e.stopPropagation()}><div className="flex items-center justify-end gap-0.5 whitespace-nowrap">{actions(r)}</div></td>}</tr>)}</tbody></table></div>}
 export const Lead=({icon:I,className=''})=><span className={`grid size-11 shrink-0 place-items-center rounded-xl bg-primary-container text-on-primary-container ${className}`}><I className="size-5"/></span>
 
 // Ảnh đại diện Google; không có ảnh hoặc ảnh lỗi thì hiện chữ cái đầu

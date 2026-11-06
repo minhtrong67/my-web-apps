@@ -370,9 +370,14 @@ $$('[data-pop]').forEach(b=>b.onclick=e=>{e.stopPropagation();const p=$('#'+b.da
 addEventListener('click',e=>{if(!e.target.closest('.pop'))closePops()});addEventListener('keydown',e=>{if(e.key==='Escape'){closePops();sheet.classList.remove('open')}})
 // menu mobile
 const sheet=$('#sheet');$('#menu').onclick=()=>sheet.classList.add('open');$$('[data-close]').forEach(b=>b.onclick=()=>sheet.classList.remove('open'))
+// cuộn mượt bằng requestAnimationFrame: luôn mượt kể cả khi trình duyệt / hệ điều hành tắt hiệu ứng, dừng ngay khi người dùng cuộn tay
+let anim=0;function smoothTo(y){const from=scrollY,to=Math.max(0,Math.min(y,document.documentElement.scrollHeight-innerHeight)),dist=to-from;if(Math.abs(dist)<2)return
+ const dur=Math.min(1000,Math.max(450,Math.abs(dist)*.25)),t0=performance.now(),id=++anim,prev=root.style.scrollBehavior;root.style.scrollBehavior='auto'
+ const end=()=>{anim++;root.style.scrollBehavior=prev;['wheel','touchstart','keydown'].forEach(e=>removeEventListener(e,end))};['wheel','touchstart','keydown'].forEach(e=>addEventListener(e,end,{passive:true}))
+ const step=t=>{if(id!==anim)return;const p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,4);scrollTo(0,from+dist*e);p<1?requestAnimationFrame(step):end()};requestAnimationFrame(step)}
 // cuộn mượt khi bấm liên kết (có bù chiều cao thanh điều hướng nhờ scroll-margin-top)
 $$('a[data-go]').forEach(a=>a.addEventListener('click',e=>{const id=a.getAttribute('href'),el=id==='#top'?document.body:$(id);if(!el)return;e.preventDefault();sheet.classList.remove('open')
- if(id==='#top')scrollTo({top:0,behavior:'smooth'});else el.scrollIntoView({behavior:'smooth',block:'start'});history.replaceState(null,'',id==='#top'?location.pathname:id)}))
+ smoothTo(id==='#top'?0:el.getBoundingClientRect().top+scrollY-(parseFloat(getComputedStyle(el).scrollMarginTop)||0));history.replaceState(null,'',id==='#top'?location.pathname:id)}))
 // tab module
 const tabs=$$('[data-tab]'),panes=$$('.pn');function placeInd(){const a=$('[data-tab][aria-selected=true]'),i=$('#ind');if(!a||!i)return;i.style.width=a.offsetWidth+'px';i.style.transform=`translateX(${a.offsetLeft}px)`}
 tabs.forEach(b=>b.onclick=()=>{tabs.forEach(x=>x.setAttribute('aria-selected',x===b));panes.forEach((p,i)=>p.classList.toggle('on',i==b.dataset.tab));placeInd()});addEventListener('resize',placeInd)
@@ -382,7 +387,7 @@ function onScroll(){const h=document.documentElement.scrollHeight-innerHeight;ba
  let cur='';secs.forEach(s=>{if(s.getBoundingClientRect().top<innerHeight*.4)cur=s.id});links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+cur))
  // hiệu ứng thị sai nhẹ cho các khối màu nền
  const y=Math.min(scrollY,900);root.style.setProperty('--py',(y*-.06)+'px');tick=false}
-addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(onScroll)}},{passive:true});topBtn.onclick=()=>scrollTo({top:0,behavior:'smooth'})
+addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(onScroll)}},{passive:true});topBtn.onclick=()=>smoothTo(0)
 addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;root.style.setProperty('--px',((e.clientX/innerWidth-.5)*-28)+'px')},{passive:true})
 // hiện dần + đếm số
 const io=new IntersectionObserver(es=>es.forEach(en=>{if(!en.isIntersecting)return;en.target.classList.add('in');io.unobserve(en.target)}),{threshold:.14,rootMargin:'0px 0px -6% 0px'})

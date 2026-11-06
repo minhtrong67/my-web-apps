@@ -3,17 +3,25 @@ import {Plus,SearchX,Users} from 'lucide-react'
 import {useT} from '../i18n'
 import {useData} from '../data'
 import {useLocal,useSession,V0A} from '../hooks'
-import {Acts,Btn,CardSkeleton,ChipRow,Confirm,Empty,Fab,ItemCard,PageHead,useToast} from '../ui'
+import {Acts,Btn,CardSkeleton,Confirm,DataTable,Detail,Details,Empty,Fab,ItemCard,PageHead,useToast} from '../ui'
 import Toolbar,{Chips} from '../components/Toolbar'
 import {AccountDialog} from '../components/forms'
 
-const Item=memo(function Item({a,projects,view,i,onEdit,onDelete}){
+const Item=memo(function Item({a,projects,i,onEdit,onDelete}){
  const {t}=useT(),projs=(projects||[]).filter(p=>p.userIds?.includes(a.id))
- return <ItemCard view={view} i={i} lead={<span className="avatar !size-11 !text-base !ring-0">{(a.name||a.email)[0]}</span>} title={a.name||a.email} sub={a.name?a.email:null}
-  badge={<span className="badge bg-secondary text-secondary-foreground">{t('item.nprojects',{n:projs.length})}</span>}
-  desc={a.note&&<p className="line-clamp-2 break-words text-sm text-muted-foreground">{a.note}</p>}
-  meta={projs.length?<ChipRow max={2} items={projs.map(p=><span key={p.id} className="chip max-w-36">{p.name}</span>)}/>:<span className="text-xs text-muted-foreground">{t('item.noproj')}</span>}
-  actions={<Acts onEdit={()=>onEdit(a)} onDelete={()=>onDelete(a)}/>}/>})
+ return <ItemCard i={i} lead={<span className="avatar !size-11 !text-base !ring-0">{(a.name||a.email)[0]}</span>} title={a.name||a.email} sub={a.name?<span className="break-all">{a.email}</span>:null}
+  actions={<Acts onEdit={()=>onEdit(a)} onDelete={()=>onDelete(a)}/>}>
+  {a.note&&<p className="whitespace-pre-line break-words text-sm text-muted-foreground">{a.note}</p>}
+  <Details><Detail label={t('d.projects')}>{projs.length?projs.map(p=>p.name).join(', '):<span className="text-muted-foreground">{t('item.noproj')}</span>}</Detail></Details></ItemCard>})
+
+function AccountTable({rows,projects,onEdit,onDelete}){
+ const {t}=useT(),dash=<span className="text-muted-foreground">-</span>
+ const columns=[
+  {key:'name',label:t('d.name'),className:'min-w-40',render:a=>a.name?<span className="font-semibold">{a.name}</span>:dash},
+  {key:'email',label:t('d.email'),className:'min-w-56',render:a=><span className="break-all">{a.email}</span>},
+  {key:'note',label:t('d.note'),className:'min-w-48',render:a=>a.note?<span className="whitespace-pre-line">{a.note}</span>:dash},
+  {key:'projects',label:t('d.projects'),className:'min-w-56',render:a=>{const p=(projects||[]).filter(x=>x.userIds?.includes(a.id));return p.length?p.map(x=>x.name).join(', '):dash}}]
+ return <DataTable columns={columns} rows={rows} actions={a=><Acts onEdit={()=>onEdit(a)} onDelete={()=>onDelete(a)}/>}/>}
 
 export default function Accounts({pending,setPending}){
  const {t}=useT(),toast=useToast(),{projects,accounts,removeAccount}=useData()
@@ -29,7 +37,7 @@ export default function Accounts({pending,setPending}){
  const active=(f.part!=='all')+(f.sort!=='new')
  const tags=[...(f.part!=='all'?[{k:'p',label:t('flt.'+f.part),off:()=>set({part:'all'})}]:[]),...(f.sort!=='new'?[{k:'o',label:t('sort.'+f.sort),off:()=>set({sort:'new'})}]:[])]
  const del=async()=>{setBusy(true);try{await removeAccount(ask.id);setAsk(null)}catch(e){toast(e.message,'error')}setBusy(false)}
- const grid=view==='grid'?'grid gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3 2xl:grid-cols-4':'flex flex-col gap-3'
+ const grid='grid items-stretch gap-4 sm:grid-cols-2 lg:gap-5 xl:grid-cols-3'
  return <>
   <PageHead title={t('nav.accounts')} sub={accounts&&t('accounts.count',{n:accounts.length})} onAdd={()=>setDlg({})} addLabel={t('add')}/>
   <Toolbar ph={t('accounts.search')} q={f.q} setQ={q=>set({q})} count={shown?.length} active={active} clear={()=>setV(V0A)} view={view} setView={setView} tags={tags}>
@@ -38,7 +46,8 @@ export default function Accounts({pending,setPending}){
   {shown===null?<div className={grid}><CardSkeleton n={6} lines={2}/></div>
    :!accounts.length?<Empty icon={Users} text={t('accounts.empty')} action={<Btn icon={Plus} onClick={()=>setDlg({})}>{t('add')}</Btn>}/>
    :!shown.length?<Empty icon={SearchX} text={t('noresult')}/>
-   :<div className={grid}>{shown.map((a,i)=><Item key={a.id} a={a} i={i} view={view} projects={projects} onEdit={setDlg} onDelete={setAsk}/>)}</div>}
+   :view==='list'?<AccountTable rows={shown} projects={projects} onEdit={setDlg} onDelete={setAsk}/>
+   :<div className={grid}>{shown.map((a,i)=><Item key={a.id} a={a} i={i} projects={projects} onEdit={setDlg} onDelete={setAsk}/>)}</div>}
   <Fab onClick={()=>setDlg({})} label={t('dlg.addAccount')}/>
   {dlg&&<AccountDialog init={dlg.id?dlg:null} onClose={()=>setDlg(null)}/>}
   {ask&&<Confirm title={t('c.title')} message={t('c.delAccount',{name:ask.name||ask.email})} confirmLabel={t('delete')} busy={busy} onConfirm={del} onClose={()=>setAsk(null)}/>}</>}
