@@ -52,12 +52,12 @@ Streak Logger là ứng dụng web đề cao quyền riêng tư dành cho ngư�
 
 | Mảng | Nội dung |
 | --- | --- |
-| **Mốc thời gian** | Đếm thời gian đã trôi qua (năm, tháng, ngày, giờ, phút) theo thời gian thực, có nút sao chép nhanh và đếm ngược cho mốc ở tương lai. |
-| **Nhật ký streak** | Thêm và sửa bằng sheet toàn màn hình, xóa có xác nhận, nút nổi (FAB) chỉ xuất hiện ở trang này. Tìm kiếm, sắp xếp, lọc (buổi trong ngày, khoảng ngày), tìm theo cột trên desktop và vuốt thẻ trên mobile (phải để sửa, trái để xóa). |
-| **Thống kê** | Thẻ số liệu nổi bật và **hai biểu đồ tròn** (phân bổ theo thời gian và theo buổi trong ngày) có đủ nhãn và số liệu ngay trên biểu đồ, kèm **thanh tiến độ phần trăm** ngay bên dưới mỗi biểu đồ. Xem theo ngày, tuần, tháng, năm. Xuất báo cáo **PDF chi tiết** hoặc **PNG** gọn (chỉ số liệu và hai biểu đồ tròn). |
+| **Mốc thời gian** | Đếm thời gian đã trôi qua (năm, tháng, ngày, giờ, phút) theo thời gian thực, có nút sao chép nhanh và đếm ngược cho mốc ở tương lai. **Đặt lại** đưa mốc về đúng ngày giờ hiện tại (giữ nguyên tiêu đề và ghi chú), không xóa streak. |
+| **Nhật ký streak** | Thêm và sửa bằng sheet toàn màn hình (ngày và giờ gộp chung một ô), xóa có xác nhận, nút nổi (FAB) chỉ xuất hiện ở trang này. Tìm kiếm, sắp xếp, lọc (buổi trong ngày, khoảng ngày), tìm theo cột trên desktop và vuốt thẻ trên mobile (phải để sửa, trái để xóa). |
+| **Thống kê** | Thẻ số liệu nổi bật và **hai biểu đồ tròn** (phân bổ theo tháng và theo buổi trong ngày) của **năm** đang chọn, mỗi miếng có nhãn gồm tên, số mục và phần trăm, kèm chú thích đầy đủ bên dưới. Xuất báo cáo **PDF chi tiết** hoặc **PNG** gọn (chỉ số liệu và hai biểu đồ tròn). |
 | **Cài đặt** | Chế độ hiển thị, màu chủ đề và font chữ (mục thu gọn được), cỡ chữ, ngôn ngữ, **nhập và xuất nhật ký** (nhập CSV, JSON, Excel; xuất thêm Word, PDF, PNG), cài ứng dụng, khôi phục mặc định, đăng xuất và thẻ tác giả. |
 | **An toàn** | Mọi thao tác sửa và xóa đều qua hộp thoại xác nhận. Dữ liệu được làm sạch và kiểm tra ở client, rồi kiểm tra lại bằng Firestore Rules. |
-| **Dùng ngoại tuyến** | PWA cài được, có banner và toast khi mất mạng hoặc có mạng lại. |
+| **Dùng ngoại tuyến** | PWA cài được, banner ngoại tuyến chỉ hiện khi đang mất mạng. |
 
 ## Hệ thống thiết kế
 

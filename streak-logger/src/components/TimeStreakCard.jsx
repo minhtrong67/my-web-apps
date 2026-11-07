@@ -26,7 +26,7 @@ export default function TimeStreakCard({ streak, onEdit, onReset }) {
             {streak.note && <p className="text-sm text-[var(--md-on-surface-variant)] truncate">{streak.note}</p>}
           </div>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <IconButton tone="primary" icon={Pencil} label={t("common.edit")} onClick={() => onEdit(streak)} />
           <IconButton tone="danger" icon={RotateCcw} label={t("timeStreak.reset")} onClick={() => onReset(streak)} />
         </div>
@@ -43,7 +43,7 @@ export default function TimeStreakCard({ streak, onEdit, onReset }) {
           {parts.isFuture ? t("timeStreak.countdownLabel") : t("timeStreak.elapsed")}
         </p>
         <div className="flex items-center justify-between gap-2">
-          <p className="tabular text-2xl sm:text-3xl font-bold leading-snug">{elapsedStr}</p>
+          <p className="tabular text-xl sm:text-3xl font-bold leading-snug">{elapsedStr}</p>
           <CopyButton text={elapsedStr} label={t("timeStreak.copyElapsed")} className="shrink-0 !text-[var(--md-on-primary-container)]" />
         </div>
       </div>

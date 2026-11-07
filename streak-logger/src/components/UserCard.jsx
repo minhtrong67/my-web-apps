@@ -57,11 +57,11 @@ export default function UserCard({ compact = false }) {
           {user?.displayName && <p className="text-sm text-[var(--md-on-surface-variant)] truncate">{user.email}</p>}
         </div>
         <Button
-          variant="warning"
+          variant="danger"
           icon={LogOut}
           onClick={() => setConfirmOpen(true)}
           aria-label={t('auth.logout')}
-          className="shrink-0"
+          className="shrink-0 w-full"
         >
           {!compact && t('auth.logout')}
         </Button>

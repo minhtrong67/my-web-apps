@@ -11,14 +11,7 @@ export default function PageTitle({ compact = false }) {
   const Icon = item.icon
 
   return (
-    <div key={pathname} className="anim-pop flex items-center gap-3 min-w-0">
-      <span
-        className={`shrink-0 flex items-center justify-center bg-[var(--md-primary-container)] text-[var(--md-on-primary-container)] ${
-          compact ? 'w-9 h-9 rounded-[12px]' : 'w-10 h-10 rounded-[14px]'
-        }`}
-      >
-        <Icon size={compact ? 18 : 20} />
-      </span>
+    <div key={pathname} className="flex items-center gap-3 min-w-0">
       <h2 className={`font-bold tracking-tight text-[var(--md-on-surface)] truncate ${compact ? 'text-lg' : 'text-xl'}`}>
         {t(`nav.${item.key}`)}
       </h2>

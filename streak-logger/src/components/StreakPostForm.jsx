@@ -3,7 +3,7 @@ import { Check, NotebookPen, Save, X } from 'lucide-react'
 import { useLang } from '../context/LangContext'
 import { useToast } from '../context/ToastContext'
 import { LIMITS, cleanLine, cleanMultiline, firstError, validatePost } from '../utils/validation'
-import { dateKey } from '../utils/date'
+import { toDateTimeLocalValue } from '../utils/date'
 import Field from './ui/Field'
 import Input from './ui/Input'
 import Textarea from './ui/Textarea'
@@ -13,12 +13,6 @@ import ConfirmDialog from './ui/ConfirmDialog'
 
 const FORM_ID = 'streak-post-form'
 
-const pad = (n) => String(n).padStart(2, '0')
-const nowTimeStr = () => {
-  const d = new Date()
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
-
 /**
  * Form thêm / sửa nhật ký streak. Nhiều trường (thời lượng, ngày, giờ, mô tả dài) nên
  * dùng sheet toàn màn hình. Khi sửa phải qua hộp thoại xác nhận cập nhật.
@@ -27,8 +21,7 @@ export default function StreakPostForm({ open, onClose, onSubmit, initial }) {
   const { t } = useLang()
   const toast = useToast()
   const [duration, setDuration] = useState('')
-  const [date, setDate] = useState('')
-  const [time, setTime] = useState('')
+  const [dateTime, setDateTime] = useState('')
   const [description, setDescription] = useState('')
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
@@ -39,8 +32,7 @@ export default function StreakPostForm({ open, onClose, onSubmit, initial }) {
   useEffect(() => {
     if (!open) return
     setDuration(initial?.duration || '')
-    setDate(initial?.post_date || dateKey(new Date()))
-    setTime(initial?.post_time?.slice(0, 5) || nowTimeStr())
+    setDateTime(initial?.post_date ? `${initial.post_date}T${(initial.post_time || '00:00').slice(0, 5)}` : toDateTimeLocalValue(new Date()))
     setDescription(initial?.description || '')
     setErrors({})
     setConfirmOpen(false)
@@ -59,6 +51,8 @@ export default function StreakPostForm({ open, onClose, onSubmit, initial }) {
 
   const handleSubmit = async (e) => {
     e?.preventDefault()
+    // Một ô ngày giờ duy nhất, tách lại thành ngày và giờ để lưu và kiểm tra.
+    const [date = '', time = ''] = dateTime.split('T')
     const { values, errors: nextErrors } = validatePost({ duration, post_date: date, post_time: time, description })
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length) {
@@ -112,14 +106,16 @@ export default function StreakPostForm({ open, onClose, onSubmit, initial }) {
               autoFocus
             />
           </Field>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3">
-            <Field label={t('streakPost.fieldDate')} required error={errors.date}>
-              <Input type="date" value={date} min="1900-01-01" max="2100-12-31" aria-invalid={!!errors.date} onChange={(e) => setDate(e.target.value)} />
-            </Field>
-            <Field label={t('streakPost.fieldTime')} required error={errors.time}>
-              <Input type="time" value={time} aria-invalid={!!errors.time} onChange={(e) => setTime(e.target.value)} />
-            </Field>
-          </div>
+          <Field label={t('streakPost.fieldDateTime')} required error={errors.date || errors.time}>
+            <Input
+              type="datetime-local"
+              value={dateTime}
+              min="1900-01-01T00:00"
+              max="2100-12-31T23:59"
+              aria-invalid={!!(errors.date || errors.time)}
+              onChange={(e) => setDateTime(e.target.value)}
+            />
+          </Field>
           <Field label={`${t('streakPost.fieldDescription')} (${t('common.optional')})`} error={errors.description}>
             <Textarea
               value={description}

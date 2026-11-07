@@ -104,6 +104,8 @@
   .btn-danger-soft{@apply text-destructive hover:bg-destructive/10}
   /* chip danh mục có màu: nền pha 20% màu gốc, chữ pha 55%, đúng cả sáng lẫn tối */
   .cchip{@apply inline-flex max-w-full items-center gap-1.5 truncate rounded-lg px-2.5 py-1 text-xs font-medium;background:color-mix(in oklab,var(--cc,var(--md-outline)) 20%,var(--md-surface-container-highest));color:color-mix(in oklab,var(--cc,var(--md-outline)) 55%,var(--md-on-surface))}
+  /* ô nhập khoá / token: che ký tự bằng dấu chấm (Chrome, Edge, Safari) */
+  .secret{-webkit-text-security:disc;text-security:disc}
   .cc-indigo{--cc:#6366f1}.cc-violet{--cc:#8b5cf6}.cc-sky{--cc:#0ea5e9}.cc-teal{--cc:#14b8a6}.cc-emerald{--cc:#10b981}.cc-amber{--cc:#f59e0b}.cc-orange{--cc:#f97316}.cc-rose{--cc:#f43f5e}
   .check{@apply grid size-6 shrink-0 place-items-center rounded-md border-2 border-input text-primary-foreground transition-[background-color,border-color,transform] duration-200;}
   .check[aria-checked=true],.check[aria-checked=mixed]{@apply border-primary bg-primary}

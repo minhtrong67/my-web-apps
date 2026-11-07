@@ -1,12 +1,12 @@
 import {useMemo,useState} from 'react'
 import {Eye,EyeOff,X} from 'lucide-react'
-import {useT,STATUS_KEYS,CAT_KEYS,TOOLS,CAT_COLORS,PROVIDERS,catKey,toolKey} from '../i18n'
+import {useT,STATUS_KEYS,CAT_KEYS,TOOLS,CAT_COLORS,PROVIDERS,KINDS,catKey,toolKey} from '../i18n'
+import {TECHS,TechIcon,TechList,ServiceIcon,stackOf} from '../techs'
 import {useData,clean,normUrl,urlKey,EMAIL_RE} from '../data'
 import {useLocal} from '../hooks'
 import {Dialog,Dropdown,Field,FormButtons,Input,Textarea,useSaveFlow,useToast} from '../ui'
 
 const TAG_RE=/^[\p{L}\p{N}._+-]{1,30}$/u
-const SUGGEST=['react','vite','tailwind','firebase','typescript','nodejs','nextjs','python','tauri','supabase']
 export function TagInput({tags,setTags,toast,suggest}){
  const {t}=useT(),[v,setV]=useState(''),list=suggest.filter(s=>!tags.includes(s)).slice(0,10)
  const add=raw=>{const next=[...tags]
@@ -35,20 +35,19 @@ function useForm({init,name,run,onClose}){
  return {t,toast,busy,bad,setBad,errOf,flow,footer:<FormButtons busy={busy} edit={!!init} onClose={onClose} onSave={flow.go}/>}}
 
 export function ProjectDialog({init,onClose}){
- const {projects,accounts,saveProject}=useData(),[recent,setRecent]=useLocal('recent-tags',[])
- const [f,setF]=useState({name:init?.name||'',desc:init?.desc||'',status:init?.status||'active',category:catKey(init?.category||'web'),tools:(init?.tools||[]).map(toolKey),userIds:(init?.userIds||[]).filter(id=>(accounts||[]).some(a=>a.id===id))})
- const [tags,setTags]=useState(init?.tags||[])
- // gợi ý: hashtag dùng gần đây -> hashtag đã có trong các dự án -> gợi ý mặc định
- const suggest=useMemo(()=>[...new Set([...recent,...(projects||[]).flatMap(p=>p.tags||[]),...SUGGEST])],[recent,projects])
- const {t,toast,bad,setBad,errOf,flow,footer}=useForm({init,name:init?.name,onClose,run:{
+ const {projects,accounts,saveProject}=useData()
+ const [f,setF]=useState({name:init?.name||'',desc:init?.desc||'',status:init?.status||'active',category:catKey(init?.category||'web'),tools:(init?.tools||[]).map(toolKey),userIds:(init?.userIds||[]).filter(id=>(accounts||[]).some(a=>a.id===id)),stack:init?stackOf(init):[]})
+ // danh sách công nghệ có logo; công nghệ cũ không nằm trong danh mục (dữ liệu hashtag trước đây) vẫn giữ được để bỏ chọn / giữ lại
+ const stackOptions=useMemo(()=>[...TECHS.map(x=>[x.key,x.name,<TechIcon key={x.key} k={x.key}/>]).sort((a,b)=>a[1].localeCompare(b[1])),...f.stack.filter(k=>!TECHS.some(x=>x.key===k)).map(k=>[k,k,<TechIcon key={k} k={k}/>])],[f.stack])
+ const {t,bad,setBad,errOf,flow,footer}=useForm({init,name:init?.name,onClose,run:{
   check:fail=>{const name=clean(f.name),desc=f.desc.trim()
    if(!name)return fail('name','e.name.req');if(name.length<2||name.length>80)return fail('name','e.name.len')
    if((projects||[]).some(p=>p.id!==init?.id&&p.name.toLowerCase()===name.toLowerCase()))return fail('name','e.name.dup')
    if(desc.length>500)return fail('desc','e.desc.len')
    if(!STATUS_KEYS.includes(f.status)||!CAT_KEYS.includes(f.category))return fail('','e.status.bad')
-   if(f.tools.length>10)return fail('','e.tools.max');if(f.userIds.length>20)return fail('','e.accounts.max')
-   return {name,desc,status:f.status,category:f.category,tools:f.tools,tags,userIds:f.userIds}},
-  save:async d=>{await saveProject(d,init?.id);setRecent([...new Set([...tags,...recent])].slice(0,30))}}})
+   if(f.tools.length>10)return fail('','e.tools.max');if(f.userIds.length>20)return fail('','e.accounts.max');if(f.stack.length>15)return fail('','e.stack.max')
+   return {name,desc,status:f.status,category:f.category,tools:f.tools,stack:f.stack,userIds:f.userIds}},
+  save:d=>saveProject(d,init?.id)}})
  return <Dialog full title={t(init?'dlg.editProject':'dlg.addProject')} onClose={onClose} footer={footer}>
   <Field error={errOf('name')} label={t('f.pname')}><Input autoFocus invalid={bad==='name'} value={f.name} maxLength={120} placeholder={t('f.pname.ph')} onChange={e=>{setBad('');setF({...f,name:e.target.value})}} onKeyDown={e=>e.key==='Enter'&&flow.go()}/></Field>
   <Field error={errOf('desc')} label={t('f.desc')}><Textarea rows={3} invalid={bad==='desc'} value={f.desc} placeholder={t('f.desc.ph')} onChange={e=>{setBad('');setF({...f,desc:e.target.value})}}/>{counter(f.desc.length,500)}</Field>
@@ -58,7 +57,7 @@ export function ProjectDialog({init,onClose}){
    <Dropdown multi label={t('f.tools')} placeholder={t('f.tools.ph')} value={f.tools} onChange={tools=>setF({...f,tools})} options={TOOLS.map(x=>[x,x==='Other'?t('other'):x])}/>
    <Dropdown multi label={t('f.accounts')} placeholder={t('f.accounts.ph')} value={f.userIds} onChange={userIds=>setF({...f,userIds})} options={(accounts||[]).map(a=>[a.id,a.name?`${a.name} · ${a.email}`:a.email])}/></div>
   {!accounts?.length&&<p className="-mt-3 mb-4 px-4 text-xs text-muted-foreground">{t('f.accounts.empty')}</p>}
-  <TagInput tags={tags} setTags={setTags} toast={toast} suggest={suggest}/>{flow.node}</Dialog>}
+  <Dropdown multi searchable label={t('f.stack')} placeholder={t('f.stack.ph')} value={f.stack} onChange={stack=>setF({...f,stack})} options={stackOptions} renderValue={sel=><TechList stack={sel.map(o=>o[0])}/>}/>{flow.node}</Dialog>}
 
 export function AccountDialog({init,onClose}){
  const {accounts,saveAccount}=useData()
@@ -127,18 +126,20 @@ export function PromptDialog({init,onClose}){
 
 export function KeyDialog({init,onClose}){
  const {apikeys,saveKey}=useData(),[show,setShow]=useState(false)
- const [f,setF]=useState({name:init?.name||'',provider:init?.provider||'OpenAI',key:init?.key||'',note:init?.note||''})
+ const [f,setF]=useState({name:init?.name||'',provider:init?.provider||'GitHub',kind:init?.kind||'token',key:init?.key||'',note:init?.note||''})
  const {t,bad,setBad,errOf,flow,footer}=useForm({init,name:init?.name,onClose,run:{
   check:fail=>{const name=clean(f.name),key=f.key.trim(),note=f.note.trim()
    if(!name)return fail('name','e.kname.req');if(name.length>60)return fail('name','e.kname.len')
    if(!f.provider)return fail('','e.provider.req')
-   if(!key)return fail('key','e.key.req');if(key.length>500||/\s/.test(key))return fail('key','e.key.len')
+   if(!key)return fail('key','e.key.req');if(key.length>5000)return fail('key','e.key.len')
    if((apikeys||[]).some(k=>k.id!==init?.id&&k.key===key))return fail('key','e.key.dup')
    if(note.length>200)return fail('note','e.note.len')
-   return {name,provider:f.provider,key,note}},save:d=>saveKey(d,init?.id)}})
+   return {name,provider:f.provider,kind:f.kind,key,note}},save:d=>saveKey(d,init?.id)}})
  return <Dialog title={t(init?'dlg.editKey':'dlg.addKey')} onClose={onClose} footer={footer}>
   <Field error={errOf('name')} label={t('f.kname')}><Input autoFocus invalid={bad==='name'} value={f.name} maxLength={80} placeholder={t('f.kname.ph')} onChange={e=>{setBad('');setF({...f,name:e.target.value})}}/></Field>
-  <Dropdown label={t('f.provider')} value={f.provider} onChange={provider=>setF({...f,provider})} options={PROVIDERS.map(p=>[p,p==='Other'?t('other'):p])}/>
-  <Field error={errOf('key')} label={t('f.key')}><div className="relative"><Input type={show?'text':'password'} autoComplete="off" spellCheck={false} invalid={bad==='key'} value={f.key} maxLength={520} className="pr-12 font-mono" placeholder={t('f.key.ph')} onChange={e=>{setBad('');setF({...f,key:e.target.value})}} onKeyDown={e=>e.key==='Enter'&&flow.go()}/>
-   <button type="button" aria-label={t(show?'hide':'reveal')} title={t(show?'hide':'reveal')} onClick={()=>setShow(!show)} className="icon-btn absolute right-2 top-1/2 -translate-y-1/2">{show?<EyeOff className="size-5"/>:<Eye className="size-5"/>}</button></div></Field>
+  <div className="grid gap-x-4 sm:grid-cols-2">
+   <Dropdown searchable label={t('f.provider')} value={f.provider} onChange={provider=>setF({...f,provider})} options={PROVIDERS.map(p=>[p,p==='Other'?t('other'):p,<ServiceIcon key={p} name={p}/>])}/>
+   <Dropdown label={t('f.kind')} value={f.kind} onChange={kind=>setF({...f,kind})} options={KINDS.map(k=>[k,t('kind.'+k)])}/></div>
+  <Field error={errOf('key')} label={t('f.key')}><div className="relative"><Textarea rows={3} autoComplete="off" spellCheck={false} invalid={bad==='key'} value={f.key} className={`pr-12 font-mono text-[13px] ${show?'':'secret'}`} placeholder={t('f.key.ph')} onChange={e=>{setBad('');setF({...f,key:e.target.value})}}/>
+   <button type="button" aria-label={t(show?'hide':'reveal')} title={t(show?'hide':'reveal')} onClick={()=>setShow(!show)} className="icon-btn absolute right-2 top-2">{show?<EyeOff className="size-5"/>:<Eye className="size-5"/>}</button></div>{counter(f.key.length,5000)}</Field>
   <Field error={errOf('note')} label={t('f.knote')}><Textarea rows={2} invalid={bad==='note'} value={f.note} placeholder={t('f.knote.ph')} onChange={e=>{setBad('');setF({...f,note:e.target.value})}}/></Field>{flow.node}</Dialog>}

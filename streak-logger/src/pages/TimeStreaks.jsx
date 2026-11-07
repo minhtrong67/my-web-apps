@@ -14,7 +14,7 @@ import { SkeletonCard } from "../components/ui/Skeleton";
 export default function TimeStreaks() {
   const { t } = useLang();
   const toast = useToast();
-  const { streak, loading, error, save, remove } = useTimeStreak();
+  const { streak, loading, error, save } = useTimeStreak();
 
   const [formOpen, setFormOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
@@ -29,10 +29,11 @@ export default function TimeStreaks() {
     }
   };
 
+  /** Đặt lại: đưa mốc về đúng thời điểm hiện tại (ngày và giờ bây giờ), giữ nguyên tiêu đề và ghi chú. */
   const handleReset = async () => {
     try {
-      await remove();
-      toast.success(t("toast.deleted"));
+      await save({ start_at: new Date().toISOString() });
+      toast.success(t("timeStreak.resetDone"));
     } catch (err) {
       toast.error(t("toast.error"));
       throw err;
@@ -44,17 +45,6 @@ export default function TimeStreaks() {
       <PageHeader
         title={t("timeStreak.title")}
         subtitle={t("timeStreak.subtitle")}
-        actions={
-          streak && (
-            <Button
-              icon={Pencil}
-              variant="primary"
-              onClick={() => setFormOpen(true)}
-            >
-              {t("common.edit")}
-            </Button>
-          )
-        }
       />
 
       {loading && <SkeletonCard className="max-w-xl" />}
@@ -98,6 +88,7 @@ export default function TimeStreaks() {
         body={t("timeStreak.resetBody")}
         confirmLabel={t("timeStreak.reset")}
         confirmIcon={RotateCcw}
+        tone="warning"
       />
     </div>
   );

@@ -27,7 +27,7 @@
 ## Module và tính năng
 
 ### Dự án
-- **Dự án**: tên, mô tả, trạng thái (Đang làm / Tạm dừng / Hoàn thành / Huỷ), danh mục, hashtag, công cụ AI vibe code, gán nhiều tài khoản
+- **Dự án**: tên, mô tả, trạng thái (Đang làm / Tạm dừng / Hoàn thành / Huỷ), danh mục, **công nghệ (tech stack)** chọn từ dropdown có tìm kiếm và hiển thị kèm **logo** (hơn 120 công nghệ: React, Vite, Tailwind, Firebase, Tauri...), công cụ AI vibe code, gán nhiều tài khoản. Dự án cũ dùng hashtag vẫn hiển thị bình thường
 - **Chọn hàng loạt**: chọn tất cả hoặc từng dự án để **cập nhật trạng thái** hay **xoá** trong một lần (có hộp thoại xác nhận)
 - **Tài khoản**: tên, email Google, ghi chú; xem tài khoản đang tham gia dự án nào
 - **Thống kê** riêng (luôn tính toàn bộ dữ liệu, không bộ lọc): thẻ số liệu, biểu đồ tròn theo danh mục, công cụ, tài khoản, hashtag và thanh tiến độ %
@@ -41,12 +41,12 @@
 ### Prompt
 - **Prompt**: tiêu đề, danh mục, hashtag, nội dung dài (tối đa 10.000 ký tự), xem nhanh và **sao chép một chạm**
 - **Danh mục** tự tạo như module Trang web
-- **API Key** (mini module): nhà cung cấp, tên gợi nhớ, ghi chú; key được che mờ, hiện khi cần và tự ẩn sau 20 giây
+- **Khoá & token** (mini module): lưu API key, GitHub / Vercel token, Firebase key, cấu hình JSON / env... theo **dịch vụ** (có logo) và **loại**; giá trị nhiều dòng được hỗ trợ, che mờ mặc định, hiện khi cần và tự ẩn sau 20 giây
 - **Thống kê** riêng: theo danh mục, nhà cung cấp, hashtag, prompt dài nhất
 
 ### Dùng chung
 - Tìm kiếm, lọc, sắp xếp, xem dạng lưới / danh sách; bộ lọc được nhớ trong phiên
-- **Nhập / xuất dữ liệu** chỉ gồm **CSV** và **JSON** (báo cáo thống kê xuất được PNG / PDF): nhập lại ghi đè dữ liệu trùng, không tạo bản sao. **API key không bao giờ được xuất**
+- **Nhập / xuất dữ liệu** chỉ gồm **CSV** và **JSON** (báo cáo thống kê xuất được PNG / PDF): nhập lại ghi đè dữ liệu trùng, không tạo bản sao. **Khoá và token không bao giờ được xuất**
 - Dạng lưới: thẻ hiển thị đầy đủ nội dung (không cắt chữ), thông tin dạng "nhãn: giá trị", chỉ dùng badge cho trạng thái / danh mục. Dạng danh sách: **bảng dữ liệu (datatable)** có tiêu đề cột, hover hàng, cột thao tác
 - Bộ lọc dùng dropdown gọn (trạng thái, danh mục, sắp xếp...)
 - Sidebar **thu nhỏ / mở rộng** bằng một nút, ghi nhớ lựa chọn
@@ -98,9 +98,11 @@ service cloud.firestore {
 ```
 
 ### Dữ liệu trên Firestore
+Ngày hiển thị theo định dạng `dd/mm/yyyy`.
+
 `users/{uid}/` gồm các collection: `projects`, `accounts`, `websites`, `wcategories`, `prompts`, `pcategories`, `apikeys`. Danh mục mặc định được tạo tự động ở lần đầu mở module tương ứng. Dữ liệu từ bản Project Tracker cũ (dự án, tài khoản, trang web) dùng tiếp được, không cần di chuyển.
 
-> **Về bảo mật API key**: key được lưu trong Firestore của chính bạn và chỉ tài khoản của bạn đọc được theo rules ở trên, nhưng **không mã hoá đầu cuối**. Đừng lưu key quyền cao hoặc key production.
+> **Về bảo mật khoá & token**: giá trị được lưu trong Firestore của chính bạn và chỉ tài khoản của bạn đọc được theo rules ở trên, nhưng **không mã hoá đầu cuối**. Đừng lưu thông tin quyền cao hoặc dùng cho production.
 
 ## Thiết kế
 **Material 3 Expressive**: bảng màu tông sinh bằng `@material/material-color-utilities` cho 19 màu chủ đề (mỗi màu có bản sáng và tối, file `src/theme.css`), bo góc lớn, nút viên thuốc co góc khi nhấn (shape morph), hình cookie 9 thuỳ cho logo và icon, chip lọc, navigation bar có chỉ báo viên thuốc, text field outlined có nhãn nổi, slider dày, chuyển động có độ nảy. Mọi màu đi qua token CSS nên đổi màu chủ đề là đổi cả app.
@@ -115,7 +117,7 @@ Trước khi triển khai, hãy thay `https://personal-keep.vercel.app` bằng d
 - **Favicon không hiện**: favicon lấy qua dịch vụ của Google theo tên miền; khi offline hoặc tên miền không có favicon, thẻ tự dùng chữ cái đầu.
 
 ## Tech stack
-React 18 · Vite 6 · Tailwind CSS 4 · Firebase (Auth, Firestore) · Lucide Icons · jsPDF · html-to-image · vite-plugin-pwa
+React 18 · Vite 6 · Tailwind CSS 4 · Firebase (Auth, Firestore) · Lucide Icons · simple-icons (logo công nghệ) · jsPDF · html-to-image · vite-plugin-pwa
 
 ## Scripts
 ```bash
@@ -141,6 +143,7 @@ personal-keep/
 │   ├── ui.jsx               # Button, Dialog, Confirm, Dropdown, Toast, Tooltip, ScrollTop...
 │   ├── i18n.js · hooks.js   # từ điển vi / en, cài đặt, phông chữ, PWA
 │   ├── theme.css            # 19 bảng màu M3 Expressive (tự sinh)
+│   ├── techs.jsx            # danh mục công nghệ / dịch vụ kèm logo (simple-icons)
 │   ├── accents.js           # danh sách 19 màu, cỡ chữ
 │   └── index.css            # token và component
 ├── .env.example

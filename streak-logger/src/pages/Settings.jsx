@@ -124,11 +124,10 @@ function ColorSwatch({ option, active, label, onSelect }) {
     >
       <span
         style={{ backgroundColor: option.hex }}
-        className={`flex items-center justify-center w-12 h-12 transition-all duration-500 ease-[var(--ease-spring)] ${
-          active
+        className={`flex items-center justify-center w-12 h-12 transition-all duration-500 ease-[var(--ease-spring)] ${active
             ? "rounded-[16px] scale-105 ring-4 ring-offset-2 ring-offset-[var(--md-surface-container-low)] ring-[var(--md-on-surface)]"
             : "rounded-full group-hover:rounded-[16px]"
-        }`}
+          }`}
       >
         {active && (
           <Check
@@ -139,11 +138,10 @@ function ColorSwatch({ option, active, label, onSelect }) {
         )}
       </span>
       <span
-        className={`text-[11px] leading-tight text-center line-clamp-2 ${
-          active
+        className={`text-[11px] leading-tight text-center line-clamp-2 ${active
             ? "font-bold text-[var(--md-on-surface)]"
             : "text-[var(--md-on-surface-variant)]"
-        }`}
+          }`}
       >
         {label}
       </span>
@@ -159,11 +157,10 @@ function FontRow({ option, active, name, sample, onSelect }) {
       role="radio"
       aria-checked={active}
       onClick={() => onSelect(option.key)}
-      className={`m3-ripple w-full flex items-center gap-3 px-5 py-3 text-left transition-[border-radius,background-color,color] duration-300 ease-[var(--ease-spring)] ${
-        active
+      className={`m3-ripple w-full flex items-center gap-3 px-5 py-3 text-left transition-[border-radius,background-color,color] duration-300 ease-[var(--ease-spring)] ${active
           ? "rounded-[24px] bg-[var(--md-primary-container)] text-[var(--md-on-primary-container)]"
           : "rounded-[14px] bg-[var(--md-surface-container-highest)] text-[var(--md-on-surface)]"
-      }`}
+        }`}
     >
       <span className="min-w-0 flex-1" style={{ fontFamily: option.stack }}>
         <span className="block text-base font-bold truncate">{name}</span>
@@ -278,10 +275,10 @@ export default function Settings() {
             exportedAt: new Date().toISOString(),
             timeStreak: streak
               ? {
-                  title: streak.title,
-                  start_at: streak.start_at,
-                  note: streak.note || null,
-                }
+                title: streak.title,
+                start_at: streak.start_at,
+                note: streak.note || null,
+              }
               : null,
             streakPosts: sorted.map(toPlainPost),
           },
@@ -343,7 +340,7 @@ export default function Settings() {
         subtitle={t("settings.subtitle")}
         actions={
           <Button
-            variant="warning"
+            variant="danger"
             className="w-full"
             icon={RotateCcw}
             onClick={() => setResetOpen(true)}

@@ -1,14 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { WifiOff } from 'lucide-react'
 import { useLang } from '../context/LangContext'
-import { useToast } from '../context/ToastContext'
 
-/** Banner ngoại tuyến, kèm toast cảnh báo khi mất mạng và toast thành công khi có mạng trở lại. */
+/** Banner ngoại tuyến: chỉ hiện khi mất mạng, tự ẩn khi có mạng lại (không dùng toast). */
 export default function OfflineBanner() {
   const { t } = useLang()
-  const toast = useToast()
   const [online, setOnline] = useState(navigator.onLine)
-  const first = useRef(true)
 
   useEffect(() => {
     const goOnline = () => setOnline(true)
@@ -20,17 +17,6 @@ export default function OfflineBanner() {
       window.removeEventListener('offline', goOffline)
     }
   }, [])
-
-  // Bỏ qua lần chạy đầu tiên để không báo khi vừa mở ứng dụng.
-  useEffect(() => {
-    if (first.current) {
-      first.current = false
-      return
-    }
-    if (online) toast.success(t('toast.online'))
-    else toast.warning(t('toast.offline'))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [online])
 
   if (online) return null
 

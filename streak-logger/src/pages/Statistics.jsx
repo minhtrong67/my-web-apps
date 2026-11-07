@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts'
 import { Clock, NotebookText, CalendarDays, TrendingUp, Sun, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useLang } from '../context/LangContext'
@@ -8,14 +8,13 @@ import { useStreakPosts } from '../hooks/useStreakPosts'
 import { useNow } from '../hooks/useNow'
 import { computeElapsedParts } from '../utils/date'
 import { PERIOD_HEX } from '../utils/period'
-import { RANGES, buildMetrics, buildPeriodCounts, buildPeriodSlices, buildSeries, buildTimeSlices, filterPostsInRange, getRange } from '../utils/stats'
+import { buildMetrics, buildPeriodCounts, buildPeriodSlices, buildSeries, buildTimeSlices, filterPostsInRange, getRange } from '../utils/stats'
 import { POST_COLUMNS } from '../utils/postExport'
 import { timestampSuffix } from '../utils/exportData'
 import PageHeader from '../components/ui/PageHeader'
 import ExportMenu from '../components/ExportMenu'
 import EmptyState from '../components/ui/EmptyState'
 import { SkeletonStatCard } from '../components/ui/Skeleton'
-import Segmented from '../components/ui/Segmented'
 import IconButton from '../components/ui/IconButton'
 
 /** Thẻ số liệu: nền phẳng, viền mảnh, số liệu là điểm nhấn duy nhất. */
@@ -62,9 +61,9 @@ const tooltipProps = {
 
 const fmtPercent = (p) => `${Number.isInteger(p) ? p : p.toFixed(1)}%`
 
-/** Nhãn đầy đủ ngoài mỗi miếng: dòng 1 là tên, dòng 2 là số mục và phần trăm. Miếng quá nhỏ (<4%) chỉ hiện ở danh sách bên dưới. */
+/** Nhãn đầy đủ ngoài mỗi miếng: dòng 1 là tên, dòng 2 là số mục và phần trăm. */
 function renderPieLabel({ cx, cy, midAngle, outerRadius, payload }) {
-  if (!payload || payload.percent < 4) return null
+  if (!payload) return null
   const RAD = Math.PI / 180
   const cos = Math.cos(-midAngle * RAD)
   const sin = Math.sin(-midAngle * RAD)
@@ -82,51 +81,27 @@ function renderPieLabel({ cx, cy, midAngle, outerRadius, payload }) {
   )
 }
 
-/** Thanh tiến độ phần trăm cho từng miếng, nằm ngay dưới biểu đồ tròn; thanh chạy từ 0 tới giá trị khi hiện ra. */
-function ProgressList({ slices }) {
+/** Chú thích (legend) đầy đủ của biểu đồ tròn: mỗi miếng có chấm màu, tên, số mục và phần trăm. */
+function PieLegend({ slices }) {
   const { t } = useLang()
-  const [ready, setReady] = useState(false)
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setReady(true))
-    return () => cancelAnimationFrame(id)
-  }, [])
-
   return (
-    <div className="mt-5 pt-4 border-t border-[var(--md-outline-variant)]">
-      <p className="text-xs font-semibold text-[var(--md-on-surface-variant)] mb-3">{t('stats.share')}</p>
-      <ul className="flex flex-col gap-3.5 max-h-80 overflow-y-auto overscroll-contain-y pr-2">
-        {slices.map((s) => (
-          <li key={s.key}>
-            <div className="flex items-center justify-between gap-3 text-sm mb-1.5">
-              <span className="flex items-center gap-2 min-w-0">
-                <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
-                <span className="font-semibold text-[var(--md-on-surface)] truncate">{s.name}</span>
-              </span>
-              <span className="tabular text-xs text-[var(--md-on-surface-variant)] shrink-0">
-                {s.count} {t('stats.entries')} · <span className="font-bold text-[var(--md-on-surface)]">{fmtPercent(s.percent)}</span>
-              </span>
-            </div>
-            <div
-              role="progressbar"
-              aria-valuenow={s.percent}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label={`${s.name}: ${fmtPercent(s.percent)}`}
-              className="h-2.5 rounded-full bg-[var(--md-surface-container-highest)] overflow-hidden"
-            >
-              <div
-                className="h-full rounded-full transition-[width] duration-[900ms] ease-[var(--ease-emphasized-decel)]"
-                style={{ width: ready ? `${s.percent}%` : '0%', backgroundColor: s.color }}
-              />
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="mt-2 pt-4 border-t border-[var(--md-outline-variant)] grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
+      {slices.map((s) => (
+        <li key={s.key} className="flex items-center justify-between gap-3 text-sm">
+          <span className="flex items-center gap-2 min-w-0">
+            <span className="w-3.5 h-3.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+            <span className="font-semibold text-[var(--md-on-surface)] truncate">{s.name}</span>
+          </span>
+          <span className="tabular text-xs text-[var(--md-on-surface-variant)] shrink-0">
+            {s.count} {t('stats.entries')} · <span className="font-bold text-[var(--md-on-surface)]">{fmtPercent(s.percent)}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
   )
 }
 
-/** Thẻ biểu đồ tròn + danh sách thanh phần trăm. */
+/** Thẻ biểu đồ tròn: nhãn đầy đủ trên từng miếng và chú thích bên dưới. */
 function PieCard({ title, slices, emptyText }) {
   return (
     <ChartCard title={title}>
@@ -134,9 +109,9 @@ function PieCard({ title, slices, emptyText }) {
         <p className="text-sm text-[var(--md-on-surface-variant)] py-16 text-center">{emptyText}</p>
       ) : (
         <>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart margin={{ top: 16, right: 16, bottom: 16, left: 16 }}>
-              <Pie data={slices} dataKey="count" nameKey="name" outerRadius="62%" paddingAngle={slices.length > 1 ? 1.5 : 0} label={renderPieLabel} labelLine={false} isAnimationActive animationDuration={700}>
+          <ResponsiveContainer width="100%" height={340}>
+            <PieChart margin={{ top: 24, right: 24, bottom: 24, left: 24 }}>
+              <Pie data={slices} dataKey="count" nameKey="name" outerRadius="58%" minAngle={8} paddingAngle={slices.length > 1 ? 1.5 : 0} label={renderPieLabel} labelLine={false} isAnimationActive animationDuration={700}>
                 {slices.map((s) => (
                   <Cell key={s.key} fill={s.color} stroke="var(--md-surface-container-low)" strokeWidth={3} />
                 ))}
@@ -144,7 +119,7 @@ function PieCard({ title, slices, emptyText }) {
               <Tooltip {...tooltipProps} formatter={(value, _name, item) => [`${value} (${fmtPercent(item.payload.percent)})`, item.payload.name]} />
             </PieChart>
           </ResponsiveContainer>
-          <ProgressList slices={slices} />
+          <PieLegend slices={slices} />
         </>
       )}
     </ChartCard>
@@ -157,7 +132,8 @@ export default function Statistics() {
   const now = useNow(60000)
   const { streak, loading: streakLoading } = useTimeStreak()
   const { items: posts, loading: postsLoading } = useStreakPosts()
-  const [rangeKey, setRangeKey] = useState('month') // mặc định theo tháng
+  // Chỉ thống kê theo năm; offset 0 là năm hiện tại, -1 là năm trước...
+  const rangeKey = 'year'
   const [offset, setOffset] = useState(0)
 
   const range = useMemo(() => getRange(rangeKey, now, offset), [rangeKey, now, offset])
@@ -170,14 +146,8 @@ export default function Statistics() {
 
   const loading = streakLoading || postsLoading
   const hasData = !!streak || posts.length > 0
-  const rangeLabels = { day: t('stats.byDay'), week: t('stats.byWeek'), month: t('stats.byMonth'), year: t('stats.byYear') }
   const timeSlices = useMemo(() => buildTimeSlices(series, range), [series, range])
   const periodSlices = useMemo(() => buildPeriodSlices(periodCounts, PERIOD_HEX), [periodCounts])
-
-  const changeRange = (key) => {
-    setRangeKey(key)
-    setOffset(0)
-  }
 
   /** Xuất báo cáo: PDF chi tiết (kèm bảng nhật ký) hoặc PNG gọn (chỉ số liệu và hai biểu đồ tròn). */
   const handleExportReport = async (format) => {
@@ -241,15 +211,8 @@ export default function Statistics() {
         <EmptyState icon={NotebookText} title={t('stats.noData')} />
       ) : (
         <div className="flex flex-col gap-4 sm:gap-5">
-          {/* Chọn mức thống kê và chuyển kỳ */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <Segmented
-              className="w-full sm:w-auto sm:min-w-[22rem]"
-              ariaLabel={t('stats.title')}
-              value={rangeKey}
-              onChange={changeRange}
-              options={RANGES.map((g) => ({ value: g, label: rangeLabels[g] }))}
-            />
+          {/* Chuyển năm */}
+          <div className="flex items-center justify-center sm:justify-end">
             <div className="flex items-center justify-between sm:justify-end gap-2">
               <IconButton tone="neutral" icon={ChevronLeft} label={t('stats.prev')} onClick={() => setOffset((o) => o - 1)} />
               <button
@@ -274,7 +237,7 @@ export default function Statistics() {
             </div>
           </div>
 
-          {/* Hai biểu đồ tròn, mỗi biểu đồ kèm chú thích đầy đủ và thanh phần trăm bên dưới */}
+          {/* Hai biểu đồ tròn, mỗi biểu đồ có nhãn đầy đủ trên miếng và chú thích bên dưới */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 items-start">
             <PieCard title={`${t('stats.pieOverTime')} (${range.label})`} slices={timeSlices} emptyText={t('stats.noDataInRange')} />
             <PieCard title={t('stats.pieByPeriod')} slices={periodSlices} emptyText={t('stats.noDataInRange')} />

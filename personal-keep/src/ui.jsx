@@ -1,6 +1,6 @@
 import {Component,createContext,useCallback,useContext,useEffect,useId,useLayoutEffect,useRef,useState} from 'react'
 import {createPortal} from 'react-dom'
-import {AlertCircle,ArrowUp,Bookmark,Check,CheckCircle2,ChevronDown,Info,Loader2,Minus,Pencil,Plus,Save,Trash2,TriangleAlert,X,Download} from 'lucide-react'
+import {AlertCircle,ArrowUp,Bookmark,Check,CheckCircle2,ChevronDown,Info,Loader2,Minus,Pencil,Plus,Save,Search,Trash2,TriangleAlert,X,Download} from 'lucide-react'
 import {useT} from './i18n'
 
 let locks=0
@@ -91,46 +91,52 @@ export function Dialog({title,onClose,footer,full,children}){
 
 // Dropdown render qua portal + position:fixed nên không bao giờ làm dài/xê dịch form.
 // Desktop: popover bám theo ô chọn (tự lật lên nếu thiếu chỗ). Mobile: bottom sheet. multi: chọn nhiều.
-export function Dropdown({label,value,onChange,options,placeholder,multi,compact,allowEmpty,className=''}){
- const {t}=useT(),uid=useId(),[open,setOpen]=useState(false),[pos,setPos]=useState({}),[hi,setHi]=useState(0),btn=useRef(),box=useRef()
+// Dropdown tự dựng (không dùng <select>): hỗ trợ chọn một / nhiều, bàn phím, tìm kiếm (searchable), icon cho từng mục (phần tử thứ 3 của option)
+// và hiển thị giá trị tuỳ biến (renderValue). Danh sách có chiều cao tối đa và cuộn được; trên điện thoại mở dạng bottom sheet.
+export function Dropdown({label,value,onChange,options,placeholder,multi,compact,allowEmpty,searchable,renderValue,className=''}){
+ const {t}=useT(),uid=useId(),[open,setOpen]=useState(false),[pos,setPos]=useState({}),[hi,setHi]=useState(0),[q,setQ]=useState(''),btn=useRef(),box=useRef(),inp=useRef()
  const vals=multi?value:[value],sel=options.filter(o=>(allowEmpty||o[0]!=='')&&vals.includes(o[0]))
+ const fo=q.trim()?options.filter(o=>String(o[1]).toLowerCase().includes(q.trim().toLowerCase())):options
  const text=sel.length?sel[0][1]+(sel.length>1?` +${sel.length-1}`:''):''
  const close=useCallback(()=>{setOpen(false);btn.current?.focus({preventScroll:true})},[])
  const show=()=>{const r=btn.current.getBoundingClientRect(),sheet=matchMedia('(max-width:639px)').matches
-  const below=innerHeight-r.bottom-12,above=r.top-12,up=below<220&&above>below,room=Math.max(up?above:below,140)
-  setPos(sheet?{sheet:true}:{left:r.left,width:r.width,up,maxHeight:Math.min(288,room),[up?'bottom':'top']:up?innerHeight-r.top+6:r.bottom+6})
-  setHi(Math.max(0,options.findIndex(o=>vals.includes(o[0]))));setOpen(true)}
+  const below=innerHeight-r.bottom-12,above=r.top-12,up=below<240&&above>below,room=Math.max(up?above:below,160)
+  setPos(sheet?{sheet:true}:{left:r.left,width:r.width,up,maxHeight:Math.min(searchable?340:288,room),[up?'bottom':'top']:up?innerHeight-r.top+6:r.bottom+6})
+  setQ('');setHi(Math.max(0,options.findIndex(o=>vals.includes(o[0]))));setOpen(true)}
  const pick=k=>{if(multi)onChange(vals.includes(k)?vals.filter(x=>x!==k):[...vals,k]);else{onChange(k);close()}}
  useScrollLock(open)
  useEffect(()=>{if(!open)return;let w=innerWidth
   const k=e=>{if(e.key==='Escape'){e.stopPropagation();close()}},r=()=>{if(innerWidth!==w)setOpen(false)}
-  addEventListener('keydown',k,true);addEventListener('resize',r);box.current?.focus({preventScroll:true})
-  return()=>{removeEventListener('keydown',k,true);removeEventListener('resize',r)}},[open,close])
+  addEventListener('keydown',k,true);addEventListener('resize',r);(searchable?inp:box).current?.focus({preventScroll:true})
+  return()=>{removeEventListener('keydown',k,true);removeEventListener('resize',r)}},[open,close,searchable])
  useEffect(()=>{if(open)box.current?.querySelector('[data-hi=true]')?.scrollIntoView({block:'nearest'})},[open,hi])
- const kd=e=>{const n=options.length,go=i=>{e.preventDefault();setHi(i)}
-  if(e.key==='ArrowDown')go((hi+1)%n);else if(e.key==='ArrowUp')go((hi+n-1)%n);else if(e.key==='Home')go(0);else if(e.key==='End')go(n-1)
-  else if(e.key==='Enter'||e.key===' '){e.preventDefault();options[hi]&&pick(options[hi][0])}else if(e.key==='Tab')setOpen(false)}
- const list=<ul ref={box} role="listbox" aria-multiselectable={multi||undefined} aria-label={label||placeholder} tabIndex={-1} onKeyDown={kd}
-  style={pos.sheet?undefined:{left:pos.left,width:pos.width,top:pos.top,bottom:pos.bottom,maxHeight:pos.maxHeight,'--o':pos.up?'bottom':'top'}}
-  className={pos.sheet?'min-h-0 flex-1 overflow-auto overscroll-contain px-3 py-2 outline-none':'anim-pop fixed overflow-auto overscroll-contain rounded-xl bg-popover p-2 text-popover-foreground shadow-lg outline-none ring-1 ring-black/5 dark:ring-white/10'}>
-  {options.map(([k,l],i)=>{const on=vals.includes(k)
+ const kd=e=>{const n=fo.length,go=i=>{e.preventDefault();setHi(i)}
+  if(!n){if(e.key==='Tab')setOpen(false);return}
+  if(e.key==='ArrowDown')go((hi+1)%n);else if(e.key==='ArrowUp')go((hi+n-1)%n);else if(e.key==='Home'&&!searchable)go(0);else if(e.key==='End'&&!searchable)go(n-1)
+  else if(e.key==='Enter'||(e.key===' '&&!searchable)){e.preventDefault();fo[hi]&&pick(fo[hi][0])}else if(e.key==='Tab')setOpen(false)}
+ const search=searchable&&<div className="relative shrink-0 px-1 pb-2 pt-1"><Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-[60%] text-muted-foreground"/>
+  <input ref={inp} value={q} onChange={e=>{setQ(e.target.value);setHi(0)}} onKeyDown={kd} placeholder={t('dd.search')} aria-label={t('search.title')} autoComplete="off" spellCheck={false} className="h-10 w-full rounded-full bg-muted pl-9 pr-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary"/></div>
+ const ul=<ul ref={box} role="listbox" aria-multiselectable={multi||undefined} aria-label={label||placeholder} tabIndex={-1} onKeyDown={kd} className={`min-h-0 flex-1 overflow-auto overscroll-contain outline-none ${pos.sheet?'px-3 py-2':''}`}>
+  {fo.map(([k,l,ic],i)=>{const on=vals.includes(k)
    return <li key={k||'none'} role="option" aria-selected={on} data-hi={i===hi} onMouseEnter={()=>setHi(i)} onClick={()=>pick(k)}
     className={`flex cursor-pointer items-center justify-between gap-2 rounded-lg px-3 text-sm transition-colors ${pos.sheet?'min-h-12 text-base':'min-h-11'} ${on?'bg-secondary font-medium text-secondary-foreground':i===hi?'bg-accent':''}`}>
-    <span className="truncate">{l}</span>{on&&<Check className="size-4 shrink-0"/>}</li>})}</ul>
+    <span className="flex min-w-0 items-center gap-2.5">{ic}<span className="truncate">{l}</span></span>{on&&<Check className="size-4 shrink-0"/>}</li>})}
+  {!fo.length&&<li className="px-3 py-6 text-center text-sm text-muted-foreground">{t('dd.none')}</li>}</ul>
  return <div className={compact?className:`field up ${className}`}>
   {label&&<span id={uid+'l'} className="lbl">{label}</span>}
-  <button ref={btn} type="button" aria-haspopup="listbox" aria-expanded={open} aria-labelledby={label?`${uid}l ${uid}`:undefined} onClick={()=>open?close():show()} className={`input flex items-center justify-between gap-2 text-left ${compact?'h-10 rounded-full pl-4':''}`}>
-   <span id={uid} className={`truncate ${text?'':'text-muted-foreground'}`}>{text||placeholder}</span>
+  <button ref={btn} type="button" aria-haspopup="listbox" aria-expanded={open} aria-labelledby={label?`${uid}l ${uid}`:undefined} onClick={()=>open?close():show()} className={`input flex items-center justify-between gap-2 text-left ${compact?'h-10 rounded-full pl-4':''} ${renderValue&&sel.length?'h-auto min-h-14 py-2.5':''}`}>
+   {renderValue&&sel.length?<span id={uid} className="min-w-0 flex-1">{renderValue(sel)}</span>:<span id={uid} className={`truncate ${text?'':'text-muted-foreground'}`}>{text||placeholder}</span>}
    <ChevronDown className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${open?'rotate-180':''}`}/></button>
   {open&&createPortal(pos.sheet
    ?<div className="fixed inset-0 z-[80]"><div className="anim-fade absolute inset-0 bg-black/55 backdrop-blur-[3px]" onClick={close}/>
-     <div className="anim-sheet absolute inset-x-0 bottom-0 flex max-h-[75dvh] flex-col rounded-t-2xl bg-popover text-popover-foreground shadow-xl">
+     <div className="anim-sheet absolute inset-x-0 bottom-0 flex max-h-[80dvh] flex-col rounded-t-2xl bg-popover text-popover-foreground shadow-xl">
       <div className="mx-auto mt-3 h-1 w-8 shrink-0 rounded-full bg-muted-foreground/40"/>
       <div className="flex shrink-0 items-center justify-between gap-3 px-4 pb-1 pt-2"><span className="truncate text-base font-semibold">{label||placeholder}</span>
        <button type="button" aria-label={t('close')} onClick={close} className="icon-btn -mr-2"><X className="size-5"/></button></div>
-      {list}
+      <div className="px-3">{search}</div>{ul}
       <div className="shrink-0 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2">{multi&&<Btn className="w-full" onClick={close}>{t('done')}</Btn>}</div></div></div>
-   :<div className="fixed inset-0 z-[80]" onMouseDown={e=>e.target===e.currentTarget&&close()}>{list}</div>,document.body)}</div>}
+   :<div className="fixed inset-0 z-[80]" onMouseDown={e=>e.target===e.currentTarget&&close()}>
+     <div style={{left:pos.left,width:pos.width,top:pos.top,bottom:pos.bottom,maxHeight:pos.maxHeight,'--o':pos.up?'bottom':'top'}} className="anim-pop fixed flex flex-col overflow-hidden rounded-xl bg-popover p-2 text-popover-foreground shadow-lg ring-1 ring-black/5 dark:ring-white/10">{search}{ul}</div></div>,document.body)}</div>}
 
 // Confirm: nút Huỷ (xám, icon X) + nút hành động có màu theo ngữ cảnh: xoá = đỏ, cập nhật / xác nhận = màu chủ đề
 export function Confirm({title,message,confirmLabel,busy,onConfirm,onClose,danger=true,icon}){

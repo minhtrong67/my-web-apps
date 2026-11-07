@@ -3,7 +3,7 @@ import { downloadBlob, drawPdfFooters, drawPdfHeader, formatStamp } from './expo
 import { translate } from '../i18n'
 
 /**
- * Báo cáo thống kê: xuất PDF chi tiết (thẻ số liệu, 2 biểu đồ tròn kèm chú thích và thanh phần trăm,
+ * Báo cáo thống kê: xuất PDF chi tiết (thẻ số liệu, 2 biểu đồ tròn kèm chú thích đầy đủ,
  * bảng nhật ký) hoặc ảnh PNG gọn (chỉ thẻ số liệu và 2 biểu đồ tròn).
  * Biểu đồ được vẽ trực tiếp (vector trong PDF, canvas trong PNG) và dùng font Unicode
  * nên không lỗi chữ tiếng Việt.
@@ -60,11 +60,11 @@ function drawSlice(doc, cx, cy, r, startAngle, endAngle, color) {
   doc.lines(vectors, points[0][0], points[0][1], [1, 1], 'FD', true)
 }
 
-/** Biểu đồ tròn kèm chú thích (nhãn, số mục, %) và thanh phần trăm. Trả về toạ độ y ngay dưới khối. */
+/** Biểu đồ tròn kèm chú thích đầy đủ (nhãn, số mục, %). Trả về toạ độ y ngay dưới khối. */
 function drawPieSection(doc, title, slices, y) {
   const pageH = doc.internal.pageSize.getHeight()
   const pageW = doc.internal.pageSize.getWidth()
-  const rowH = 24
+  const rowH = 18
   const columns = slices.length > 8 ? 2 : 1
   const rowsPerCol = Math.ceil(slices.length / columns)
   const r = 64
@@ -112,7 +112,7 @@ function drawPieSection(doc, title, slices, y) {
     const row = i % rowsPerCol
     const x = legendX + col * colW
     const ly = top + 10 + row * rowH
-    const barW = colW - 14
+    const textRight = x + colW - 14
     doc.setFillColor(s.color)
     doc.circle(x + 4, ly - 3, 3.5, 'F')
     doc.setFont(PDF_FONT, 'bold')
@@ -121,11 +121,7 @@ function drawPieSection(doc, title, slices, y) {
     doc.text(s.name, x + 14, ly)
     doc.setFont(PDF_FONT, 'normal')
     doc.setTextColor('#52525B')
-    doc.text(entryText(s), x + barW, ly, { align: 'right' })
-    doc.setFillColor('#E4E4E7')
-    doc.roundedRect(x + 14, ly + 3.5, barW - 14, 4, 2, 2, 'F')
-    doc.setFillColor(s.color)
-    doc.roundedRect(x + 14, ly + 3.5, Math.max(3, ((barW - 14) * s.percent) / 100), 4, 2, 2, 'F')
+    doc.text(entryText(s), textRight, ly, { align: 'right' })
   })
   return top + height + 16
 }
@@ -191,9 +187,9 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath()
 }
 
-/** Vẽ một bảng biểu đồ tròn (tiêu đề, hình tròn có % trên miếng, chú thích và thanh %) vào vùng [x, x + w]. Trả về y cuối. */
+/** Vẽ một bảng biểu đồ tròn (tiêu đề, hình tròn có % trên miếng, chú thích  vào vùng [x, x + w]. Trả về y cuối. */
 function paintPiePanel(ctx, title, slices, x, y, w) {
-  const rowH = 34
+  const rowH = 30
   const r = 120
   const innerPad = 24
   const legendH = slices.length * rowH
@@ -253,17 +249,11 @@ function paintPiePanel(ctx, title, slices, x, y, w) {
     ctx.fillStyle = '#18181B'
     ctx.font = `700 15px ${CANVAS_FONT}`
     ctx.textAlign = 'left'
-    ctx.fillText(s.name, left + 20, ly - 5)
+    ctx.fillText(s.name, left + 20, ly)
     ctx.fillStyle = '#52525B'
     ctx.font = `14px ${CANVAS_FONT}`
     ctx.textAlign = 'right'
-    ctx.fillText(entryText(s), right, ly - 5)
-    ctx.fillStyle = '#E4E4E7'
-    roundRect(ctx, left + 20, ly + 6, right - left - 20, 6, 3)
-    ctx.fill()
-    ctx.fillStyle = s.color
-    roundRect(ctx, left + 20, ly + 6, Math.max(6, ((right - left - 20) * s.percent) / 100), 6, 3)
-    ctx.fill()
+    ctx.fillText(entryText(s), right, ly)
     ly += rowH
   })
   ctx.textAlign = 'left'
@@ -279,7 +269,7 @@ export async function exportStatsPng({ rangeKey, rangeLabel, cards, timeSlices, 
   const GAP = 20
   const panelW = (W - PAD * 2 - GAP) / 2
   const rowsMax = Math.max(timeSlices.length, periodSlices.length, 1)
-  const H = HEADER_H + 24 + CARD_H + 28 + (24 * 2 + 40 + 240 + 28 + Math.max(rowsMax * 34, 40)) + PAD
+  const H = HEADER_H + 24 + CARD_H + 28 + (24 * 2 + 40 + 240 + 28 + Math.max(rowsMax * 30, 40)) + PAD
   const scale = H * 2 <= 16000 ? 2 : 1
 
   const canvas = document.createElement('canvas')

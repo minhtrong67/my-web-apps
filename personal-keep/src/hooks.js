@@ -12,7 +12,7 @@ export const V0P={q:'',status:'all',cat:'',sort:'new'}
 export const V0A={q:'',part:'all',sort:'new'}
 export const V0W={q:'',cat:'',sort:'new'}
 export const V0R={q:'',cat:'',sort:'new'}
-export const V0K={q:'',prov:'',sort:'new'}
+export const V0K={q:'',prov:'',kind:'',sort:'new'}
 export const DEF={mode:'system',lang:'vi',fs:16,accent:'indigo',font:'system',home:'projects/list'}
 export const SettingsCtx=createContext()
 export const useSettings=()=>useContext(SettingsCtx)

@@ -52,12 +52,12 @@ Streak Logger is a privacy-first web app for people who build habits. Sign in wi
 
 | Area | What you get |
 | --- | --- |
-| **Time Streak** | Live elapsed time (years, months, days, hours, minutes) since a milestone, with one-tap copy buttons and a countdown for future milestones. |
-| **Streak Journal** | Add and edit entries in full-screen sheets, delete with confirmation, and a floating action button (FAB) that only appears on this page. Search, sort and filter (time of day, date range), per-column search on desktop and swipe gestures on mobile (right to edit, left to delete). |
-| **Statistics** | Highlight cards and **two pie charts** (distribution over time and by time of day) with full labels and values on the chart, plus **percentage progress bars** right below each pie. Views by day, week, month or year. Export a **detailed PDF** report or a compact **PNG** (figures and the two pie charts only). |
+| **Time Streak** | Live elapsed time (years, months, days, hours, minutes) since a milestone, with one-tap copy buttons and a countdown for future milestones. **Reset** moves the milestone to the current date and time (title and note are kept), it never deletes the streak. |
+| **Streak Journal** | Add and edit entries in full-screen sheets (date and time share a single field), delete with confirmation, and a floating action button (FAB) that only appears on this page. Search, sort and filter (time of day, date range), per-column search on desktop and swipe gestures on mobile (right to edit, left to delete). |
+| **Statistics** | Highlight cards and **two pie charts** (distribution by month and by time of day) for the selected **year**, with a name, count and percentage label on every slice and a full legend below each chart. Export a **detailed PDF** report or a compact **PNG** (figures and the two pie charts only). |
 | **Settings** | Display mode, theme color and font (collapsible sections), text size, language, **import and export of the journal** (CSV, JSON, Excel; export also Word, PDF, PNG), install prompt, reset to defaults, sign out and the author card. |
 | **Safety** | Every edit and delete goes through a confirmation dialog. Input is trimmed and validated on the client and again by Firestore Rules. |
-| **Offline friendly** | Installable PWA, offline banner and toasts when the connection drops or returns. |
+| **Offline friendly** | Installable PWA with an offline banner that appears only while the connection is down. |
 
 ## Design system
 

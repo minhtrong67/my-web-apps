@@ -1,3 +1,4 @@
+import {fmtDate} from './i18n'
 // Màu theo theme hiện tại (CSS variable dạng hex) để file xuất khớp màu chủ đề của app
 const token=(n,d)=>{const v=getComputedStyle(document.documentElement).getPropertyValue(n).trim();return /^#[0-9a-f]{6}$/i.test(v)?v:d}
 export const dl=(blob,name)=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
@@ -29,7 +30,7 @@ export async function exportReport(kind,title,cols,rows,name){
  const el=document.createElement('div')
  el.style.cssText='position:fixed;left:-99999px;top:0;width:1000px;padding:40px;background:#fff;color:#0a0a0a;font-family:system-ui,sans-serif'
  const pc=token('--md-primary','#4f52ba'),th=`background:${pc};color:${token('--md-on-primary','#fff')};text-align:left;padding:10px;font-weight:600`
- el.innerHTML=`<h1 style="margin:0 0 4px;font-size:28px;color:${pc}">${esc(title)}</h1><p style="margin:0 0 20px;color:#737373;font-size:13px">Personal Keep · ${new Date().toLocaleString(document.documentElement.lang==='en'?'en-US':'vi-VN')} · ${rows.length} mục</p>
+ el.innerHTML=`<h1 style="margin:0 0 4px;font-size:28px;color:${pc}">${esc(title)}</h1><p style="margin:0 0 20px;color:#737373;font-size:13px">Personal Keep · ${fmtDate(new Date())} · ${rows.length} mục</p>
 <table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>${cols.map(c=>`<th style="${th}">${esc(c[1])}</th>`).join('')}</tr></thead>
 <tbody>${rows.map((r,i)=>`<tr style="background:${i%2?'#fafafa':'#fff'}">${cols.map(c=>`<td style="padding:9px 10px;border-bottom:1px solid #e5e5e5;vertical-align:top">${esc(r[c[0]])}</td>`).join('')}</tr>`).join('')}</tbody></table>
 <p style="margin-top:24px;font-size:11px;color:#737373">minhtrong67 · Claude</p>`
