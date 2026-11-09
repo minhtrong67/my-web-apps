@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#E91E63" />
+    <meta name="description" content="Umamusume Roster - browse every Umamusume: Pretty Derby character." />
+    <title>Umamusume Roster</title>
+    <script>
+      try {
+        var s = JSON.parse(localStorage.getItem('uma.settings.v1') || '{}');
+        var m = s.mode || 'system';
+        if (m === 'dark' || (m === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+        var p = JSON.parse(localStorage.getItem('uma.paint') || 'null');
+        if (p) { document.documentElement.style.setProperty('--p', p.p); document.documentElement.style.setProperty('--on-p', p.on); }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

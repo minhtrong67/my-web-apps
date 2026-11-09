@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --font: system-ui, sans-serif; }
+.dark { --bg: 11 11 13; --surface: 24 24 28; --fg: 242 242 242; --muted: 150 150 160; --line: 48 48 56; color-scheme: dark; }
+.light { --bg: 238 238 240; --surface: 255 255 255; --fg: 17 17 20; --muted: 104 104 116; --line: 214 214 220; color-scheme: light; }
+
+html { font-size: var(--fs, 16px); }
+body { @apply bg-bg text-fg font-app antialiased; min-height: 100dvh; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: repeating-linear-gradient(135deg, rgb(var(--fg) / .035) 0 2px, transparent 2px 14px); }
+.card { content-visibility: auto; }
+
+/* ZZZ-style angular cut corners */
+.cut { clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); }
+.cut-sm { clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px)); }
+.stripes { background-image: repeating-linear-gradient(-45deg, rgb(var(--p) / .16) 0 6px, transparent 6px 12px); }
+.tv { background-image: repeating-linear-gradient(0deg, rgb(0 0 0 / .12) 0 1px, transparent 1px 3px); }
+@keyframes pop { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+.pop { animation: pop .3s cubic-bezier(.2,.8,.2,1) backwards; }
+::-webkit-scrollbar { width: 8px } ::-webkit-scrollbar-thumb { background: rgb(var(--p) / .5) }
+
+/* Scrollbar tùy chỉnh */
+* { scrollbar-width: thin; scrollbar-color: rgb(var(--p) / .7) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgb(var(--fg) / .05); }
+::-webkit-scrollbar-thumb { background: rgb(var(--p) / .65); border: 2px solid rgb(var(--bg)); }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--p)); }
+html { scroll-behavior: smooth; }
+
+/* Hiệu ứng */
+.shine { position: relative; overflow: hidden; }
+.shine::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 40%, rgb(var(--p) / .28) 50%, transparent 60%); transform: translateX(-120%); transition: transform .7s; pointer-events: none; }
+@media (hover: hover) { .shine:hover::after { transform: translateX(120%); } }
+@keyframes dlg { from { opacity: 0; transform: translateY(20px) scale(.97) } to { opacity: 1; transform: none } }
+@keyframes fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes toast { from { opacity: 0; transform: translateX(32px) skewX(-8deg) } to { opacity: 1; transform: none } }
+@keyframes bar { from { transform: scaleX(1) } to { transform: scaleX(0) } }
+@keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
+.dlg { animation: dlg .28s cubic-bezier(.2,.8,.2,1) backwards; }
+.fade { animation: fade .18s backwards; }
+.toast { animation: toast .28s cubic-bezier(.2,.8,.2,1) backwards; }
+.fab { animation: float 2.4s ease-in-out infinite; }
+.tip { position: fixed; z-index: 100; pointer-events: none; animation: fade .12s backwards; }
+.btn:active { transform: translateY(1px) scale(.97); }
+@media (prefers-reduced-motion: reduce) { *, ::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* Skeleton (shimmer bằng transform nên không gây repaint) */
+.sk { position: relative; overflow: hidden; background: rgb(var(--fg) / .07); }
+.sk::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgb(var(--fg) / .12), transparent); animation: skm 1.3s infinite; }
+@keyframes skm { to { transform: translateX(100%); } }
+.boot { max-width: 1600px; margin: 0 auto; padding: 16px; }
+.boot-bar { height: 56px; margin-bottom: 16px; }
+.boot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.boot-grid .sk { aspect-ratio: 4 / 5.2; }
+
+/* Focus rõ ràng (vẽ bên trong vì nhiều phần tử bị clip-path) */
+:focus-visible { outline: 2px solid rgb(var(--p)); outline-offset: -2px; }
+input:focus-visible { outline: none; }
+::selection { background: rgb(var(--p) / .45); }
