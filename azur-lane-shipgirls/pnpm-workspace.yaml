@@ -1,2 +1,11 @@
+# pnpm >= 10 blocks dependency install scripts unless they are explicitly allowed.
+# esbuild (used by Vite) needs its postinstall step, so it is allow-listed here.
+# Both keys are listed because the name differs between pnpm versions (allowBuilds: pnpm 11+, onlyBuiltDependencies: pnpm 10).
+packages:
+  - '.'
+
 allowBuilds:
-  esbuild: set this to true or false
+  esbuild: true
+
+onlyBuiltDependencies:
+  - esbuild

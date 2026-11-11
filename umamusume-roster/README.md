@@ -47,13 +47,13 @@ React 18 · Tailwind CSS 4 · Vite 6 · vite-plugin-pwa · lucide-react
 ### Getting started
 
 ```bash
-npm install
-npm run dev        # start the dev server
-npm run build      # production build in ./dist
-npm run preview    # preview the production build
+pnpm install
+pnpm dev        # start the dev server
+pnpm build      # production build in ./dist
+pnpm preview    # preview the production build
 ```
 
-Requires Node.js 18 or newer.
+Requires Node.js 18+ and [pnpm](https://pnpm.io) 9+ (`pnpm-workspace.yaml` already allows esbuild's install script, so `ERR_PNPM_IGNORED_BUILDS` does not appear).
 
 ### Project structure
 
@@ -104,10 +104,10 @@ Umamusume Roster tổng hợp **294 nhân vật** của _Umamusume: Pretty Derby
 ### Chạy dự án
 
 ```bash
-npm install
-npm run dev
-npm run build
-npm run preview
+pnpm install
+pnpm dev
+pnpm build
+pnpm preview
 ```
 
 ### Dữ liệu

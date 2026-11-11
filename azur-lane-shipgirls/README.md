@@ -69,13 +69,15 @@
 ## 🚀 Getting started
 
 ```bash
-npm install
+npm install       # or: pnpm install / yarn
 npm run dev       # start the dev server
 npm run build     # production build -> dist/
 npm run preview   # preview the production build
 ```
 
 Requires **Node.js 18+**.
+
+> **pnpm note:** pnpm 10+ blocks dependency build scripts by default. `pnpm-workspace.yaml` already allow-lists `esbuild`, so `pnpm install` works out of the box. If you ever see `ERR_PNPM_IGNORED_BUILDS`, run `pnpm approve-builds` and select `esbuild`.
 
 ### Refreshing the ship data
 
