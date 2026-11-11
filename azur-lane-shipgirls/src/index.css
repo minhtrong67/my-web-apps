@@ -110,3 +110,19 @@ body { margin: 0; font-family: var(--font); color: rgb(var(--fg)); background: r
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+@layer components {
+  .kbd { @apply inline-flex h-6 min-w-6 items-center justify-center rounded border border-line bg-surf2 px-1.5 text-[11px] font-bold text-muted; box-shadow: 0 2px 0 rgb(var(--line)); font-family: inherit; }
+}
+
+@property --ang { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+.rainbow::before { content: ''; position: absolute; inset: 0; z-index: 2; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: conic-gradient(from var(--ang), #f472b6, #facc15, #34d399, #38bdf8, #a78bfa, #f472b6); animation: spinAng 4s linear infinite;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.scene-tint { position: fixed; inset: 0; z-index: -2; pointer-events: none; transition: opacity .6s ease; }
+mark.hl { background: rgb(var(--p) / .32); color: inherit; border-radius: 2px; padding: 0 1px; }
+.anim-up-in { animation: sheetUp .28s cubic-bezier(.2,.8,.2,1) both; }
+.anim-up-out { animation: sheetDown .2s ease-in both; }
+@keyframes spinAng { to { --ang: 360deg; } }
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes sheetDown { to { transform: translateY(100%); } }

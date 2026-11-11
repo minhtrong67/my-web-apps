@@ -1,8 +1,8 @@
 {
-  "name": "azur-lane-characters",
+  "name": "azur-lane-shipgirls",
   "private": true,
   "version": "1.0.0",
-  "description": "Azur Lane shipgirl roster - React, Tailwind CSS, Vite, PWA",
+  "description": "Azur Lane Shipgirls - React, Tailwind CSS, Vite, PWA",
   "type": "module",
   "scripts": {
     "dev": "vite",

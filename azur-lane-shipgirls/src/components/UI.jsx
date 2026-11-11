@@ -6,7 +6,7 @@ import { useI18n } from '../lib/i18n.jsx'
 export const cx = (...a) => a.filter(Boolean).join(' ')
 
 /* ---------- Tooltip ---------- */
-export function Tooltip({ label, children, side = 'top' }) {
+export function Tooltip({ label, children, side = 'top', className = 'inline-flex' }) {
   const ref = useRef(null)
   const timer = useRef(0)
   const [pos, setPos] = useState(null)
@@ -25,7 +25,7 @@ export function Tooltip({ label, children, side = 'top' }) {
   if (!label) return children
   return (
     <>
-      <span ref={ref} className="inline-flex" onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide} onClick={hide}>
+      <span ref={ref} className={className} onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide} onClick={hide}>
         {children}
       </span>
       {pos && createPortal(
@@ -54,23 +54,33 @@ export function Btn({ tone = 'primary', icon: Icon, children, className, ...p })
   )
 }
 
-export function IconBtn({ label, icon: Icon, className, ...p }) {
+export function IconBtn({ label, icon: Icon, className, iconClass, ...p }) {
   return (
     <Tooltip label={label}>
       <button type="button" aria-label={label} {...p} className={cx('icon-btn', className)}>
-        <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+        <Icon className={cx('h-[18px] w-[18px]', iconClass)} aria-hidden="true" />
       </button>
     </Tooltip>
   )
 }
 
 export function Segmented({ value, onChange, options, label }) {
+  const ref = useRef(null)
+  const cur = Math.max(0, options.findIndex((o) => o.value === value))
+  const onKey = (e) => {
+    const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]
+    if (!d) return
+    e.preventDefault()
+    const i = (cur + d + options.length) % options.length
+    onChange(options[i].value)
+    requestAnimationFrame(() => ref.current?.querySelectorAll('[role=radio]')[i]?.focus())
+  }
   return (
-    <div role="radiogroup" aria-label={label} className="seg [&>span]:flex-1 [&>span>button]:w-full">
-      {options.map((o) => {
+    <div ref={ref} role="radiogroup" aria-label={label} onKeyDown={onKey} className="seg [&>span]:flex-1 [&>span>button]:w-full">
+      {options.map((o, i) => {
         const I = o.icon
         const b = (
-          <button key={o.value} type="button" role="radio" aria-checked={o.value === value} aria-label={o.label || o.tip} onClick={() => onChange(o.value)} className={cx('seg-i', o.value === value && 'is-on')}>
+          <button key={o.value} type="button" role="radio" tabIndex={i === cur ? 0 : -1} aria-checked={o.value === value} aria-label={o.label || o.tip} onClick={() => onChange(o.value)} className={cx('seg-i', o.value === value && 'is-on')}>
             {I && <I aria-hidden="true" />}
             {o.label}
           </button>
@@ -78,6 +88,20 @@ export function Segmented({ value, onChange, options, label }) {
         return o.tip ? <Tooltip key={o.value} label={o.tip}>{b}</Tooltip> : b
       })}
     </div>
+  )
+}
+
+export function Switch({ checked, onChange, label, desc }) {
+  return (
+    <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)} className="flex w-full items-center gap-3 rounded-md border border-line bg-surf px-3 py-2.5 text-left transition hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-semibold">{label}</span>
+        {desc && <span className="mt-0.5 block text-xs text-muted">{desc}</span>}
+      </span>
+      <span className={cx('relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200', checked ? 'bg-primary' : 'bg-line')}>
+        <span className={cx('absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200', checked && 'translate-x-5')} />
+      </span>
+    </button>
   )
 }
 
@@ -158,10 +182,12 @@ export function Select({ value, onChange, options, icon: Icon, label, className 
 
 /* ---------- Modal / Sheet ---------- */
 const stack = []
+export const modalOpen = () => stack.length > 0
 const SIZE = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-3xl' }
 
-export function Modal({ open, onClose, title, icon: Icon, footer, children, size = 'md', sheet = false }) {
+export function Modal({ open, onClose, title, icon: Icon, footer, children, size = 'md', sheet = false, variant = 'dialog' }) {
   const { t } = useI18n()
+  const v = sheet ? 'sheet' : variant
   const [render, setRender] = useState(open)
   const [closing, setClosing] = useState(false)
   const panel = useRef(null)
@@ -192,20 +218,30 @@ export function Modal({ open, onClose, title, icon: Icon, footer, children, size
 
   useEffect(() => {
     if (!render || !open) return
-    const k = (e) => { if (e.key === 'Escape' && stack[stack.length - 1] === id.current) onClose() }
+    const k = (e) => {
+      if (stack[stack.length - 1] !== id.current) return
+      if (e.key === 'Escape') { onClose(); return }
+      if (e.key !== 'Tab' || !panel.current) return
+      const f = [...panel.current.querySelectorAll('a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter((el) => el.offsetParent !== null)
+      if (!f.length) { e.preventDefault(); return }
+      const first = f[0], last = f[f.length - 1], a = document.activeElement
+      if (!panel.current.contains(a) || (e.shiftKey && (a === first || a === panel.current))) { e.preventDefault(); (e.shiftKey ? last : first).focus() }
+      else if (!e.shiftKey && a === last) { e.preventDefault(); first.focus() }
+    }
     document.addEventListener('keydown', k)
     return () => document.removeEventListener('keydown', k)
   }, [render, open, onClose])
 
   if (!render) return null
   return createPortal(
-    <div className={cx('fixed inset-0 z-50 flex', !sheet && 'p-3')}>
+    <div className={cx('fixed inset-0 z-50 flex', v === 'dialog' && 'p-3')}>
       <div className={cx('absolute inset-0 bg-black/55 backdrop-blur-sm', closing ? 'anim-fade-out' : 'anim-fade')} onClick={onClose} />
       <div
         ref={panel} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title}
         className={cx(
           'relative flex flex-col overflow-hidden border border-line bg-surf shadow-2xl outline-none',
-          sheet ? cx('ml-auto h-full w-full max-w-md border-y-0 border-r-0', closing ? 'anim-sheet-out' : 'anim-sheet')
+          v === 'sheet' ? cx('ml-auto h-full w-full max-w-md border-y-0 border-r-0', closing ? 'anim-sheet-out' : 'anim-sheet')
+            : v === 'bottom' ? cx('mt-auto max-h-[88%] w-full rounded-t-2xl border-b-0', closing ? 'anim-up-out' : 'anim-up-in')
             : cx('m-auto max-h-full w-full rounded-lg', SIZE[size], closing ? 'anim-pop-out' : 'anim-pop')
         )}
       >

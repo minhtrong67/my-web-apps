@@ -23,7 +23,20 @@ const lum = (c) => {
   const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4 }
   return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2])
 }
-export const onColor = (hex) => (lum(rgb(hex)) > 0.4 ? '#111827' : '#ffffff')
+export const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05) }
+const WHITE = [255, 255, 255], DARK = [17, 24, 39]
+const pickOn = (c) => (contrast(c, WHITE) >= contrast(c, DARK) ? WHITE : DARK)
+export const onColor = (hex) => `rgb(${pickOn(rgb(hex)).join(',')})`
+
+/** Accent text color: nudged toward black/white until it reaches 4.5:1 against the surface. */
+export function inkFor(c, dark) {
+  const surf = dark ? [14, 27, 45] : [255, 255, 255]
+  const to = dark ? WHITE : [0, 0, 0]
+  let a = dark ? 0.12 : 0
+  let ink = mix(c, to, a)
+  while (contrast(ink, surf) < 4.5 && a < 1) { a += 0.08; ink = mix(c, to, a) }
+  return ink
+}
 
 export function applyTheme(s) {
   const root = document.documentElement
@@ -31,8 +44,8 @@ export function applyTheme(s) {
   root.classList.toggle('dark', dark)
   root.style.colorScheme = dark ? 'dark' : 'light'
   const c = rgb(COLORS[s.color] || COLORS['Light Blue'])
-  const ink = dark ? mix(c, [255, 255, 255], 0.25) : mix(c, [0, 0, 0], lum(c) > 0.45 ? 0.62 : 0.3)
-  const on = lum(c) > 0.4 ? [17, 24, 39] : [255, 255, 255]
+  const ink = inkFor(c, dark)
+  const on = pickOn(c)
   root.style.setProperty('--p', c.join(' '))
   root.style.setProperty('--p-ink', ink.join(' '))
   root.style.setProperty('--on-p', on.join(' '))

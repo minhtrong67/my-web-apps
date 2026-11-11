@@ -8,12 +8,12 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Azur Lane Roster',
-        short_name: 'AL Roster',
-        description: 'Azur Lane shipgirl roster with filters, details and export.',
+        name: 'Azur Lane Shipgirls',
+        short_name: 'AL Shipgirls',
+        description: 'Azur Lane Shipgirls: browse, filter, compare and export every shipgirl.',
         theme_color: '#08111e',
         background_color: '#08111e',
         display: 'standalone',
