@@ -17,7 +17,7 @@ lock lock_reset logout mail mark_email_read menu notifications notifications_act
 pause_circle payments person picture_as_pdf pie_chart play_circle qr_code_2 real_estate_agent receipt_long remove restart_alt
 rocket savings schedule search search_off settings shield show_chart space_dashboard star summarize swap_vert sync_alt table_view
 translate trending_down trending_up tune upload_file visibility visibility_off warning wifi_off
-local_cafe storefront location_on add_photo_alternate coffee
+local_cafe storefront location_on add_photo_alternate coffee map content_copy
 zoom_in zoom_out drag_indicator broken_image refresh`.split(/\s+/);
 
 // app name -> Material Symbols file name where they differ

@@ -119,8 +119,10 @@
 ```bash
 git clone <repo-url>
 cd expenser
-npm install
+pnpm install
 ```
+
+> Dự án dùng **pnpm** (cài bằng `npm i -g pnpm` hoặc `corepack enable`). Các script build của dependency (esbuild, @firebase/util…) được khai báo sẵn trong `pnpm-workspace.yaml`, nên không cần chạy `pnpm approve-builds`.
 
 **1. Tạo Firebase project**
 
@@ -150,7 +152,7 @@ VITE_VAPID_PUBLIC_KEY=
 **5. Chạy thử**
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ## 🔔 Nhắc nhở hàng ngày (thông báo đẩy)
@@ -171,7 +173,7 @@ Cả ba dùng chung một `tag` nên mỗi ngày chỉ hiện một thông báo.
 
 ### Bật Web Push trên Vercel
 
-1. Sinh khóa VAPID: `npm run vapid` (in ra *public key* và *private key*).
+1. Sinh khóa VAPID: `pnpm vapid` (in ra *public key* và *private key*).
 2. Đặt `VITE_VAPID_PUBLIC_KEY` (public key) vào `.env` và **Environment Variables** của Vercel.
 3. Thêm các biến **chỉ dùng phía máy chủ** trên Vercel:
 
@@ -197,12 +199,12 @@ Mỗi thiết bị bật nhắc nhở lưu một tài liệu trong collection `r
 
 | Lệnh | Tác dụng |
 | --- | --- |
-| `npm run dev` | Dev server tại `http://localhost:5173` (thêm `-- --host` để mở trên điện thoại cùng mạng LAN). |
-| `npm run build` | Build production vào `dist/` (kèm service worker). |
-| `npm run preview` | Chạy thử bản build. |
-| `npm run lint` | Kiểm tra code bằng oxlint. |
-| `npm run i18n:check` | Kiểm tra mọi khóa dịch có đủ ở `vi.js` và `en.js`. |
-| `npm run vapid` | Sinh cặp khóa VAPID cho thông báo đẩy. |
+| `pnpm dev` | Dev server tại `http://localhost:5173` (thêm `--host` để mở trên điện thoại cùng mạng LAN). |
+| `pnpm build` | Build production vào `dist/` (kèm service worker). |
+| `pnpm preview` | Chạy thử bản build. |
+| `pnpm lint` | Kiểm tra code bằng oxlint. |
+| `pnpm i18n:check` | Kiểm tra mọi khóa dịch có đủ ở `vi.js` và `en.js`. |
+| `pnpm vapid` | Sinh cặp khóa VAPID cho thông báo đẩy. |
 
 **Thêm / sửa văn bản:** mọi chuỗi hiển thị nằm trong [`src/i18n/vi.js`](src/i18n/vi.js) và [`src/i18n/en.js`](src/i18n/en.js). Dùng `const t = useT()` rồi `t('khóa', { n: 3 })`; trong tiếng Anh, khóa kết thúc `_one` là dạng số ít khi `n === 1`.
 
@@ -292,7 +294,7 @@ reminders/{uid}_{hash}   { uid, enabled, time, tz, lang, subscription, lastSentD
 ## 📦 Triển khai
 
 ```bash
-npm run build
+pnpm build
 ```
 
 Triển khai thư mục `dist/` cùng thư mục `api/` lên **Vercel** (đã có `vercel.json`: SPA rewrite, chuyển hướng `/landing.html` → `/welcome`). Nhớ thêm tên miền triển khai vào **Authorized domains** của Firebase Auth. Nếu không dùng Vercel, ứng dụng vẫn chạy tĩnh được (Firebase Hosting, Netlify…) 

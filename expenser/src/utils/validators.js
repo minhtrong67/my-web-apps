@@ -70,6 +70,22 @@ export function validateWallet(form, existingNames, t) {
   return { valid: Object.keys(errors).length === 0, errors };
 }
 
+/** Accepts "https://maps.app.goo.gl/..", "maps.google.com/..", "www.google.com/maps/.." (scheme optional). */
+export function normalizeUrl(v) {
+  const s = typeof v === 'string' ? v.trim() : '';
+  if (!s) return '';
+  return /^[a-z][a-z0-9+.-]*:\/\//i.test(s) ? s : `https://${s}`;
+}
+
+export function isValidHttpUrl(v) {
+  try {
+    const u = new URL(normalizeUrl(v));
+    return (u.protocol === 'http:' || u.protocol === 'https:') && u.hostname.includes('.');
+  } catch {
+    return false;
+  }
+}
+
 export function validateCafeShop(form, existingNames, t) {
   const errors = {};
   const name = trimValue(form.name);
@@ -78,6 +94,11 @@ export function validateCafeShop(form, existingNames, t) {
   else if (existingNames.some((n) => n.toLowerCase() === name.toLowerCase())) errors.name = t('validation.shopExists');
   if (!maxLength(form.address || '', 200)) errors.address = t('validation.addressMax');
   if (!maxLength(form.description || '', 500)) errors.description = t('validation.descriptionMax');
+  const mapUrl = trimValue(form.mapUrl || '');
+  if (mapUrl) {
+    if (mapUrl.length > 1000) errors.mapUrl = t('validation.mapUrlMax');
+    else if (!isValidHttpUrl(mapUrl)) errors.mapUrl = t('validation.mapUrlInvalid');
+  }
   const r = Number(form.rating);
   if (!Number.isFinite(r) || r < 0 || r > 5) errors.rating = t('validation.ratingInvalid');
   return { valid: Object.keys(errors).length === 0, errors };

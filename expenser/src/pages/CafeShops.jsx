@@ -1,15 +1,12 @@
 import { useMemo, useState } from 'react';
 import { notify } from '../utils/notify';
-import Icon from '../components/ui/Icon';
 import TextInput from '../components/ui/TextInput';
 import Fab from '../components/ui/Fab';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import EmptyState from '../components/ui/EmptyState';
-import SwipeableItem, { ItemActions } from '../components/ui/SwipeableItem';
-import { Stars } from '../components/ui/RatingInput';
+import SwipeableItem from '../components/ui/SwipeableItem';
 import { TableSkeleton } from '../components/ui/Skeleton';
-import CafeThumb from '../components/CafeThumb';
-import IconButton from '../components/ui/IconButton';
+import CafeShopCard from '../components/CafeShopCard';
 import CafeShopFormModal from '../components/CafeShopFormModal';
 import { useData } from '../contexts/DataContext';
 import { useI18n } from '../i18n';
@@ -99,31 +96,18 @@ export default function CafeShopsPage() {
           <p className="px-1 text-body-sm text-on-surface-variant">{t('common.swipeHint')}</p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {list.map((s, idx) => (
-              <SwipeableItem key={s.id} className="animate-slide-up" style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }} onEdit={() => openForm(s)} onDelete={() => setDeleteTarget(s)}>
-                <div className="flex items-start gap-3 rounded-2xl bg-surface-container-low p-4 transition-colors duration-200 hover:bg-surface-container">
-                  <CafeThumb src={s.imageUrl} icon="storefront" size={64} zoomable title={s.name} />
-                  <div className="min-w-0 flex-1">
-                    <p className="wrap-any text-title-sm text-on-surface">{s.name}</p>
-                    {s.rating > 0 && <Stars value={s.rating} size={15} />}
-                    {s.address && (
-                      <p className="wrap-any flex items-start gap-1 text-body-sm text-on-surface-variant">
-                        <Icon name="location_on" size={14} className="mt-0.5" />
-                        <span>{s.address}</span>
-                      </p>
-                    )}
-                    {s.description && <p className="wrap-any line-clamp-2 text-body-sm text-on-surface-variant">{s.description}</p>}
-                    <p className="mt-1 text-label-md text-on-surface-variant">{t('cafe.visits', { n: usage.get(s.id) || 0 })}</p>
-                  </div>
-                  <div className="flex shrink-0 flex-col">
-                    {canMove && list.length > 1 && (
-                      <>
-                        <IconButton icon="expand_less" label={t('cafe.moveUp')} size={22} disabled={moving || idx === 0} onClick={() => move(s.id, -1)} className="!h-8 !w-8" />
-                        <IconButton icon="expand_more" label={t('cafe.moveDown')} size={22} disabled={moving || idx === list.length - 1} onClick={() => move(s.id, 1)} className="!h-8 !w-8" />
-                      </>
-                    )}
-                  </div>
-                  <ItemActions onEdit={() => openForm(s)} onDelete={() => setDeleteTarget(s)} />
-                </div>
+              <SwipeableItem key={s.id} rounded="rounded-3xl" className="animate-slide-up" style={{ animationDelay: `${Math.min(idx * 30, 300)}ms` }} onEdit={() => openForm(s)} onDelete={() => setDeleteTarget(s)}>
+                <CafeShopCard
+                  shop={s}
+                  visits={usage.get(s.id) || 0}
+                  canMove={canMove && list.length > 1}
+                  isFirst={idx === 0}
+                  isLast={idx === list.length - 1}
+                  busy={moving}
+                  onMove={(dir) => move(s.id, dir)}
+                  onEdit={() => openForm(s)}
+                  onDelete={() => setDeleteTarget(s)}
+                />
               </SwipeableItem>
             ))}
           </div>

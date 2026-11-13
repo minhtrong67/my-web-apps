@@ -1,0 +1,12 @@
+# pnpm (v10.26+ / v11+) blocks dependency build scripts unless they are decided here.
+# true  = allowed to run its install script, false = deliberately skipped (cosmetic scripts only).
+allowBuilds:
+  esbuild: true # downloads/validates the platform binary used by Vite
+  '@firebase/util': true # postinstall that resolves Firebase's default app config
+  core-js: false # only prints a funding banner
+  protobufjs: false # only checks its version at install time
+
+# Same decision for pnpm 10.x versions that predate `allowBuilds`.
+onlyBuiltDependencies:
+  - esbuild
+  - '@firebase/util'

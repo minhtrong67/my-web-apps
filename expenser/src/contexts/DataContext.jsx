@@ -462,6 +462,7 @@ export function DataProvider({ children }) {
         setDoc(ref, {
           name: p.name.trim(),
           address: (p.address || '').trim(),
+          mapUrl: (p.mapUrl || '').trim(),
           imageUrl: (p.imageUrl || '').trim(),
           description: (p.description || '').trim(),
           rating: Number(p.rating) || 0,
@@ -481,6 +482,7 @@ export function DataProvider({ children }) {
         updateDoc(doc(db, 'users', uid, 'cafeShops', id), {
           name: p.name.trim(),
           address: (p.address || '').trim(),
+          mapUrl: (p.mapUrl || '').trim(),
           imageUrl: (p.imageUrl || '').trim(),
           description: (p.description || '').trim(),
           rating: Number(p.rating) || 0,

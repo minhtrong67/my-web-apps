@@ -1,5 +1,5 @@
 // Verifies that every t('key') used in src/ exists in BOTH dictionaries and
-// that the two dictionaries have the same keys. Run: npm run i18n:check
+// that the two dictionaries have the same keys. Run: pnpm i18n:check
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import vi from '../src/i18n/vi.js';

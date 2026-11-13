@@ -36,6 +36,9 @@ export default function SelectField({ label, value, onChange, children, options:
   const { present, closing } = usePresence(open, 200);
   const triggerRef = useRef(null);
   const listRef = useRef(null);
+  // true only when the highlighted row changed through the keyboard / on open, so hovering or
+  // scrolling the list never yanks it back to the "active" row.
+  const revealRef = useRef(false);
 
   const place = useCallback(() => {
     const el = triggerRef.current;
@@ -46,24 +49,33 @@ export default function SelectField({ label, value, onChange, children, options:
     const above = r.top - 12;
     const wanted = Math.min(MAX_H, options.length * 44 + 12);
     const flip = below < wanted && above > below;
-    setPos({
+    const next = {
       left: r.left,
       width: r.width,
       top: flip ? undefined : r.bottom + 4,
       bottom: flip ? vh - r.top + 4 : undefined,
       maxHeight: Math.max(120, Math.min(MAX_H, flip ? above : below)),
       flip,
-    });
+    };
+    // keep the same object when nothing moved -> no pointless re-render
+    setPos((prev) => (prev && Object.keys(next).every((k) => prev[k] === next[k]) ? prev : next));
   }, [options.length]);
 
   useLayoutEffect(() => {
     if (!open) return undefined;
     place();
+    // Page / ancestor scrolling re-anchors the list under its trigger. Scrolling INSIDE the list
+    // itself must be ignored: it is captured here too and used to re-run the "scroll the active row
+    // into view" effect, which snapped the list back and made it impossible to scroll.
+    const onScroll = (e) => {
+      if (listRef.current && (e.target === listRef.current || listRef.current.contains(e.target))) return;
+      place();
+    };
     window.addEventListener('resize', place);
-    window.addEventListener('scroll', place, true);
+    window.addEventListener('scroll', onScroll, true);
     return () => {
       window.removeEventListener('resize', place);
-      window.removeEventListener('scroll', place, true);
+      window.removeEventListener('scroll', onScroll, true);
     };
   }, [open, place]);
 
@@ -77,13 +89,22 @@ export default function SelectField({ label, value, onChange, children, options:
     return () => document.removeEventListener('pointerdown', onPointerDown);
   }, [open]);
 
-  // Keep the highlighted row visible while moving with the keyboard.
+  // Keep the highlighted row visible while moving with the keyboard (and reveal the selected row on open).
   useEffect(() => {
-    if (!open || active < 0) return;
-    listRef.current?.querySelector(`[data-index="${active}"]`)?.scrollIntoView({ block: 'nearest' });
+    if (!open || active < 0 || !revealRef.current) return;
+    const row = listRef.current?.querySelector(`[data-index="${active}"]`);
+    if (!row) return; // list not mounted yet - try again after it renders
+    row.scrollIntoView({ block: 'nearest' });
+    revealRef.current = false;
   }, [open, active, pos]);
 
+  function moveActive(updater) {
+    revealRef.current = true;
+    setActive(updater);
+  }
+
   function openList() {
+    revealRef.current = true;
     setActive(Math.max(0, selectedIndex));
     setOpen(true);
     onOpen?.();
@@ -104,11 +125,11 @@ export default function SelectField({ label, value, onChange, children, options:
     } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();
       if (!open) openList();
-      else setActive((i) => Math.min(last, Math.max(0, i + (e.key === 'ArrowDown' ? 1 : -1))));
+      else moveActive((i) => Math.min(last, Math.max(0, i + (e.key === 'ArrowDown' ? 1 : -1))));
     } else if (e.key === 'Home' || e.key === 'End') {
       if (open) {
         e.preventDefault();
-        setActive(e.key === 'Home' ? 0 : last);
+        moveActive(e.key === 'Home' ? 0 : last);
       }
     } else if ((e.key === 'Enter' || e.key === ' ') && open) {
       e.preventDefault();
@@ -122,7 +143,7 @@ export default function SelectField({ label, value, onChange, children, options:
       const idx = [...options.slice(from), ...options.slice(0, from)].findIndex((o) => String(o.label).toLowerCase().startsWith(ch));
       if (idx >= 0) {
         const target = (from + idx) % options.length;
-        if (open) setActive(target);
+        if (open) moveActive(target);
         else choose(options[target]);
       }
     }
@@ -159,8 +180,8 @@ export default function SelectField({ label, value, onChange, children, options:
             id={listId}
             role="listbox"
             aria-labelledby={id}
-            style={{ position: 'fixed', left: pos.left, width: pos.width, top: pos.top, bottom: pos.bottom, maxHeight: pos.maxHeight }}
-            className={`z-[70] overflow-y-auto overscroll-contain rounded-2xl border border-outline-variant bg-surface-container-high p-1.5 shadow-elev-3 ${
+            style={{ position: 'fixed', left: pos.left, width: pos.width, top: pos.top, bottom: pos.bottom, maxHeight: pos.maxHeight, WebkitOverflowScrolling: 'touch' }}
+            className={`z-[70] touch-pan-y overflow-y-auto overscroll-contain rounded-2xl border border-outline-variant bg-surface-container-high p-1.5 shadow-elev-3 ${
               pos.flip ? 'origin-bottom' : 'origin-top'
             } ${closing ? 'pointer-events-none animate-menu-out' : 'animate-menu-in'}`}
           >
